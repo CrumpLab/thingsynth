@@ -157,3 +157,114 @@ def main() -> None:
 
 if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- chosen: boing ------------------------------------------------------------------------------------------------
+GREY = '#D2D3D4'
+
+
+def clamp01(u):
+    return max(0.0, min(1.0, u))
+
+
+def ease_out(u):
+    return 1 - (1 - clamp01(u)) ** 3
+
+
+def ease_back(u):
+    """Out-back: overshoots a little and settles, the spring's boing."""
+    u = clamp01(u)
+    c1 = 1.9
+    return 1 + (c1 + 1) * (u - 1) ** 3 + c1 * (u - 1) ** 2
+
+
+def eye_at(cx, cy, r, o, look=(0.0, 0.0)) -> str:
+    """The eye open by o: white ball, iris and pupil, the lid coming down over it from the top (o = 0: half shut, as
+    painted; o = 1: rolled up into a thin crescent), lashes once it is open."""
+    out = outlined(circle(cx, cy, r), '#ffffff', INK)
+    out += outlined(circle(cx + look[0], cy + 12 + look[1], r * 0.48), '#f5d76e', INK * 0.8)
+    out += f'<path d="{circle(cx + look[0], cy + 12 + look[1], r * 0.22)}" fill="#000"/>'
+    out += f'<path d="{circle(cx + look[0] + r * 0.14, cy - r * 0.05 + look[1], r * 0.08)}" fill="#fff"/>'
+    edge = cy + r * (0.05 - 0.75 * o)  # where the lid's lower edge crosses the middle
+    lid = (f'<defs><clipPath id="ball{cx:.0f}{cy:.0f}"><path d="{circle(cx, cy, r)}"/></clipPath></defs>'
+           f'<g clip-path="url(#ball{cx:.0f}{cy:.0f})"><path d="M{p(cx - r * 1.1, cy - r * 1.2)}L{p(cx + r * 1.1, cy - r * 1.2)}'
+           f'L{p(cx + r * 1.1, edge - r * 0.1)}C{p(cx + r * 0.5, edge + r * 0.25)} {p(cx - r * 0.5, edge + r * 0.25)} {p(cx - r * 1.1, edge - r * 0.1)}Z" '
+           f'fill="{LID}" stroke="#000" stroke-width="{INK}"/></g>')
+    out += lid + f'<path d="{circle(cx, cy, r)}" fill="none" stroke="#000" stroke-width="{INK}"/>'
+    if o > 0.7:
+        k = (o - 0.7) / 0.3
+        for j in range(-2, 3):
+            a = math.radians(-90 + j * 26)
+            x1, y1 = cx + math.cos(a) * r * 0.98, cy + math.sin(a) * r * 0.98
+            x2, y2 = cx + math.cos(a) * r * (1 + 0.38 * k), cy + math.sin(a) * r * (1 + 0.38 * k)
+            nx, ny = -math.sin(a) * 9, math.cos(a) * 9
+            out += outlined(f'M{p(x1 - nx, y1 - ny)}L{p(x2, y2)}L{p(x1 + nx, y1 + ny)}Z', '#000', 6)
+    return out
+
+
+def boing_frame(t: float) -> Image.Image:
+    """Percussion at t: the eye opens in place (0..0.25), springs out on its coil with an overshoot (0.2..0.8), and
+    the motion lines flick out last (0.65..1)."""
+    if t <= 0:
+        return m.compose()
+    bx, by = EYE
+    tx, ty = bx + 120, by - 330
+    o = ease_out(t / 0.25)
+    e = ease_back((t - 0.2) / 0.6)
+    ex, ey = bx + (tx - bx) * e, by + (ty - by) * e
+    out = ''
+    # the nub on the creature where the eye sat, and the coil from it to the eye
+    nub = outlined(ellipse(bx, by + 2, 108, 126), GREY, INK)  # an empty grey cup over the eye's old footprint
+    out += nub
+    if e > 0.02:
+        coil = []
+        turns = 8 * max(0.2, abs(e))
+        for i in range(80):
+            u = i / 79
+            coil.append((bx + (ex - bx) * u + 45 * math.sin(u * math.pi * turns), by + 20 + (ey - by - 20) * u))
+        d = 'M' + 'L'.join(p(*q) for q in coil)
+        out += (f'<path d="{d}" fill="none" stroke="#000" stroke-width="{INK * 2.2}" stroke-linecap="round" stroke-linejoin="round"/>'
+                f'<path d="{d}" fill="none" stroke="{LOWER}" stroke-width="{INK}" stroke-linecap="round" stroke-linejoin="round"/>')
+    lg = ease_out((t - 0.65) / 0.35)
+    if lg > 0.02:
+        out += swoosh(ex, ey, 190, 110, 110 + 40 * lg, 30 * lg) + swoosh(ex, ey, 190, 70 - 40 * lg, 70, 30 * lg)
+    out += eye_at(ex, ey, R, o, look=(10 * o, -6 * o))
+    return m.compose(front=out, **hide_eye())
+
+
+def boing_main() -> None:
+    out = OUT.parent / 'boing'
+    out.mkdir(parents=True, exist_ok=True)
+    boing_frame(1.0).save(out / 'end-frame.png')
+    frames = [0, 0.25, 0.5, 0.75, 1.0]
+    tiles = [boing_frame(t) for t in frames]
+    w, h = tiles[0].size
+    sc = 0.42
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * 5 + 60, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (tt, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {tt:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    import shutil
+    import subprocess
+    tmp = out / '_frames'
+    tmp.mkdir(exist_ok=True)
+    seq = [k / 24 for k in range(25)] + [k / 24 for k in range(23, 0, -1)]
+    for i, tt in enumerate(seq):
+        boing_frame(tt).convert('RGB').resize((520, round(520 * h / w)), Image.LANCZOS).save(tmp / f'{i:03d}.png')
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', '12', '-i', str(tmp / '%03d.png'), '-vf',
+                    'split[a][b];[a]palettegen=max_colors=192[p];[b][p]paletteuse=dither=bayer:bayer_scale=4', '-loop', '0',
+                    str(out / 'sweep.gif')], check=True)
+    shutil.rmtree(tmp)
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'boing' in __import__('sys').argv[1:]:
+    boing_main()
