@@ -121,19 +121,49 @@ hit area is its own outline, not a rectangle).
   "regions": [ ... ] }
 ```
 
-The value drawn is the parameter's position in `range` through `curve` (0..1), so a drag, a preset or MIDI all
-move the picture. Effects (`web/src/effects.ts`), at amount 1 and value 1:
+A binding names either an `object` from objects.json or a single fill as `"part": "f006"`, and either a `param`
+(with `range` and `curve`) or a `note`. Optional: `gesture`, `glide` (ms the picture takes to follow, default 150;
+1500 makes a rotor spin up and brake), and for notes `release` (ms after note-off, default 300).
 
-| effect | on | what it does |
-| --- | --- | --- |
-| `glow` | fills | OKLCH chroma +0.09, deepened by up to 0.18 lightness only as far as needed to hold that chroma (pastels near white have no room for it otherwise), opacity 60% of the way to solid |
-| `hue` | fills | turns the hue by 60 degrees (negative amounts turn the other way) |
-| `boil` | ink | every outline stroke jitters by up to 10 canvas px and 0.6 degrees about its centre, re-drawn 8 times a second; still at 0 |
+```jsonc
+{ "id": "curl-rotor", "object": "spiral-curl", "param": "leslie.speed", "range": [0, 2], "curve": "linear",
+  "gesture": "tap", "glide": 1500, "effects": [ { "effect": "spin" } ] }
+{ "id": "note-64", "part": "f119", "note": 64, "gesture": "hold",          // hold: plays while pressed; tap: briefly
+  "effects": [ { "effect": "glow", "amount": 1.3 }, { "effect": "hue", "amount": 0.25 }, { "effect": "boil", "amount": 0.6 } ] }
+```
 
-Values glide (150 ms, 400 ms after a preset load). Several bindings may touch the same fill or stroke: hue turns
-and glows add up, boils take the largest. Fill ids (`f001`..) and ink ids (`i0001`..) come from the extractor
-and are stable as long as the PSD's drawing does not change; `?debug`'s parts mode (backquote) shows the id of
-the shape under the pointer.
+The value drawn is a parameter's position in `range` through `curve` (0..1), so a drag, a preset or MIDI all
+move the picture; for a note it is an envelope, velocity/127 with a 10 ms attack and back to 0 over `release`.
+Effects (`web/src/effects.ts`), at amount 1 and value 1; every effect takes optional `parts` (a role or list of
+roles) and `amount`:
+
+| effect | on | what it does | options |
+| --- | --- | --- | --- |
+| `glow` | fills | more vivid and more solid: OKLCH chroma +0.09; light colours deepen only as far as needed to hold it, mid and dark colours lift towards light; opacity 60% of the way to solid | |
+| `hue` | fills | turns the hue by 60 degrees (negative turns the other way) | |
+| `fill` | fills | a vivid copy of the shape rises from an edge, like a drawbar pulled out | `from`: bottom, top, left, right |
+| `scribble` | fills | pencil loops in a deeper shade of the shape's colour draw themselves in, clipped to it | `count` (default 14) |
+| `boil` | ink | every outline stroke jitters by up to 10 canvas px and 0.6 degrees, re-drawn 8 times a second; still at 0 | |
+| `pulse` | object | breathes: scale about its centre by up to 5% | `hz` (default 0.6) |
+| `wobble` | object | heat-shimmer sway (10 px) and skew (2 degrees) | `hz` (default 1.6) |
+| `spin` | object | turns about its centre at up to 0.75 rev/s; it stops where it is | |
+| `blink` | object | squashes to 12% height and back in 160 ms, on note-on or when the value rises past half | |
+
+"Object" effects move the object's fills together with the ink strokes enclosed by it (`ownInk`), leaving the
+borders it shares with neighbours in place. The painting is redrawn at most 30 times a second: every change inside
+the art SVG re-rasterises the whole painting, and at the display's 120 Hz that backed up into long frames.
+
+Values glide (150 ms, or the binding's `glide`). A preset load travels across the painting as a wave from its
+centre (up to 450 ms of delay at the corners) with 400 ms glides. Several bindings may touch the same fill or
+stroke: hue turns and glows add up, boils take the largest, motions compose. For a minute after anything is
+played or touched, unbound scenery idles: 40 mid-sized shapes drift in hue by up to 7 degrees, the pencil-scribble
+layer breathes by 6 px, and blinking objects blink now and then; then it fades out over 2 s. With the system's
+reduced-motion setting on, boil, pulse, wobble, spin, blink and idle are off; colours and reveals still follow.
+
+Fill ids (`f001`..) and ink ids (`i0001`..) come from the extractor and are stable as long as the PSD's drawing does
+not change; `?debug`'s parts mode (backquote) shows the id of the shape under the pointer. The parts table also
+records how much of each fill is visible (`visible`, `visibleArea`): shapes sit inside their ink lines, so almost
+all are 98-99% visible; 10 of 312 are fully hidden and should not be bound.
 
 Possible later additions (not implemented): `"params": [...]`
 to fan one gesture out to several parameters, `"relative": true` for drags that nudge from the current value
@@ -273,7 +303,8 @@ layer, 3 MB of WebP, is the largest piece). Nothing is deployed yet.
 
 [docs/animation-layer-plan.md](docs/animation-layer-plan.md) (approved 2026-10-24) rebuilds the painting from
 the PSD's vector layers and animates its own fill shapes and ink strokes so the 47 parameters and 88 notes each
-own something visible. Milestones 1 and 2 are done: `tools/extract_psd.py` exports the layers into
+own something visible. Milestones 1 to 3 are done: `tools/extract_psd.py` exports the layers into
 `art/<slug>/layers/`, the page draws the painting from them, `?debug` has a parts mode for picking shapes, and
-mapping.json v2 binds the golden pyramid to Drive with glow, hue and boil (section 3.1). Next is milestone 3,
-the rest of the effect vocabulary and the note parts.
+mapping.json v2 binds objects and single parts to parameters and notes with nine effects (section 3.1). The
+current mapping is a demo: 8 parameters on 8 objects and the 17 computer-keyboard notes on small shapes. Next is
+milestone 4, the proposal for all 47 parameters and 88 notes, and shuffle.

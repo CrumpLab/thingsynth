@@ -1,7 +1,7 @@
 # Animation layer: plan for review
 
 *Written 2026-10-24, revised the same day after reading the PSD, approved by Matt the same day.
-Status: milestones 1 and 2 done (see section 6).*
+Status: milestones 1 to 3 done (see section 6).*
 
 ## 0. In one paragraph
 
@@ -233,7 +233,32 @@ shuffle:
      belong to the pyramid's hit area: they will be their own objects.
    - Glides use real elapsed time, so a throttled tab catches up instead of crawling; a background tab applies
      values immediately.
-3. **Vocabulary**: the rest of the effects, note parts, envelopes, transitions, idle.
+3. **Vocabulary** (done 2026-10-24): fill, pulse, wobble, scribble, spin and blink join glow, hue and boil;
+   note bindings with velocity envelopes and play-on-touch; bindings on single parts (`"part": "f006"`);
+   per-binding glide; the preset wave; idle; reduced motion. Constants and schema are in PLAN.md section 3.1. The
+   demo mapping binds Drive (pyramid: hue, glow, boil), the 16' and 5 1/3' drawbars (the two green stalks: fill),
+   rotor speed (the spiral curl: spin, 1.5 s glide), expression (the worm on the pyramid: pulse), upper vibrato on
+   (the stream: wobble), wheel age (the cloud: scribble), percussion (the purple-lidded eye: blink), and notes 60
+   to 76 on 17 small shapes picked by the planned rule (farthest-point spread, bigger shape = lower note).
+   Findings:
+   - Measured in the browser: drawbar fill heights land exactly on n/8 of the shape; scribble strokes drawn match
+     value x count; spin runs at 135 deg/s at Slow and 270 at Fast and coasts to a stop; pulse breathes +-5%;
+     wobble only while vibrato is on; blink squashes to 13% and back in ~160 ms; a note colours its shape within
+     120 ms and returns to the exact painted colour after release; a preset load reaches the pyramid after ~180 ms
+     and the far corner after ~400 ms.
+   - Glow on mid and dark colours originally darkened them (a green went to #00540E); glow now lifts mid and dark
+     colours towards light and only deepens light ones. The drawbar fill uses the same glowing colour.
+   - Performance: with everything moving at once (fast rotor, boiling pyramid, breathing worm, wobbling stream,
+     idle, a six-note chord) the median frame stayed at 120 fps but 2-3 frames per 3 s took 130-140 ms. Long-frame
+     attribution showed no script and ~1 ms of style and render: the time is the browser re-rasterising the one big
+     art layer on every change. Writes are now capped at 30 Hz. This could not be re-measured: the app window was
+     covered and the browser throttled the page to 1 fps. Re-measure with the window visible; if hitches remain,
+     the next step is moving animated objects into their own layer (an overlay SVG holding the object and the
+     later shapes and ink that overlap it).
+   - The extractor now records each fill's visible share. Shapes sit inside their ink, so almost all are 98-99%
+     visible; 10 of 312 are fully hidden.
+   - Parameter changes count as activity for idle only once audio runs, so the boot-time preset load does not
+     start idle.
 4. **Objects and bindings**: grouping, names, the proposal for all 47 + 88, the bind editor; Matt's review.
 5. **Polish**: line boil quality, scribble style tuned against the real scribbles, phone performance, a
    recorded demo.

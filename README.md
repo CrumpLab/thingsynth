@@ -45,7 +45,7 @@ web/                    Vite app, plain TypeScript, no framework
   src/painting.ts       the art + an SVG hit layer in image-pixel coordinates, gesture handling
   src/mapping.ts        mapping.json schema (v1 regions, v2 bindings), validation, value curves
   src/objects.ts        art/<slug>/objects.json resolved against the parts table
-  src/effects.ts        glow, hue and boil on the painting's own paths, driven by parameter values
+  src/effects.ts        the nine effects, note envelopes, the preset wave and idle, on the painting's own paths
   src/color.ts          OKLCH colour math with darken-first gamut mapping
   src/debug.ts          ?debug overlay, HUD and region editor
   runtime/              copy of SynthLand's web runtime (do not edit here)

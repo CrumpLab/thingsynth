@@ -35,7 +35,7 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
   coords.className = 'coords';
   const table = document.createElement('table');
   const rows = new Map<string, HTMLTableCellElement>();
-  const mapped = Array.from(new Set([...mapping.regions, ...mapping.bindings].map((r) => r.param)));
+  const mapped = Array.from(new Set([...mapping.regions, ...mapping.bindings].flatMap((r) => ('param' in r ? [r.param] : []))));
   for (const id of mapped) {
     const tr = document.createElement('tr');
     const name = document.createElement('td');
@@ -50,7 +50,17 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
   help.innerHTML = 'click: log image px to console &middot; shift+click: add polygon point &middot; Enter: print entry &middot; Backspace/Esc: undo/clear &middot; <b>`</b>: parts mode';
   const partLine = document.createElement('div');
   partLine.className = 'part';
-  hud.append(coords, partLine, table, help);
+  const liveLine = document.createElement('div');
+  liveLine.className = 'live';
+  hud.append(coords, partLine, liveLine, table, help);
+  if (effects) {
+    const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const noteName = (n: number): string => `${names[n % 12]}${Math.floor(n / 12) - 1}`;
+    window.setInterval(() => {
+      const held = effects.notes();
+      liveLine.textContent = `notes: ${held.length ? held.map(noteName).join(' ') : '-'} · idle ${effects.idle() ? 'on' : 'off'}`;
+    }, 150);
+  }
   document.body.append(hud);
 
   const fmt = (id: string, v: number): string => {

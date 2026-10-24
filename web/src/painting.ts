@@ -8,9 +8,10 @@
 import type { WebSynthlandHost } from '../runtime/types';
 import type { Art } from './art';
 import { layers } from './art';
-import type { ArtObject } from './objects';
+import { resolveObject, type ArtObject } from './objects';
 import {
-  axisPosition, boundingBox, shapePoints, tapNext, valueAt, type Binding, type Box, type Control, type Mapping, type Point,
+  axisPosition, boundingBox, shapePoints, tapNext, valueAt, type Binding, type Box, type Control, type Mapping,
+  type NoteBinding, type Point,
 } from './mapping';
 
 const SVG = 'http://www.w3.org/2000/svg';
@@ -29,8 +30,10 @@ export interface PaintingLayer {
   art: Art;
   /** Screen (client) coordinates -> image pixels. */
   toImage(clientX: number, clientY: number): Point;
-  /** Every control, regions first then bindings, in mapping order. Binding shapes arrive once `ready` resolves. */
+  /** Every parameter control, regions first then bindings, in mapping order. Binding shapes arrive with `ready`. */
   controls: ControlShape[];
+  /** Note bindings with a gesture: the object plays its note when touched. */
+  notePads: Array<{ binding: NoteBinding; el: SVGGraphicsElement; box: Box }>;
   /** Resolves when every control's hit shape is in place. */
   ready: Promise<void>;
   /** Called with the control and the value just sent to the host. */
@@ -73,6 +76,7 @@ export function mountPainting(
   };
 
   const controls: ControlShape[] = [];
+  const notePads: PaintingLayer['notePads'] = [];
   for (const entry of mapping.regions) {
     const el = document.createElementNS(SVG, 'polygon');
     el.setAttribute('points', shapePoints(entry.region).map(([x, y]) => `${x},${y}`).join(' '));
@@ -88,9 +92,8 @@ export function mountPainting(
   const ready = art.ready.catch(() => undefined).then(() => {
     for (const binding of mapping.bindings) {
       if (!binding.gesture) continue;
-      const obj = objects.get(binding.object);
-      if (!obj) { console.warn(`[thingsynth] binding "${binding.id}" names unknown object "${binding.object}"`); continue; }
-      const control: Control = { ...binding, gesture: binding.gesture };
+      const obj = resolveObject(objects, binding.object);
+      if (!obj) continue; // main.ts warns
       const g = document.createElementNS(SVG, 'g');
       g.setAttribute('transform', `scale(${k})`);
       const ds = obj.fills.map((id) => art.fills.get(id)?.getAttribute('d')).filter((d): d is string => !!d);
@@ -107,16 +110,47 @@ export function mountPainting(
         r.setAttribute('x', String(x)); r.setAttribute('y', String(y)); r.setAttribute('width', String(w)); r.setAttribute('height', String(h));
         g.append(r);
       }
-      label(g, control);
       svg.append(g);
       const [x, y, w, h] = obj.bbox;
       const box: Box = { x: x * k, y: y * k, w: Math.max(1, w * k), h: Math.max(1, h * k) };
+      if (binding.kind === 'note') {
+        g.classList.add('region', 'note-pad', `g-${binding.gesture}`);
+        g.dataset.id = binding.id;
+        notePads.push({ binding, el: g, box });
+        bindNote(g, binding, host);
+        continue;
+      }
+      const control: Control = { id: binding.id, gesture: binding.gesture, param: binding.param, range: binding.range, curve: binding.curve };
+      if (binding.label) control.label = binding.label;
+      if (binding.step !== undefined) control.step = binding.step;
+      label(g, control);
       controls.push({ control, el: g, box, binding });
       bindGesture(g, control, box, toImage, send, () => desc(control.param), host);
     }
   });
 
-  return { svg, art, toImage, controls, ready, onChange: (cb) => { listeners.push(cb); } };
+  return { svg, art, toImage, controls, notePads, ready, onChange: (cb) => { listeners.push(cb); } };
+}
+
+/** A note binding's object as a pad: hold sounds while pressed, tap sounds for a moment. */
+function bindNote(el: SVGElement, binding: NoteBinding, host: WebSynthlandHost): void {
+  el.addEventListener('pointerdown', (ev) => {
+    if (ev.button !== 0 || ev.shiftKey) return;
+    void host.audio.start().catch(() => undefined);
+    host.noteOn(binding.note, 100);
+    if (binding.gesture === 'tap') {
+      window.setTimeout(() => host.noteOff(binding.note), 220);
+      return;
+    }
+    el.setPointerCapture(ev.pointerId);
+    const release = (): void => {
+      host.noteOff(binding.note);
+      el.removeEventListener('pointerup', release);
+      el.removeEventListener('pointercancel', release);
+    };
+    el.addEventListener('pointerup', release);
+    el.addEventListener('pointercancel', release);
+  });
 }
 
 function bindGesture(

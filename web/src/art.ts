@@ -34,6 +34,8 @@ export interface Art {
   /** Fill and ink paths by id (empty in flat mode). */
   fills: Map<string, SVGPathElement>;
   ink: Map<string, SVGPathElement>;
+  /** The groups and images of the stack (null in flat mode), for effects that add or move layers. */
+  stack: { fills: SVGGElement; ink: SVGGElement; scribbles: SVGImageElement; defs: SVGDefsElement } | null;
   flat: boolean;
 }
 
@@ -85,7 +87,7 @@ export function buildArt(flat: boolean): Art {
       img.addEventListener('load', () => resolve(), { once: true });
       img.addEventListener('error', () => resolve(), { once: true });
     });
-    return { el: img, ready, fills, ink, flat: true };
+    return { el: img, ready, fills, ink, stack: null, flat: true };
   }
 
   const [W, H] = layers.canvas;
@@ -119,5 +121,5 @@ export function buildArt(flat: boolean): Art {
       console.warn(`[thingsynth] expected ${layers.counts.fills} fills and ${layers.counts.ink} ink paths, got ${fills.size} and ${ink.size}`);
     }
   });
-  return { el: svg, ready, fills, ink, flat: false };
+  return { el: svg, ready, fills, ink, stack: { fills: fillsG, ink: inkG, scribbles, defs }, flat: false };
 }

@@ -31,23 +31,51 @@ export interface RegionEntry extends Control {
   region: RegionShape;
 }
 
-export type EffectKind = 'glow' | 'hue' | 'boil';
-export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'boil'];
+export type EffectKind = 'glow' | 'hue' | 'boil' | 'fill' | 'pulse' | 'wobble' | 'scribble' | 'spin' | 'blink';
+export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'boil', 'fill', 'pulse', 'wobble', 'scribble', 'spin', 'blink'];
+export type FillFrom = 'bottom' | 'top' | 'left' | 'right';
 
 export interface EffectSpec {
   effect: EffectKind;
-  /** Roles from the object's `parts` to apply to (fill effects); omitted = every fill of the object. */
+  /** Roles from the object's `parts` to apply to; omitted = every fill of the object. */
   parts?: string[];
-  /** Strength, 1 = the effect's full designed range; negative reverses hue direction. */
+  /** Strength, 1 = the effect's full designed range; negative reverses hue and spin direction. */
   amount: number;
+  /** pulse, wobble: cycles per second (defaults 0.6 and 1.6). */
+  hz?: number;
+  /** fill: the edge the colour rises from (default bottom). */
+  from?: FillFrom;
+  /** scribble: how many pencil strokes at full value (default 14). */
+  count?: number;
+}
+
+interface BindingBase {
+  id: string;
+  label?: string;
+  /** An object id from objects.json, or "#fNNN" when the mapping named a single `part`. */
+  object: string;
+  /** param bindings: tap | drag-x | drag-y | hold | hover. note bindings: tap | hold (plays the note). */
+  gesture?: Gesture;
+  effects: EffectSpec[];
+  /** How long the picture takes to follow a change, ms (default 150; e.g. 1500 for a rotor spinning up). */
+  glide?: number;
 }
 
 /** v2: an object of the painting bound to a parameter. Without `gesture` it only shows the value. */
-export interface Binding extends Omit<Control, 'gesture'> {
-  object: string;
-  gesture?: Gesture;
-  effects: EffectSpec[];
+export interface ParamBinding extends BindingBase, Omit<Control, 'gesture' | 'id' | 'label'> {
+  kind: 'param';
 }
+
+/** v2: an object of the painting bound to a note: it shows the note's envelope (velocity, then release). */
+export interface NoteBinding extends BindingBase {
+  kind: 'note';
+  /** MIDI note number, 21..108 on a piano. */
+  note: number;
+  /** Release time in ms after note-off (default 300). */
+  release: number;
+}
+
+export type Binding = ParamBinding | NoteBinding;
 
 export interface Mapping {
   schema: 'thingsynth.mapping/1' | 'thingsynth.mapping/2';
@@ -109,8 +137,16 @@ function parseBinding(raw: unknown, i: number): Binding {
   const where = `bindings[${i}]`;
   if (!raw || typeof raw !== 'object') fail(where, 'not an object');
   const r = raw as Record<string, unknown>;
-  if (typeof r.object !== 'string' || !r.object) fail(where, 'object must be an id from objects.json');
+  const hasObject = typeof r.object === 'string' && r.object !== '';
+  const hasPart = typeof r.part === 'string' && /^f\d+$/.test(r.part);
+  if (hasObject === hasPart) fail(where, 'give exactly one of "object" (an id from objects.json) or "part" (a fill id like "f006")');
+  const object = hasObject ? (r.object as string) : `#${r.part as string}`;
+  if (typeof r.object === 'string' && r.object.startsWith('#')) fail(where, 'object ids may not start with "#"');
+  const isNote = r.note !== undefined;
+  if (isNote === (r.param !== undefined)) fail(where, 'give exactly one of "param" or "note"');
   if (r.gesture !== undefined && !GESTURES.includes(r.gesture as Gesture)) fail(where, `gesture must be one of ${GESTURES.join(', ')}`);
+  if (isNote && r.gesture !== undefined && r.gesture !== 'tap' && r.gesture !== 'hold') fail(where, 'a note binding\'s gesture is tap or hold');
+  if (r.glide !== undefined && (typeof r.glide !== 'number' || r.glide < 0)) fail(where, 'glide must be milliseconds >= 0');
   if (!Array.isArray(r.effects)) fail(where, 'effects must be an array (may be empty)');
   const effects = r.effects.map((e, k): EffectSpec => {
     const w = `${where}.effects[${k}]`;
@@ -118,6 +154,18 @@ function parseBinding(raw: unknown, i: number): Binding {
     const o = e as Record<string, unknown>;
     if (!EFFECTS.includes(o.effect as EffectKind)) fail(w, `effect must be one of ${EFFECTS.join(', ')}`);
     const spec: EffectSpec = { effect: o.effect as EffectKind, amount: typeof o.amount === 'number' ? o.amount : 1 };
+    if (o.hz !== undefined) {
+      if (typeof o.hz !== 'number' || o.hz <= 0) fail(w, 'hz must be a positive number');
+      spec.hz = o.hz;
+    }
+    if (o.from !== undefined) {
+      if (!['bottom', 'top', 'left', 'right'].includes(o.from as string)) fail(w, 'from must be bottom, top, left or right');
+      spec.from = o.from as FillFrom;
+    }
+    if (o.count !== undefined) {
+      if (typeof o.count !== 'number' || o.count < 1 || o.count > 64) fail(w, 'count must be 1..64');
+      spec.count = Math.round(o.count);
+    }
     if (o.parts !== undefined) {
       const parts = typeof o.parts === 'string' ? [o.parts] : o.parts;
       if (!Array.isArray(parts) || !parts.every((x) => typeof x === 'string')) fail(w, 'parts must be a role name or a list of them');
@@ -125,8 +173,16 @@ function parseBinding(raw: unknown, i: number): Binding {
     }
     return spec;
   });
-  const b: Binding = { ...parseCommon(r, where, i), object: r.object, effects };
+  let b: Binding;
+  if (isNote) {
+    if (typeof r.note !== 'number' || !Number.isInteger(r.note) || r.note < 0 || r.note > 127) fail(where, 'note must be a MIDI note number 0..127');
+    if (r.release !== undefined && (typeof r.release !== 'number' || r.release < 0)) fail(where, 'release must be milliseconds >= 0');
+    b = { kind: 'note', id: typeof r.id === 'string' && r.id ? r.id : `note-${r.note}#${i}`, object, note: r.note,
+      release: typeof r.release === 'number' ? r.release : 300, effects };
+    if (typeof r.label === 'string') b.label = r.label;
+  } else b = { kind: 'param', ...parseCommon(r, where, i), object, effects };
   if (r.gesture !== undefined) b.gesture = r.gesture as Gesture;
+  if (typeof r.glide === 'number') b.glide = r.glide;
   return b;
 }
 

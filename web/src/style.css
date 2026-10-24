@@ -57,6 +57,7 @@ body.parts-mode #stage .hits { pointer-events: none; }
 body.parts-mode .region, body.parts-mode .region-label { opacity: 0.25; pointer-events: none; }
 .part-hilite { fill: rgba(80, 220, 255, 0.25); stroke: #50dcff; stroke-width: 3; vector-effect: non-scaling-stroke; pointer-events: none; }
 #hud .part { color: #9effa0; min-height: 1.5em; }
+#hud .live { color: #ffd27a; }
 
 /* v2 object controls: the hit shape is the object's own outline; debug shows the outline only, so the
    effects on the painting stay visible underneath */

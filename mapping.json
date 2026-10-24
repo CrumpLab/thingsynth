@@ -1,7 +1,10 @@
 {
   "schema": "thingsynth.mapping/2",
   "image": "art/golden-pyramid-with-tunnel-celebration/golden-pyramid-with-tunnel-celebration.jpg",
-  "size": [2475, 2475],
+  "size": [
+    2475,
+    2475
+  ],
   "defaultPreset": "jazz-trio",
   "bindings": [
     {
@@ -9,34 +12,526 @@
       "label": "The golden pyramid: drag across it for Drive; it heats towards red, deepens and its lines boil",
       "object": "golden-pyramid",
       "param": "amp.drive",
-      "range": [0, 1],
+      "range": [
+        0,
+        1
+      ],
       "curve": "linear",
       "gesture": "drag-x",
       "effects": [
-        { "effect": "hue", "amount": -0.3 },
-        { "effect": "glow", "amount": 1 },
-        { "effect": "boil", "amount": 1 }
+        {
+          "effect": "hue",
+          "amount": -0.3
+        },
+        {
+          "effect": "glow",
+          "amount": 1
+        },
+        {
+          "effect": "boil",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "stalk-drawbar-16",
+      "label": "The left stalk: drag up and down for the Upper 16' drawbar; it fills like a drawbar pulled out",
+      "object": "stalk-left",
+      "param": "upper.db1",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "stalk-drawbar-513",
+      "label": "The right stalk: drag up and down for the Upper 5 1/3' drawbar",
+      "object": "stalk-right",
+      "param": "upper.db2",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "curl-rotor",
+      "label": "The spiral curl is the rotor: tap to cycle Stop, Slow, Fast; it spins up and brakes",
+      "object": "spiral-curl",
+      "param": "leslie.speed",
+      "range": [
+        0,
+        2
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "glide": 1500,
+      "effects": [
+        {
+          "effect": "spin",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "worm-expression",
+      "label": "The worm breathes with Expression: drag up and down",
+      "object": "pyramid-worm",
+      "param": "amp.expression",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "pulse",
+          "amount": 1
+        },
+        {
+          "effect": "glow",
+          "amount": 0.4
+        }
+      ]
+    },
+    {
+      "id": "stream-vibrato",
+      "label": "The stream shimmers while vibrato is on for the upper manual: tap to switch",
+      "object": "stream",
+      "param": "vib.upper",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "glide": 300,
+      "effects": [
+        {
+          "effect": "wobble",
+          "amount": 1
+        },
+        {
+          "effect": "hue",
+          "parts": "water",
+          "amount": 0.3
+        }
+      ]
+    },
+    {
+      "id": "cloud-age",
+      "label": "The cloud fills with pencil scribbles as the wheels age: drag across it",
+      "object": "cloud",
+      "param": "tg.age",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "drag-x",
+      "effects": [
+        {
+          "effect": "scribble",
+          "count": 18
+        }
+      ]
+    },
+    {
+      "id": "eye-percussion",
+      "label": "The eye: tap to switch percussion; it blinks awake and its lid glows",
+      "object": "bottom-eye",
+      "param": "perc.on",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "effects": [
+        {
+          "effect": "blink",
+          "amount": 1
+        },
+        {
+          "effect": "glow",
+          "parts": "lid",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "note-60",
+      "label": "C4: hold to play",
+      "part": "f175",
+      "note": 60,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-61",
+      "label": "C#4: hold to play",
+      "part": "f291",
+      "note": 61,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-62",
+      "label": "D4: hold to play",
+      "part": "f252",
+      "note": 62,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-63",
+      "label": "D#4: hold to play",
+      "part": "f310",
+      "note": 63,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-64",
+      "label": "E4: hold to play",
+      "part": "f119",
+      "note": 64,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-65",
+      "label": "F4: hold to play",
+      "part": "f133",
+      "note": 65,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-66",
+      "label": "F#4: hold to play",
+      "part": "f102",
+      "note": 66,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-67",
+      "label": "G4: hold to play",
+      "part": "f056",
+      "note": 67,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-68",
+      "label": "G#4: hold to play",
+      "part": "f285",
+      "note": 68,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-69",
+      "label": "A4: hold to play",
+      "part": "f203",
+      "note": 69,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-70",
+      "label": "A#4: hold to play",
+      "part": "f199",
+      "note": 70,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-71",
+      "label": "B4: hold to play",
+      "part": "f215",
+      "note": 71,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-72",
+      "label": "C5: hold to play",
+      "part": "f091",
+      "note": 72,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-73",
+      "label": "C#5: hold to play",
+      "part": "f050",
+      "note": 73,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-74",
+      "label": "D5: hold to play",
+      "part": "f043",
+      "note": 74,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-75",
+      "label": "D#5: hold to play",
+      "part": "f023",
+      "note": 75,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-76",
+      "label": "E5: hold to play",
+      "part": "f008",
+      "note": 76,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
       ]
     }
   ],
-  "regions": [
-    {
-      "id": "placeholder-drawbar",
-      "label": "Placeholder: drag up/down for the Upper 16' drawbar",
-      "region": { "polygon": [[1500, 1500], [2300, 1500], [2300, 2300], [1500, 2300]] },
-      "gesture": "drag-y",
-      "param": "upper.db1",
-      "range": [0, 8],
-      "curve": "linear"
-    },
-    {
-      "id": "placeholder-rotor",
-      "label": "Placeholder: tap to cycle rotor speed (Stop / Slow / Fast)",
-      "region": { "rect": [1500, 160, 800, 400] },
-      "gesture": "tap",
-      "param": "leslie.speed",
-      "range": [0, 2],
-      "curve": "linear"
-    }
-  ]
+  "regions": []
 }

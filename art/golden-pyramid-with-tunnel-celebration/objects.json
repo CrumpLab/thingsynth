@@ -1,12 +1,88 @@
 {
   "schema": "thingsynth.objects/1",
-  "canvas": [4950, 4950],
+  "canvas": [
+    4950,
+    4950
+  ],
   "objects": {
     "golden-pyramid": {
       "label": "The golden pyramid, both faces",
       "parts": {
-        "face-left": ["f135"],
-        "face-right": ["f136"]
+        "face-left": [
+          "f135"
+        ],
+        "face-right": [
+          "f136"
+        ]
+      },
+      "ink": "auto"
+    },
+    "stalk-left": {
+      "label": "The left green stalk (f260)",
+      "parts": {
+        "body": [
+          "f260"
+        ]
+      },
+      "ink": "auto"
+    },
+    "stalk-right": {
+      "label": "The right green stalk with its mushroom cap",
+      "parts": {
+        "body": [
+          "f262"
+        ]
+      },
+      "ink": "auto"
+    },
+    "spiral-curl": {
+      "label": "The pink spiral curl, bottom left",
+      "parts": {
+        "body": [
+          "f006"
+        ]
+      },
+      "ink": "auto"
+    },
+    "pyramid-worm": {
+      "label": "The pink worm hanging on the pyramid",
+      "parts": {
+        "body": [
+          "f220"
+        ]
+      },
+      "ink": "auto"
+    },
+    "stream": {
+      "label": "The stream and the waterfall's splash",
+      "parts": {
+        "water": [
+          "f134"
+        ],
+        "splash": [
+          "f156"
+        ]
+      },
+      "ink": "auto"
+    },
+    "cloud": {
+      "label": "The big pale cloud at the top",
+      "parts": {
+        "body": [
+          "f193"
+        ]
+      },
+      "ink": "auto"
+    },
+    "bottom-eye": {
+      "label": "The eye with the purple lid, bottom centre",
+      "parts": {
+        "lid": [
+          "f020"
+        ],
+        "lower": [
+          "f019"
+        ]
       },
       "ink": "auto"
     }

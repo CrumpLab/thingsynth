@@ -231,6 +231,37 @@ def main() -> int:
     body = '<g fill="#000">\n' + "".join(f'<path id="{s["id"]}" d="{s["d"]}"/>\n' for s in inks) + "</g>\n"
     (out / "ink.svg").write_text(svg_doc(canvas, body))
 
+    # How much of each fill is visible: later fills paint over earlier ones (a tree's body under its trunk
+    # details), so a shape's own area says little about what a viewer sees. Render every fill in paint order in an
+    # id-encoded colour, unblended and without anti-aliasing, and count the pixels each keeps; then subtract what the
+    # ink covers. `visible` is the share of the fill's area left showing, `visibleArea` that area in canvas px.
+    import resvg_py
+    VS = canvas // 2
+    ids_svg = "".join(f'<path fill="#{i + 1:06x}" d="{f["d"]}"/>' for i, f in enumerate(fills))
+    ink_svg = "".join(f'<path d="{s_["d"]}"/>' for s_ in inks)
+    vis_svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {canvas} {canvas}" width="{VS}" height="{VS}" '
+               f'shape-rendering="crispEdges"><rect width="{canvas}" height="{canvas}" fill="#000"/>{ids_svg}'
+               f'<g fill="#000">{ink_svg}</g></svg>')
+    px = np.asarray(Image.open(io.BytesIO(bytes(resvg_py.svg_to_bytes(svg_string=vis_svg)))).convert("RGB")).astype(np.int64)
+    idx = (px[..., 0] << 16) | (px[..., 1] << 8) | px[..., 2]
+    counts = np.bincount(idx.ravel(), minlength=len(fills) + 1)
+    k2 = (canvas / VS) ** 2
+    # Each fill's own pixel area, rendered alone over its box at the same scale (the shoelace `area` is only a
+    # ranking hint: it is wrong for shapes with holes or several sub-shapes).
+    for i, f in enumerate(fills):
+        x, y, w, h = f["bbox"]
+        W, H = max(1, round(w / 2)), max(1, round(h / 2))
+        solo = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{x} {y} {W * 2} {H * 2}" width="{W}" height="{H}" '
+                f'shape-rendering="crispEdges"><path fill="#fff" d="{f["d"]}"/></svg>')
+        a_ = np.asarray(Image.open(io.BytesIO(bytes(resvg_py.svg_to_bytes(svg_string=solo)))).convert("RGBA"))[..., 3]
+        own = float((a_ > 127).sum()) * k2
+        va = float(counts[i + 1]) * k2
+        f["pixelArea"] = round(own)
+        f["visibleArea"] = round(va)
+        f["visible"] = round(min(1.0, va / own) if own > 0 else 0.0, 3)
+    print(f"  visibility: median {np.median([f['visible'] for f in fills]):.2f}, "
+          f"{sum(f['visible'] >= 0.5 for f in fills)} fills at least half visible")
+
     # The painted area is the hole in the white border frame (a shape layer); everything is clipped to it.
     frame = next((l for l in psd if l.kind == "shape"), None)
     painted = frame_hole(frame) if frame else [0, 0, canvas, canvas]

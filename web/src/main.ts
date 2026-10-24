@@ -6,7 +6,7 @@ import rawMapping from '../../mapping.json';
 import { buildArt } from './art';
 import { mountEffects } from './effects';
 import { parseMapping } from './mapping';
-import { loadObjects } from './objects';
+import { loadObjects, resolveObject } from './objects';
 import { mountPainting } from './painting';
 
 const base = import.meta.env.BASE_URL;
@@ -24,7 +24,7 @@ async function boot(): Promise<void> {
   const mapping = parseMapping(rawMapping);
   const objects = loadObjects();
   for (const b of mapping.bindings) {
-    if (!objects.has(b.object)) console.warn(`[thingsynth] binding "${b.id}" names unknown object "${b.object}"`);
+    if (!resolveObject(objects, b.object)) console.warn(`[thingsynth] binding "${b.id}" names unknown object or part "${b.object.replace(/^#/, '')}"`);
   }
   // Start building the painting first: its files load while the runtime fetches plugin.json and the presets.
   const art = buildArt(flat);
@@ -49,7 +49,7 @@ async function boot(): Promise<void> {
   // Warn about mapping entries that name a parameter Tonewheel does not have.
   const ids = new Set(host.params().map((p) => p.id));
   for (const r of [...mapping.regions, ...mapping.bindings]) {
-    if (!ids.has(r.param)) console.warn(`[thingsynth] mapping entry "${r.id}" uses unknown param "${r.param}"`);
+    if ('param' in r && !ids.has(r.param)) console.warn(`[thingsynth] mapping entry "${r.id}" uses unknown param "${r.param}"`);
   }
 
   const layer = mountPainting(stage, art, mapping, host, objects);

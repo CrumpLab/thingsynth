@@ -62,3 +62,20 @@ export function oklchToHex(col: Oklch, maxDarken = 0): string {
   const rgb = oklchToLinear(c).map((v) => Math.round(Math.min(1, Math.max(0, toGamma(Math.min(1, Math.max(0, v))))) * 255));
   return '#' + rgb.map((v) => v.toString(16).padStart(2, '0')).join('');
 }
+
+const GLOW_CHROMA = 0.09, GLOW_DARKEN = 0.18, GLOW_LIFT = 0.15;
+
+/**
+ * The glowing version of a colour: OKLCH chroma up by 0.09 per unit of glow. Light colours (L above 0.6, fully
+ * from 0.8) deepen only as far as needed to hold that chroma; mid and dark colours (L below 0.75) lift towards
+ * light, so glow never dims a shape. `hueTurn` in degrees.
+ */
+export function glowColour(base: Oklch, hueTurn: number, glow: number): string {
+  const g = Math.max(0, glow);
+  const light = Math.max(0, Math.min(1, (base.l - 0.6) / 0.2));
+  const lift = GLOW_LIFT * g * Math.max(0, Math.min(1, (0.75 - base.l) / 0.25));
+  return oklchToHex(
+    { l: Math.min(0.97, base.l + lift), c: Math.max(0, base.c + GLOW_CHROMA * glow), h: (base.h + hueTurn + 360) % 360 },
+    GLOW_DARKEN * g * light,
+  );
+}
