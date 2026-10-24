@@ -1,9 +1,10 @@
 // Render one binding's animation, first frame to last, for reviewing an object's animation:
 //
-//   node scripts/object_frames.mjs <binding-id> [url] [--out dir] [--frames 5] [--tag name]
+//   node scripts/object_frames.mjs <binding-id> [url] [--out dir] [--frames 5] [--tag name] [--context]
 //
 // Opens the app in a headless Chrome (your installed one, a throwaway profile), holds the binding at each frame with
-// the editor's pin (the organ is not touched), and writes into docs/objects/<binding-id>/ (or --out):
+// the editor's pin (the organ is not touched), and writes into docs/objects/<binding-id>/ (or --out). Every other
+// binding is held at its first frame so only this one shows (--context leaves them at their current values):
 //   <tag>-strip.png   frames 0, 0.25 .. 1 side by side, cropped to the object, frame values underneath
 //   <tag>-sweep.gif   a loop from the first frame to the last and back
 // Needs the dev server running (pnpm dev) and ffmpeg.
@@ -17,6 +18,8 @@ import { fileURLToPath } from 'node:url';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const opt = (name, d) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args.splice(i, 2)[1] : d; };
+const context = args.includes('--context');
+if (context) args.splice(args.indexOf('--context'), 1);
 const outArg = opt('out', null), frames = Number(opt('frames', '5')), tag = opt('tag', 'current');
 const [id, base = 'http://localhost:5173/'] = args;
 if (!id) { console.error('usage: node scripts/object_frames.mjs <binding-id> [url] [--frames 5] [--tag name]'); process.exit(1); }
@@ -44,6 +47,12 @@ try {
     style.textContent = '.region-label, #hud, #start, #editor, #bar, .hits { display: none !important; }';
     document.head.append(style);
   });
+  if (!context) {
+    await page.evaluate((bindingId) => {
+      const T = window.thingsynth;
+      for (const b of T.mapping.bindings) if (b.id !== bindingId) T.effects.pin(b.id, 0);
+    }, id);
+  }
   // the object's box on screen, from its fills
   const box = await page.evaluate((bindingId) => {
     const T = window.thingsynth;

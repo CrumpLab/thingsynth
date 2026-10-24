@@ -17,6 +17,11 @@
 //             `turn` turns the revealed colour's hue (degrees by the last frame) as it advances, `toward` moves every
 //             shape's revealed colour to one hue instead, `color` moves it to one exact colour
 //   scribble  pencil loops drawn in, clipped to the shape, in the painting's own scribble style (`count` strokes)
+//   grow      new growth sprouts from the object, drawn in the painting's own idiom: curving branches in its thick
+//             black ink, each ending in a spiral tendril or a little eye-bud, with candy-coloured leaves along them.
+//             One branch per 1/count of the timeline (a drawbar's 8 steps grow 8 branches), climbing the shape from
+//             its base and alternating sides; within its step a branch draws itself out, then its leaves unfurl,
+//             then its tip appears. Seeded per binding, so a frame always shows the same drawing
 //   line      the object's linework from less of itself to more of itself: at u = 0 thinner, lighter and broken by
 //             small gaps like an unfinished sketch; at 0.5 exactly as painted; at 1 bolder, with a second hand-drawn
 //             pass of every stroke just beside the first (thinning, gaps and boldness scale with `amount`)
@@ -103,6 +108,8 @@ interface Track {
     paths: SVGPathElement[]; filterId: string; morph: SVGFEMorphologyElement; mask: SVGFEFuncAElement;
     echo: SVGGElement; under: SVGGElement; written: string;
   };
+  /** grow: the features, each with when it grows and how */
+  growth?: Growth;
   /** swell, lean, spin, blink: the elements moved, and the centre and base point they move about */
   targets: SVGPathElement[];
   centre: [number, number];
@@ -237,6 +244,16 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
         case 'boil':
           tr.ink = obj.ink.filter((s) => art.ink.has(s));
           break;
+        case 'grow': {
+          const host = ids.map((id) => art.fills.get(id)).find((p): p is SVGPathElement => !!p);
+          if (!host) break;
+          const g = document.createElementNS(SVG, 'g');
+          g.style.pointerEvents = 'none';
+          stack.ink.after(g);
+          L.added.push(g);
+          tr.growth = buildGrowth(g, host, obj.bbox, spec.count ?? GROW_COUNT, Math.abs(spec.amount) || 1, rand);
+          break;
+        }
         case 'line': {
           const paths = obj.ink.map((s) => art.ink.get(s)).filter((p): p is SVGPathElement => !!p);
           if (!paths.length) break;
@@ -503,6 +520,26 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       transformed.delete(el);
     }
 
+    // Grow: each feature at its own progress through its window of the timeline.
+    for (const L of live) for (const tr of L.tracks) {
+      if (!tr.growth) continue;
+      const t = local(tr, L.shown);
+      for (const f of tr.growth.features) {
+        const p = Math.max(0, Math.min(1, (t - f.from) / (f.to - f.from)));
+        const key = p.toFixed(3);
+        if (key === f.written) continue;
+        f.written = key;
+        if (f.kind === 'draw') {
+          f.el.setAttribute('stroke-dashoffset', (1 - p).toFixed(4));
+          f.el.style.visibility = p > 0 ? 'visible' : 'hidden';
+        } else {
+          const s = p <= 0 ? 0 : popEase(p);
+          f.el.style.visibility = p > 0 ? 'visible' : 'hidden';
+          f.el.setAttribute('transform', `translate(${f.at[0].toFixed(1)} ${f.at[1].toFixed(1)}) scale(${s.toFixed(4)}) translate(${(-f.at[0]).toFixed(1)} ${(-f.at[1]).toFixed(1)})`);
+        }
+      }
+    }
+
     // Line: one filter per track on its object's strokes; below the middle thinner and gappier, above it bolder with
     // the second pass showing. At exactly 0.5 the strokes are left as painted (no filter at all).
     const filtered = new Map<SVGPathElement, string>();
@@ -718,6 +755,161 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       if (raf) cancelAnimationFrame(raf);
     },
   };
+}
+
+// ---- grow ----------------------------------------------------------------------------------------------------------
+
+const GROW_COUNT = 8;
+/** Line weights in canvas px, close to the painting's own ink (its strokes are 14 to 40 px wide). */
+const GROW_STEM_PX = 26, GROW_EDGE_PX = 16;
+const LEAF_COLOURS = ['#9cf27c', '#c6f58a', '#7fe8b0', '#f2ef7a', '#b4e0a2'];
+const BUD_COLOURS = ['#f2a6c6', '#c4a3f0', '#ffb36b', '#7fd8f5', '#ff8fa3'];
+
+interface GrowFeature {
+  kind: 'draw' | 'pop';
+  el: SVGElement;
+  /** the window of the effect's timeline (0..1) it grows over */
+  from: number;
+  to: number;
+  /** pop: the point it grows out of */
+  at: [number, number];
+  written: string;
+}
+interface Growth { features: GrowFeature[] }
+
+/** A pop that overshoots a little and settles, like something unfurling. */
+function popEase(p: number): number {
+  const c = 1.6;
+  const q = p - 1;
+  return 1 + (c + 1) * q * q * q + c * q * q;
+}
+
+type Pt = [number, number];
+const add = (a: Pt, b: Pt): Pt => [a[0] + b[0], a[1] + b[1]];
+const mul = (a: Pt, k: number): Pt => [a[0] * k, a[1] * k];
+const rot = (a: Pt, deg: number): Pt => {
+  const r = (deg * Math.PI) / 180, c = Math.cos(r), s = Math.sin(r);
+  return [a[0] * c - a[1] * s, a[0] * s + a[1] * c];
+};
+const norm = (a: Pt): Pt => { const l = Math.hypot(a[0], a[1]) || 1; return [a[0] / l, a[1] / l]; };
+const poly = (pts: Pt[]): string => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('');
+
+/**
+ * Lay out the growth on a host shape: `count` branches, climbing from its base, alternating sides. Each branch
+ * starts on the shape's edge at its height, curves outward and upward, and ends in a spiral tendril or an eye-bud,
+ * with one or two leaves along it. Everything is drawn into `g` hidden; the paint step reveals it frame by frame.
+ */
+function buildGrowth(g: SVGGElement, host: SVGPathElement, box: [number, number, number, number], count: number, size: number, rand: () => number): Growth {
+  const [bx, by, bw, bh] = box;
+  // The host's outline, sampled, to find its left and right edges at any height.
+  const total = host.getTotalLength();
+  const outline: Pt[] = [];
+  for (let i = 0; i < 600; i++) { const q = host.getPointAtLength((total * i) / 600); outline.push([q.x, q.y]); }
+  const edge = (y: number, side: -1 | 1): Pt | null => {
+    const band = outline.filter((p) => Math.abs(p[1] - y) < bh * 0.03);
+    if (!band.length) return null;
+    return band.reduce((best, p) => (side < 0 ? (p[0] < best[0] ? p : best) : (p[0] > best[0] ? p : best)));
+  };
+  const features: GrowFeature[] = [];
+  const mk = <K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string, string>): SVGElementTagNameMap[K] => {
+    const e = document.createElementNS(SVG, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    e.style.visibility = 'hidden';
+    g.append(e);
+    return e;
+  };
+  // Branch length follows the shape's height (a tall stalk grows long branches), capped by its size overall.
+  const scale = Math.min(bh, Math.max(bw, bh) * 0.9) * size;
+  for (let k = 0; k < count; k++) {
+    const from = k / count, to = (k + 1) / count;
+    const win = (a: number, b: number): [number, number] => [from + (to - from) * a, from + (to - from) * b];
+    const side: -1 | 1 = k % 2 === 0 ? -1 : 1;
+    const y = by + bh * (0.92 - 0.8 * ((k + 0.5) / count)) + (rand() - 0.5) * bh * 0.04;
+    const A = edge(y, side);
+    if (!A) continue;
+    // Outward, then turned upward 25..55 degrees, with a bend one way or the other.
+    const lean = 25 + rand() * 30;
+    const dir = norm(rot([side, 0], side < 0 ? lean : -lean));
+    const nrm: Pt = [-dir[1], dir[0]];
+    const len = scale * (0.24 + rand() * 0.14);
+    const bend = (rand() < 0.5 ? -1 : 1) * len * (0.12 + rand() * 0.1);
+    const P1 = add(add(A, mul(dir, len * 0.35)), mul(nrm, bend));
+    const P2 = add(add(A, mul(dir, len * 0.75)), mul(nrm, -bend * 0.6));
+    const P3 = add(A, mul(dir, len));
+    const stem: Pt[] = [];
+    for (let i = 0; i <= 28; i++) {
+      const t = i / 28, u = 1 - t;
+      stem.push([
+        u * u * u * A[0] + 3 * u * u * t * P1[0] + 3 * u * t * t * P2[0] + t * t * t * P3[0],
+        u * u * u * A[1] + 3 * u * u * t * P1[1] + 3 * u * t * t * P2[1] + t * t * t * P3[1],
+      ]);
+    }
+    const tipDir = norm([P3[0] - P2[0], P3[1] - P2[1]]);
+    const curl = k % 2 === 0;
+    if (curl) {
+      // A spiral tendril continuing the stem: just over a turn, tightening, curling upward.
+      const r0 = len * 0.13, turn = side < 0 ? 1 : -1;
+      let a0 = Math.atan2(tipDir[1], tipDir[0]) - turn * Math.PI / 2;
+      const centre = add(P3, mul(rot(tipDir, turn * 90), r0));
+      for (let i = 1; i <= 26; i++) {
+        const t = i / 26, r = r0 * (1 - 0.65 * t), a = a0 + turn * t * Math.PI * 2.3;
+        stem.push([centre[0] + Math.cos(a) * r, centre[1] + Math.sin(a) * r]);
+      }
+      a0 = 0;
+    }
+    const branch = mk('path', { d: poly(stem), fill: 'none', stroke: '#000', 'stroke-width': String(GROW_STEM_PX), 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: '1', 'stroke-dasharray': '1 1', 'stroke-dashoffset': '1' });
+    const [b0, b1] = win(0, curl ? 0.75 : 0.6);
+    features.push({ kind: 'draw', el: branch, from: b0, to: b1, at: A, written: '' });
+
+    // One or two leaves along the stem, on alternating sides of it.
+    const leaves = 1 + (rand() < 0.6 ? 1 : 0);
+    for (let j = 0; j < leaves; j++) {
+      const s = 0.45 + j * 0.3 + rand() * 0.08;
+      const qi = Math.min(27, Math.round(s * 28));
+      const Q = stem[qi]!, T = norm([stem[qi + 1]![0] - Q[0], stem[qi + 1]![1] - Q[1]]);
+      const D = norm(rot(T, (j % 2 ? 1 : -1) * (45 + rand() * 20)));
+      const N: Pt = [-D[1], D[0]];
+      const l = len * (0.34 + rand() * 0.14), w = l * 0.42;
+      const tip = add(Q, mul(D, l));
+      const c1 = add(add(Q, mul(D, l * 0.5)), mul(N, w)), c2 = add(add(Q, mul(D, l * 0.5)), mul(N, -w));
+      const leaf = mk('g', {});
+      const body = document.createElementNS(SVG, 'path');
+      body.setAttribute('d', `M${Q[0].toFixed(1)} ${Q[1].toFixed(1)}Q${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${tip[0].toFixed(1)} ${tip[1].toFixed(1)}Q${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${Q[0].toFixed(1)} ${Q[1].toFixed(1)}Z`);
+      body.setAttribute('fill', LEAF_COLOURS[Math.floor(rand() * LEAF_COLOURS.length)]!);
+      body.setAttribute('stroke', '#000'); body.setAttribute('stroke-width', String(GROW_EDGE_PX)); body.setAttribute('stroke-linejoin', 'round');
+      const rib = document.createElementNS(SVG, 'path');
+      const ribEnd = add(Q, mul(D, l * 0.72));
+      rib.setAttribute('d', `M${Q[0].toFixed(1)} ${Q[1].toFixed(1)}L${ribEnd[0].toFixed(1)} ${ribEnd[1].toFixed(1)}`);
+      rib.setAttribute('stroke', '#000'); rib.setAttribute('stroke-width', String(GROW_EDGE_PX * 0.6)); rib.setAttribute('stroke-linecap', 'round');
+      leaf.append(body, rib);
+      const [l0, l1] = win(0.35 + j * 0.18, 0.75 + j * 0.12);
+      features.push({ kind: 'pop', el: leaf, from: l0, to: Math.min(to, l1), at: Q, written: '' });
+    }
+
+    if (!curl) {
+      // An eye-bud at the tip: a candy bulb with an eye, like the painting's many eyes in things.
+      const r = len * 0.16;
+      const C = add(P3, mul(tipDir, r * 0.85));
+      const bud = mk('g', {});
+      const bulb = document.createElementNS(SVG, 'ellipse');
+      bulb.setAttribute('cx', C[0].toFixed(1)); bulb.setAttribute('cy', C[1].toFixed(1));
+      bulb.setAttribute('rx', r.toFixed(1)); bulb.setAttribute('ry', (r * 0.9).toFixed(1));
+      bulb.setAttribute('fill', BUD_COLOURS[Math.floor(rand() * BUD_COLOURS.length)]!);
+      bulb.setAttribute('stroke', '#000'); bulb.setAttribute('stroke-width', String(GROW_EDGE_PX));
+      const white = document.createElementNS(SVG, 'ellipse');
+      white.setAttribute('cx', C[0].toFixed(1)); white.setAttribute('cy', C[1].toFixed(1));
+      white.setAttribute('rx', (r * 0.55).toFixed(1)); white.setAttribute('ry', (r * 0.42).toFixed(1));
+      white.setAttribute('fill', '#fff'); white.setAttribute('stroke', '#000'); white.setAttribute('stroke-width', String(GROW_EDGE_PX * 0.7));
+      const look = mul(tipDir, r * 0.2);
+      const pupil = document.createElementNS(SVG, 'circle');
+      pupil.setAttribute('cx', (C[0] + look[0]).toFixed(1)); pupil.setAttribute('cy', (C[1] + look[1]).toFixed(1));
+      pupil.setAttribute('r', (r * 0.22).toFixed(1)); pupil.setAttribute('fill', '#000');
+      bud.append(bulb, white, pupil);
+      const [e0, e1] = win(0.6, 1);
+      features.push({ kind: 'pop', el: bud, from: e0, to: e1, at: P3, written: '' });
+    }
+  }
+  return { features };
 }
 
 /** The shorter turn (degrees, -180..180) from hue a to hue b. */

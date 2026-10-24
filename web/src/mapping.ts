@@ -31,8 +31,8 @@ export interface RegionEntry extends Control {
   region: RegionShape;
 }
 
-export type EffectKind = 'glow' | 'hue' | 'fill' | 'scribble' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
-export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'fill', 'scribble', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
+export type EffectKind = 'glow' | 'hue' | 'fill' | 'scribble' | 'grow' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
+export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'fill', 'scribble', 'grow', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
 /** Older names still read: pulse and wobble were free-running; as frames of the timeline they are swell and lean. */
 const EFFECT_ALIASES: Record<string, EffectKind> = { pulse: 'swell', wobble: 'lean' };
 export type FillFrom = 'bottom' | 'top' | 'left' | 'right';
@@ -61,7 +61,7 @@ export interface EffectSpec {
   /** fill: the revealed colour at the last frame (hex); it moves there from the shape's glowing colour as the fill
    * advances. Overrides `turn` and `toward`. */
   color?: string;
-  /** scribble: how many pencil strokes at full value (default 14). */
+  /** scribble: how many pencil strokes at full value (default 14). grow: how many branches (default 8). */
   count?: number;
 }
 
