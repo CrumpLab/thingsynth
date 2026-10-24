@@ -201,5 +201,134 @@ def main() -> None:
     print('wrote', OUT / 'sheet.png')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- the chosen direction: whirlwind, with its little baguette arm raised -------------------------------------
+ARM, SHOULDER = 'f005', (1128.0, 4330.0)
+GROUND = '#BDA1FF'
+
+
+def arm_svg(angle: float) -> tuple[str, str]:
+    """(cover, arm): the lavender ground painted back over where the arm hung (with its outline), and the arm, the
+    creature's own shape and ribs with its own outline, rotated `angle` degrees about the shoulder."""
+    d = m.FILLS[ARM]
+    ribs = ''.join(f'<path d="{m.INKS[i]}"/>' for i in m.own_ink(ARM))
+    # The neighbours grow into the gap in their own colours (in paint order), clipped to the arm's old place.
+    x, y, w, h = m.FP[ARM]['bbox']
+    near = [f for f, fp in m.FP.items() if f != ARM and fp['bbox'][0] < x + w + 60 and fp['bbox'][0] + fp['bbox'][2] > x - 60
+            and fp['bbox'][1] < y + h + 60 and fp['bbox'][1] + fp['bbox'][3] > y - 60 and fp.get('visible', 1) > 0.5]
+    near.sort(key=lambda f: int(f[1:]))
+    grow = ''.join(f'<path d="{m.FILLS[f]}" fill="{m.FP[f]["fill"]}" stroke="{m.FP[f]["fill"]}" stroke-width="170" stroke-linejoin="round"/>' for f in near)
+    cover = (f'<defs><clipPath id="arm-gap"><path d="{d}" stroke="#000" stroke-width="34" stroke-linejoin="round"/></clipPath></defs>'
+             f'<g clip-path="url(#arm-gap)"><path d="{d}" fill="{GROUND}" stroke="{GROUND}" stroke-width="34"/>{grow}</g>')
+    arm = (f'<g transform="rotate({angle:.1f} {SHOULDER[0]} {SHOULDER[1]})">'
+           f'<path d="{d}" fill="#EBE49B" stroke="#000" stroke-width="{INK}" stroke-linejoin="round"/>'
+           f'<g fill="#000">{ribs}</g></g>')
+    return cover, arm
+
+
+def whirl_end(angle: float = -150.0) -> Image.Image:
+    cover, arm = arm_svg(angle)
+    cx, cy = HEAD[0] + 80, HEAD[1] + 40
+    bands = ''
+    cols = ['#d6c7ff', '#ffffff', '#c4a3f0', '#e7e0ff']
+    for k, (r, a0, a1, w) in enumerate([(330, 160, 330, 70), (430, 190, 350, 60), (270, -20, 120, 56), (490, 10, 140, 50)]):
+        bands += swoosh(cx, cy, r, a0, a1, w, cols[k])
+    return m.compose(front=cover + bands + arm + wide_eye(*EYE, look=(-20, -10), scale=0.95))
+
+
+
+
+def ease(u: float) -> float:
+    u = max(0.0, min(1.0, u))
+    return 1 - (1 - u) ** 3
+
+
+BANDS = [(330, 160, 330, 70, '#d6c7ff'), (430, 190, 350, 60, '#ffffff'), (270, -20, 120, 56, '#c4a3f0'), (490, 10, 140, 50, '#e7e0ff')]
+BAND_START = [0.0, 0.12, 0.4, 0.55]
+ARM_UP = -150.0
+
+
+def opening_eye(o: float) -> str:
+    """The sleepy eye opening wide: an outlined white whose height grows with o, the pupil once it is open enough."""
+    if o <= 0:
+        return ''
+    cx, cy = EYE
+    rx, ry = 114.0, 90.0 * max(0.12, o)
+    eye = outlined(ellipse(cx, cy, rx, ry), '#ffffff', INK)
+    if o > 0.35:
+        k = min(1.0, (o - 0.35) / 0.4)
+        eye += f'<path d="{circle(cx - 20, cy - 10 * k, 42 * k)}" fill="#000"/><path d="{circle(cx - 4, cy - 26 * k, 12 * k)}" fill="#fff"/>'
+    return eye
+
+
+def whirl_frame(t: float) -> Image.Image:
+    """Rotor at t (0 Stop, 0.5 Slow, 1 Fast): wind bands sweep in one after another, the eye opens by Slow, the arm
+    rises after Slow, and leaves and petals get caught up near Fast."""
+    if t <= 0:
+        return m.compose()
+    cx, cy = HEAD[0] + 80, HEAD[1] + 40
+    bands = ''
+    for (r, a0, a1, w, col), st in zip(BANDS, BAND_START):
+        g = ease((t - st) / 0.45)
+        if g > 0.01:
+            bands += swoosh(cx, cy, r, a0, a0 + (a1 - a0) * g, w * (0.5 + 0.5 * g), col)
+    rnd = random.Random(5)
+    bits = ''
+    for k in range(5):
+        a = math.radians(200 + k * 33)
+        r = 380 + rnd.random() * 80
+        rot = rnd.random() * 180
+        g = ease((t - 0.62 - k * 0.06) / 0.2)
+        if g <= 0:
+            continue
+        x, y = cx + math.cos(a) * r, cy + math.sin(a) * r
+        sz = 34 * g
+        leaf = f'M{p(x - sz, y)}Q{p(x, y - sz * 0.9)} {p(x + sz, y)}Q{p(x, y + sz * 0.9)} {p(x - sz, y)}Z'
+        bits += f'<g transform="rotate({rot:.0f} {x:.0f} {y:.0f})">' + outlined(leaf, ['#b4e0a2', '#f2a6c6', '#ffe066'][k % 3], INK * 0.8) + '</g>'
+    a = ease((t - 0.45) / 0.55)
+    front = bands + bits + opening_eye(ease((t - 0.1) / 0.35))
+    if a > 0:
+        cover, arm = arm_svg(ARM_UP * a)
+        front = cover + bands + bits + arm + opening_eye(ease((t - 0.1) / 0.35))
+    return m.compose(front=front)
+
+
+def prog_main() -> None:
+    out = OUT.parent / 'whirlwind'
+    out.mkdir(parents=True, exist_ok=True)
+    whirl_frame(1.0).save(out / 'end-frame.png')
+    frames = [(0, 'Stop'), (0.25, ''), (0.5, 'Slow'), (0.75, ''), (1.0, 'Fast')]
+    tiles = [whirl_frame(t) for t, _ in frames]
+    w, h = tiles[0].size
+    sc = 0.42
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * len(tiles) + 10 * (len(tiles) + 1), th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, ((t, name), im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {t:.2f}' + (f'  {name}' if name else ''), fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    import shutil
+    import subprocess
+    tmp = out / '_frames'
+    tmp.mkdir(exist_ok=True)
+    seq = [k / 20 for k in range(21)] + [k / 20 for k in range(19, 0, -1)]
+    for i, t in enumerate(seq):
+        whirl_frame(t).convert('RGB').resize((560, round(560 * h / w)), Image.LANCZOS).save(tmp / f'{i:03d}.png')
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', '12', '-i', str(tmp / '%03d.png'), '-vf',
+                    'split[a][b];[a]palettegen=max_colors=192[p];[b][p]paletteuse=dither=bayer:bayer_scale=4', '-loop', '0',
+                    str(out / 'sweep.gif')], check=True)
+    shutil.rmtree(tmp)
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'prog' in __import__('sys').argv[1:]:
+    prog_main()

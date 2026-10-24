@@ -71,6 +71,10 @@ What the decisions have shown, to apply to later objects:
 - **Pyramid review (2026-10-24):** offered five end frames: flaming crown, puffed up, puffed and burning, erupting,
   sunburst and eye. Picked sunburst and eye "with a little bit of flaming crown". Before that, cracks of lava and a
   heat fill were rejected as not working; Matt stepped in to steer with options rather than iterations.
+- **Creature review, rotor speed (2026-10-24):** the "spiral curl" is the ear of a sleepy green creature. Offered:
+  propeller cap, pinwheel ear, dizzy, whirlwind, racing. Picked whirlwind, and asked that its little arm (the ribbed
+  "baguette" under its cap) be raised as well. He knows his characters' anatomy: look for limbs and features that can
+  move, not only for things to add around them.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
@@ -84,4 +88,5 @@ its thing in the painting's style.
 | object | binding | what it is | what it does |
 | --- | --- | --- | --- |
 | golden-pyramid | `amp.drive` | the big golden pyramid, centre-right, with creatures on it | built: a sunburst grows out behind it (frames 0-0.6), a big eye opens on its right face (0.25-0.8), small flames rise on its slopes (0.55-1), its faces warm throughout; `docs/objects/pyramid-drive/mockup-vs-app.png` |
+| creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | proposed: wind bands sweep round it, its eye opens by Slow, its arm rises and leaves are caught up by Fast (`docs/objects/curl-rotor/whirlwind/`, awaiting approval) |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
