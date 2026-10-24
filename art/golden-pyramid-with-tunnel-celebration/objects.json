@@ -139,12 +139,12 @@
       "ink": "auto"
     },
     "lying-creature": {
-      "label": "The long magenta creature lying at the bottom, arms up",
+      "label": "The big grey creature lying across the bottom, its mitten arm up, a closed peach slit eye",
       "parts": {
         "body": [
           "f014"
         ],
-        "detail": [
+        "eye": [
           "f023",
           "f024"
         ]

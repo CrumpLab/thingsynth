@@ -121,6 +121,11 @@ What the decisions have shown, to apply to later objects:
   butterfly wings, starfish, hot-air balloon. Asked for a chain of morphs: starfish, then butterfly, then jellyfish.
   A continuous parameter can carry several end frames in sequence, each replacing the last, not only one change
   growing.
+- **Lying creature review, key click (2026-10-24, object picked by Claude):** round one offered crab claw, castanet
+  jaws, organ keys, woodpecker, finger snap. Matt redirected: "go more in a narwhal direction" (the creature as a
+  whole becoming an animal, rather than one part clicking). Round two offered ivory tusk, echo clicks, spotted
+  narwhal, tail wave, party narwhal; he picked the party narwhal (candy tusk, sparkles, blowhole fountain): the
+  most celebratory of the set again.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
@@ -143,5 +148,6 @@ its thing in the painting's style.
 | tunnel (vib-mode) | `vib.mode` | the dark teal arch in the golden pyramid, its mouth mostly hidden by the acorn frog and bush | built: each of the six modes brings rainbow rings up out of the tunnel's depth (outer first, the innermost night-dark), then two glowing yellow eyes open in dark sockets, peeking out; drawn on the tunnel, under the frog and ink; 0.6 s glide; `docs/objects/vib-mode/mockup-vs-app.png` |
 | big-eye (perc-harmonic) | `perc.harmonic` | the round orange-magenta eye of the lavender, triangle-headed creature at the right edge | built: on Third six peacock feathers fan open behind its head one after another, the eye turns into a disco ball (base, then rings of mirror tiles) and sparkles pop last; 0.8 s glide; `docs/objects/perc-harmonic/mockup-vs-app.png` |
 | orange-sprite (pedal-sustain) | `pedal.sustain` | the orange star-shaped creature with a yellow head and a sleepy cyan eye, on the green bush | built: three morphs in turn: starfish arms grow out of it (0-0.25) and draw back as butterfly wings open (0.35-0.58), the wings fold away as the sprite fades (0.66-0.8) and a jellyfish bell swells out of its head, its eye opening and tentacles dropping over the bush (0.68-1); `docs/objects/pedal-sustain/mockup-vs-app.png` |
+| lying-creature (tg-click) | `tg.click` | the big grey creature lying across the bottom, mitten arm up, closed peach slit eye | built: party narwhal: the slit eye fades as a round friendly eye opens, a pink-and-white candy tusk grows band by band out of its head, a fountain spouts from its blowhole and splashes, sparkles pop at the tusk's tip; `docs/objects/tg-click/mockup-vs-app.png` |
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |

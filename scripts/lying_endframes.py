@@ -323,3 +323,116 @@ if __name__ == '__main__' and 'narwhal' in __import__('sys').argv[1:]:
     m.CROP = (1450, 3300, 1800, 1250)
     m.WASH, m.SCRIB = m.raster('wash.webp'), m.raster('scribbles.webp')
     narwhal_main()
+
+
+# ---- chosen: party narwhal ----------------------------------------------------------------------------------------
+# Key click from none to loudest: the slit eye fades (0..0.15) as a friendly round eye opens (0.05..0.3), the candy
+# tusk grows out of its head (0.15..0.6), the blowhole fountain spouts up and splashes out (0.5..0.85), the drops fall
+# and the sparkles pop at the tusk's tip (0.75..1).
+def tusk_parts(cols=('#ff9fc4', '#ffffff'), bands=8) -> list[tuple[str, str]]:
+    x, y = TUSK_BASE
+    a = math.radians(TUSK_ANG)
+    ca, sa = math.cos(a), math.sin(a)
+    R = lambda u, v: (x + ca * u - sa * v, y + sa * u + ca * v)
+    w = lambda u: 58 * (1 - u / TUSK_LEN) + 6
+    out = []
+    for k in range(bands):
+        u0, u1 = TUSK_LEN * k / bands, TUSK_LEN * (k + 1) / bands
+        sk = (u1 - u0) * 0.45
+        quad = [R(u0, -w(u0)), R(u1, -w(u1)), R(u1 + sk, w(u1)), R(u0 + sk, w(u0))] if k < bands - 1 else [R(u0, -w(u0)), R(TUSK_LEN + 20, 0), R(u0 + sk, w(u0))]
+        out.append(('M' + 'L'.join(p(*q) for q in quad) + 'Z', cols[k % 2]))
+    return out
+
+
+def party_items() -> list[dict]:
+    items = []
+    A = lambda d, f, e, at, s, t, grow='scale': items.append({'d': d, 'fill': f, 'edge': round(e, 1), 'at': [round(at[0], 1), round(at[1], 1)],
+                                                               'start': round(s, 3), 'end': round(t, 3), 'grow': grow})
+    # the friendly eye opening
+    sx, sy = 2095.0, 3938.0
+    A(ellipse(sx, sy, 108, 74, -12), '#ffffff', INK, (sx, sy), 0.05, 0.25, 'y')
+    A(circle(sx + 22, sy + 6, 38), '#1b2a5a', 0, (sx + 22, sy + 6), 0.12, 0.3)
+    A(circle(sx + 36, sy - 8, 12), '#ffffff', 0, (sx + 36, sy - 8), 0.2, 0.32)
+    # the tusk, band by band from the head out
+    parts = tusk_parts()
+    for k, (d, col) in enumerate(parts):
+        s = 0.15 + 0.045 * k
+        A(d, col, INK, TUSK_BASE, s, s + 0.12)
+    # the fountain
+    x, y = 2230.0, 3790.0
+    A(tube([(x, y - 40), (x - 10, y - 140), (x + 10, y - 240)], 34, 26), '#bff6ff', INK, (x, y - 40), 0.5, 0.65, 'y')
+    for k, ang in enumerate((-160, -125, -55, -20)):
+        a = math.radians(ang)
+        P = bez((x + 10, y - 250), (x + math.cos(a) * 80, y - 300), (x + math.cos(a) * 170, y - 280 + 60), (x + math.cos(a) * 200, y - 160), 16)
+        A(tube(P, 20, 12), '#bff6ff', INK * 0.9, (x + 10, y - 250), 0.62 + 0.02 * k, 0.8 + 0.02 * k)
+        dx, dy = P[-1]
+        A(f'M{p(dx, dy + 10)}C{p(dx + 22, dy + 40)} {p(dx + 18, dy + 70)} {p(dx, dy + 70)}C{p(dx - 18, dy + 70)} {p(dx - 22, dy + 40)} {p(dx, dy + 10)}Z',
+          '#bff6ff', INK * 0.8, (dx, dy + 40), 0.75 + 0.03 * k, 0.9 + 0.03 * k)
+    # sparkles at the tip
+    tx, ty = tusk_tip()
+    for k, (sx2, sy2, s) in enumerate([(tx + 40, ty - 70, 55), (tx + 90, ty + 30, 40), (tx - 30, ty - 120, 34)]):
+        pts = []
+        for q in range(8):
+            a = math.radians(-90 + q * 45)
+            rr = s if q % 2 == 0 else s * 0.3
+            pts.append((sx2 + math.cos(a) * rr, sy2 + math.sin(a) * rr))
+        A('M' + 'L'.join(p(*q) for q in pts) + 'Z', '#ffe066', INK * 0.8, (sx2, sy2), 0.8 + 0.05 * k, 0.9 + 0.05 * k)
+    return items
+
+
+def party_frame(t: float) -> Image.Image:
+    if t <= 0:
+        return m.compose()
+    kw = {}
+    if t >= 0.08:  # the slit eye's fade, shown as gone past its middle
+        kw = {'fill_over': {f: 'M0 0Z' for f in ('f023', 'f024')}, 'ink_over': {i: 'M0 0Z' for f in ('f023', 'f024') for i in m.own_ink(f)}}
+    im = m.compose(front='<g/>', **kw)
+    im.alpha_composite(m.svg(g.sprite_svg(party_items(), t)))
+    return im
+
+
+def party_main() -> None:
+    m.CROP = (1450, 3300, 1800, 1250)
+    m.WASH, m.SCRIB = m.raster('wash.webp'), m.raster('scribbles.webp')
+    out = ROOT / 'docs/objects/tg-click/party-narwhal'
+    out.mkdir(parents=True, exist_ok=True)
+    frames = [0, 0.25, 0.5, 0.75, 1.0]
+    tiles = [party_frame(t) for t in frames]
+    tiles[-1].save(out / 'end-frame.png')
+    w, h = tiles[0].size
+    sc = 0.42
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * 5 + 60, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (tt, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {tt:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'party' in __import__('sys').argv[1:]:
+    party_main()
+
+if __name__ == '__main__' and 'export' in __import__('sys').argv[1:]:
+    import json as _j
+    op = ROOT / 'art/golden-pyramid-with-tunnel-celebration/objects.json'
+    O = _j.loads(op.read_text())
+    objs = O['objects'] if 'objects' in O else O
+    objs['lying-creature']['label'] = 'The big grey creature lying across the bottom, its mitten arm up, a closed peach slit eye'
+    objs['lying-creature']['parts'] = {'body': ['f014'], 'eye': ['f023', 'f024']}
+    op.write_text(_j.dumps(O, indent=2) + '\n')
+    mp = ROOT / 'mapping.json'
+    M = _j.loads(mp.read_text())
+    for b in M['bindings']:
+        if b['id'] == 'tg-click':
+            b['label'] = 'The lying creature: drag across for Key Click; it turns into a party narwhal, candy tusk, spouting fountain and all'
+            b['effects'] = [{'effect': 'vanish', 'parts': ['eye'], 'span': [0.0, 0.15]},
+                            {'effect': 'sprites', 'place': 'over', 'items': party_items()}]
+    mp.write_text(_j.dumps(M, indent=2) + '\n')
+    print('exported', len(party_items()), 'shapes')
