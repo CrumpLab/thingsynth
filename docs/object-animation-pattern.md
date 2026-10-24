@@ -39,15 +39,46 @@ Anything new is drawn in the painting's style:
 Supporting effects (sap rising, glow, colour moving toward a hue) can accompany the drawn change, but the drawn
 change is the point.
 
-## 4. Repeat
+## 4. Review loop, one object at a time (for now)
 
-For each object: render its current animation (`node scripts/object_frames.mjs <binding-id> --tag before`), write
-the description and what it gets to do, build it, render the after, compare first-to-last frame, and tune until it
-reads as the object doing its thing in the painting's style.
+Until Matt says the choices can be made without him, every object goes through these steps with him:
+
+1. **Look and describe.** Crop the object from the painting, say what it is and how it sits in the picture.
+2. **Five end frames.** Mock up five different last frames (Drive or the note fully on) straight from the painting's
+   layers, each a different idea of what the thing gets to do, all drawn the painting's way. Show them as one sheet
+   next to the object as painted.
+3. **Matt picks and adjusts.** He chooses one, combines several, or redirects.
+4. **Progression.** Mock up the chosen end frame's frames 0 to 1: what happens first, what follows, what comes last.
+   Show a strip of frames 0, 0.25, 0.5, 0.75, 1 and a loop.
+5. **Build** it into the app only after Matt approves the progression; render it from the app and compare it with the
+   mockup.
+6. **Log the choice** below: what was offered, what was picked, and what that says about his taste.
+
+Once Matt hands it over, the loop runs without him, using the log to choose.
+
+## 5. Matt's choices so far
+
+What the decisions have shown, to apply to later objects:
+
+- **The drawing must change, not just the colour.** Colour fills, glows and hue shifts alone were "not interesting
+  enough"; the stalks only worked once they grew new drawn parts.
+- **No bare lines; outlines around fills.** New parts are coloured shapes with black outlines, never single strokes.
+- **Ink weight matches the object's own lines.** Heavy 26 px strokes on the thin-lined stalks were "too thick".
+- **Growth in the object's own nature.** Plants sprout branches, leaves, tendrils and eye-buds. Lines merely getting
+  bolder was not wanted.
+- **Expressive, symbolic additions are welcome.** For the pyramid he chose a sunburst behind it and a big eye opening
+  on its face, with a little flaming crown, over cracks, heat colour, puffing up, or an eruption.
+- **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
+
+## 6. Repeat
+
+For each object: render its current animation (`node scripts/object_frames.mjs <binding-id> --tag before`), run the
+review loop above, build, render the after, compare first-to-last frame, and tune until it reads as the object doing
+its thing in the painting's style.
 
 ## Done so far
 
 | object | binding | what it is | what it does |
 | --- | --- | --- | --- |
-| golden-pyramid | `amp.drive` | the big golden pyramid, centre-right, with creatures on it | molten heat rises inside it; past half its outline boils (to redo under this pattern) |
+| golden-pyramid | `amp.drive` | the big golden pyramid, centre-right, with creatures on it | chosen: a sunburst grows out behind it, a big eye opens on its right face, small flames rise on its slopes (mocked up in `docs/objects/pyramid-drive/sunburst/`, not yet built) |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
