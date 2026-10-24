@@ -31,8 +31,8 @@ export interface RegionEntry extends Control {
   region: RegionShape;
 }
 
-export type EffectKind = 'glow' | 'hue' | 'fill' | 'scribble' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
-export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'fill', 'scribble', 'boil', 'swell', 'lean', 'spin', 'blink'];
+export type EffectKind = 'glow' | 'hue' | 'fill' | 'scribble' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
+export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'fill', 'scribble', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
 /** Older names still read: pulse and wobble were free-running; as frames of the timeline they are swell and lean. */
 const EFFECT_ALIASES: Record<string, EffectKind> = { pulse: 'swell', wobble: 'lean' };
 export type FillFrom = 'bottom' | 'top' | 'left' | 'right';

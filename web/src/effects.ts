@@ -17,6 +17,9 @@
 //             `turn` turns the revealed colour's hue (degrees by the last frame) as it advances, `toward` moves every
 //             shape's revealed colour to one hue instead, `color` moves it to one exact colour
 //   scribble  pencil loops drawn in, clipped to the shape, in the painting's own scribble style (`count` strokes)
+//   line      the object's linework from less of itself to more of itself: at u = 0 thinner, lighter and broken by
+//             small gaps like an unfinished sketch; at 0.5 exactly as painted; at 1 bolder, with a second hand-drawn
+//             pass of every stroke just beside the first (thinning, gaps and boldness scale with `amount`)
 //   boil      the outline redrawn: the lines bend further from their own shape as u grows, a new drawing every
 //             1/12 of the way, so dragging makes them writhe and holding keeps them still; the original at 0
 //   swell     the object grows about its centre, 8% at amount 1 (negative shrinks)
@@ -37,6 +40,12 @@ const HUE_DEG = 60;
 const GLOW_OPACITY = 0.6;
 /** fill: the revealed copy is the shape's own colour glowing this much (vivid, lighter for mid and dark colours). */
 const FILL_GLOW = 1.4;
+/**
+ * line: at amount 1, how much thinner the strokes get at the start (canvas px eroded from each side; the painting's
+ * lines are 14 to 40 px wide), how much of them the gaps take, how much bolder they get at the end, and the second pass:
+ * its opacity, how far beside the first it sits, and how differently it is drawn (px of bending).
+ */
+const LINE_THIN_PX = 4, LINE_GAPS = 0.3, LINE_BOLD_PX = 5, ECHO_OPACITY = 0.6, ECHO_OFFSET_PX = 9, ECHO_BEND_PX = 10;
 /** boil: how far lines bend at u = 1 (canvas px), and how many distinct drawings there are from 0 to 1. */
 const BOIL_PX = 12, BOIL_FRAMES = 12;
 /** Wavelengths of the bending field in canvas px: long enough that both edges of a stroke move together. */
@@ -89,6 +98,11 @@ interface Track {
   reveals: Reveal[];
   /** scribble */
   scribble?: Scribble;
+  /** line: the filter on the object's strokes, its knobs, and the second pass */
+  line?: {
+    paths: SVGPathElement[]; filterId: string; morph: SVGFEMorphologyElement; mask: SVGFEFuncAElement;
+    echo: SVGGElement; under: SVGGElement; written: string;
+  };
   /** swell, lean, spin, blink: the elements moved, and the centre and base point they move about */
   targets: SVGPathElement[];
   centre: [number, number];
@@ -223,6 +237,62 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
         case 'boil':
           tr.ink = obj.ink.filter((s) => art.ink.has(s));
           break;
+        case 'line': {
+          const paths = obj.ink.map((s) => art.ink.get(s)).filter((p): p is SVGPathElement => !!p);
+          if (!paths.length) break;
+          // One filter for the object's strokes: erode or dilate, then a noise mask that opens gaps.
+          const filterId = `ts-line-${uid++}`;
+          const f = document.createElementNS(SVG, 'filter');
+          f.id = filterId;
+          f.setAttribute('filterUnits', 'userSpaceOnUse');
+          f.setAttribute('x', String(bx - 60)); f.setAttribute('y', String(by - 60));
+          f.setAttribute('width', String(bw + 120)); f.setAttribute('height', String(bh + 120));
+          const morph = document.createElementNS(SVG, 'feMorphology');
+          morph.setAttribute('in', 'SourceGraphic'); morph.setAttribute('operator', 'erode'); morph.setAttribute('radius', '0');
+          morph.setAttribute('result', 'weight');
+          const noise = document.createElementNS(SVG, 'feTurbulence');
+          noise.setAttribute('type', 'fractalNoise'); noise.setAttribute('baseFrequency', '0.03'); noise.setAttribute('numOctaves', '2');
+          noise.setAttribute('seed', String(1 + Math.floor(rand() * 999))); noise.setAttribute('result', 'noise');
+          const ct = document.createElementNS(SVG, 'feComponentTransfer');
+          ct.setAttribute('in', 'noise'); ct.setAttribute('result', 'mask');
+          const fa = document.createElementNS(SVG, 'feFuncA');
+          fa.setAttribute('type', 'linear'); fa.setAttribute('slope', '0'); fa.setAttribute('intercept', '1');
+          ct.append(fa);
+          const comp = document.createElementNS(SVG, 'feComposite');
+          comp.setAttribute('in', 'weight'); comp.setAttribute('in2', 'mask'); comp.setAttribute('operator', 'in');
+          f.append(morph, noise, ct, comp);
+          stack.defs.append(f);
+          L.added.push(f);
+          // The second pass: every stroke redrawn a little differently, beside the first, hidden until past 0.5.
+          const echo = document.createElementNS(SVG, 'g');
+          echo.setAttribute('fill', '#000');
+          echo.setAttribute('opacity', '0');
+          echo.style.pointerEvents = 'none';
+          const er = rng(`${binding.id}#echo`);
+          for (const p of paths) {
+            const e = document.createElementNS(SVG, 'path');
+            e.setAttribute('d', wobblePath(p.getAttribute('d') ?? '', ECHO_BEND_PX * Math.abs(spec.amount), er));
+            echo.append(e);
+          }
+          stack.ink.append(echo);
+          L.added.push(echo);
+          // Under the strokes, the object's own colour: the painting's shapes stop at the ink, so where a line thins
+          // or breaks this shows instead of white paper. Only below the middle frame.
+          const bodyId = obj.roles.get('body')?.[0] ?? obj.fills[0] ?? '';
+          const under = document.createElementNS(SVG, 'g');
+          under.setAttribute('fill', fillParts.get(bodyId)?.fill ?? '#888888');
+          under.setAttribute('opacity', '0');
+          under.style.pointerEvents = 'none';
+          for (const p of paths) {
+            const c = document.createElementNS(SVG, 'path');
+            c.setAttribute('d', p.getAttribute('d') ?? '');
+            under.append(c);
+          }
+          stack.ink.before(under);
+          L.added.push(under);
+          tr.line = { paths, filterId, morph, mask: fa, echo, under, written: '' };
+          break;
+        }
         case 'fill':
           for (const id of ids) {
             const orig = art.fills.get(id), part = fillParts.get(id);
@@ -322,6 +392,9 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     return L;
   };
   const retire = (L: Live): void => {
+    for (const tr of L.tracks) if (tr.line) for (const p of tr.line.paths) {
+      if (p.getAttribute('filter') === `url(#${tr.line.filterId})`) p.removeAttribute('filter');
+    }
     for (const el of L.added) el.remove();
     L.added = [];
   };
@@ -428,6 +501,48 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       if (parts.has(el)) continue;
       el.removeAttribute('transform');
       transformed.delete(el);
+    }
+
+    // Line: one filter per track on its object's strokes; below the middle thinner and gappier, above it bolder with
+    // the second pass showing. At exactly 0.5 the strokes are left as painted (no filter at all).
+    const filtered = new Map<SVGPathElement, string>();
+    for (const L of live) for (const tr of L.tracks) {
+      const ln = tr.line;
+      if (!ln) continue;
+      const u = local(tr, L.shown);
+      const a = Math.abs(tr.spec.amount);
+      const less = Math.max(0, 1 - 2 * u), more = Math.max(0, 2 * u - 1);
+      const key = `${less.toFixed(3)}/${more.toFixed(3)}`;
+      if (key !== ln.written) {
+        ln.written = key;
+        if (less > 0) {
+          ln.morph.setAttribute('operator', 'erode');
+          ln.morph.setAttribute('radius', (LINE_THIN_PX * a * less).toFixed(2));
+          // Noise alpha sits around 0.5; this keeps coverage full at less = 0 and opens gaps over LINE_GAPS of it at 1.
+          const t = 0.5 - 0.3 + LINE_GAPS * a * less * 0.6;
+          ln.mask.setAttribute('slope', '12');
+          ln.mask.setAttribute('intercept', (-12 * t + 0.5).toFixed(3));
+        } else {
+          ln.morph.setAttribute('operator', 'dilate');
+          ln.morph.setAttribute('radius', (LINE_BOLD_PX * a * more).toFixed(2));
+          ln.mask.setAttribute('slope', '0');
+          ln.mask.setAttribute('intercept', '1');
+        }
+        ln.under.setAttribute('opacity', less > 0 ? '1' : '0');
+        ln.echo.setAttribute('opacity', (ECHO_OPACITY * Math.min(1, a) * more).toFixed(3));
+        const off = ECHO_OFFSET_PX * a * more;
+        ln.echo.setAttribute('transform', `translate(${off.toFixed(1)} ${(-off * 0.7).toFixed(1)})`);
+      }
+      if (less > 0 || more > 0) for (const p of ln.paths) filtered.set(p, ln.filterId);
+    }
+    for (const L of live) for (const tr of L.tracks) {
+      if (!tr.line) continue;
+      for (const p of tr.line.paths) {
+        const want = filtered.get(p);
+        const has = p.getAttribute('filter');
+        if (want && has !== `url(#${want})`) p.setAttribute('filter', `url(#${want})`);
+        else if (!want && has) p.removeAttribute('filter');
+      }
     }
 
     // Boil: per stroke, the depth is the largest any track asks for; the drawing is the one for that depth.

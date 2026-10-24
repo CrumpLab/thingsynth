@@ -150,6 +150,7 @@ span (`web/src/effects.ts`):
 | `hue` | fills | the hue turned 60 degrees (negative turns the other way) | |
 | `fill` | fills | a vivid copy of the object fully revealed from an edge, one level across all its shapes, like a drawbar pulled out | `from`: bottom, top, left, right; `edge`: straight or wave (a hand-drawn surface that rolls as it moves); `turn` (degrees the colour turns as it advances), `toward` (a hue, OKLCH degrees, every shape's colour moves to) or `color` (an exact colour it moves to) |
 | `scribble` | fills | pencil loops in the painting's own scribble style, all drawn in, clipped to the shape | `count` (default 14) |
+| `line` | ink | the linework from less of itself to more of itself: at the first frame thinner (4 px eroded from each side) and broken by gaps like an unfinished sketch, the object's own colour showing where lines thin; exactly as painted at the middle; at the last frame bolder (5 px) with a second hand-drawn pass of every stroke beside the first | |
 | `boil` | ink | the outline redrawn, its lines bent up to 12 canvas px; a new drawing every 1/12 of the way, so dragging makes them writhe and holding keeps them still | |
 | `swell` | object | 8% larger about its centre (negative shrinks) | |
 | `lean` | object | leaning 10 degrees from its base (negative leans left) | |
@@ -179,7 +180,8 @@ surface climbs from the pyramid's base to its apex as Drive goes 0 to 1, both fa
 rises; the faces above the level warm from 20%; the outline starts to boil past 55%, easing in.
 **stalk-drawbar-16 and stalk-drawbar-513**, sap rising: a green sap with a wavy surface climbs each stalk with the
 drawbar, turning a luminous light green (#9cf27c) towards the top; each bud on the stalk (roles `bud-1`..) swells
-24% and glows just as the sap reaches its height.
+24% and glows just as the sap reaches its height; and the linework goes from thin broken sketch lines with the
+drawbar in, through the lines as painted at half way, to bold double-inked lines with it fully out (`line`).
 
 Fill ids (`f001`..) and ink ids (`i0001`..) come from the extractor and are stable as long as the PSD's drawing does
 not change; `?debug`'s parts mode (backquote) shows the id of the shape under the pointer. The parts table also
