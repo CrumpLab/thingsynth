@@ -1,0 +1,738 @@
+{
+  "id": "tonewheel",
+  "name": "Tonewheel",
+  "kind": "synth",
+  "core": "additive",
+  "version": "0.1.0",
+  "family": "Additive (tonewheel organ)",
+  "lineage": [
+    "Hammond B3",
+    "Hammond C3",
+    "Leslie 122"
+  ],
+  "description": "Tonewheel organ: 91 gear-tuned wheels with foldback, nine drawbars on each of two manuals plus pedals, contact key click, single-triggered harmonic percussion, scanner vibrato and chorus, a tube preamp and a rotating speaker whose horn and drum speed up and brake at their own rates.",
+  "codes": {
+    "manufacturer": "Crmp",
+    "plugin": "SLtw"
+  },
+  "engineOptions": {
+    "topology": "tonewheel",
+    "wheels": 91,
+    "manuals": 2,
+    "pedals": 25
+  },
+  "parameters": {
+    "engine.topology": {
+      "hidden": true,
+      "default": "Tonewheel"
+    },
+    "perc.fast_time": {
+      "hidden": true
+    },
+    "perc.slow_time": {
+      "hidden": true
+    },
+    "vib.rate": {
+      "hidden": true
+    },
+    "vib.chorus_mix": {
+      "hidden": true
+    },
+    "leslie.horn_slow": {
+      "hidden": true
+    },
+    "leslie.horn_fast": {
+      "hidden": true
+    },
+    "leslie.drum_slow": {
+      "hidden": true
+    },
+    "leslie.drum_fast": {
+      "hidden": true
+    },
+    "leslie.horn_accel": {
+      "hidden": true
+    },
+    "leslie.horn_decel": {
+      "hidden": true
+    },
+    "leslie.drum_accel": {
+      "hidden": true
+    },
+    "leslie.drum_decel": {
+      "hidden": true
+    },
+    "leslie.xover": {
+      "hidden": true
+    },
+    "leslie.cabinet": {
+      "hidden": true
+    },
+    "leslie.horn_am": {
+      "hidden": true
+    },
+    "voice.count": {
+      "hidden": true
+    },
+    "voice.mode": {
+      "hidden": true
+    },
+    "voice.glide": {
+      "hidden": true
+    },
+    "voice.bend_range": {
+      "hidden": true
+    },
+    "voice.phase": {
+      "hidden": true
+    },
+    "spa.h01": {
+      "hidden": true
+    },
+    "spa.h02": {
+      "hidden": true
+    },
+    "spa.h03": {
+      "hidden": true
+    },
+    "spa.h04": {
+      "hidden": true
+    },
+    "spa.h05": {
+      "hidden": true
+    },
+    "spa.h06": {
+      "hidden": true
+    },
+    "spa.h07": {
+      "hidden": true
+    },
+    "spa.h08": {
+      "hidden": true
+    },
+    "spa.h09": {
+      "hidden": true
+    },
+    "spa.h10": {
+      "hidden": true
+    },
+    "spa.h11": {
+      "hidden": true
+    },
+    "spa.h12": {
+      "hidden": true
+    },
+    "spa.h13": {
+      "hidden": true
+    },
+    "spa.h14": {
+      "hidden": true
+    },
+    "spa.h15": {
+      "hidden": true
+    },
+    "spa.h16": {
+      "hidden": true
+    },
+    "spa.h17": {
+      "hidden": true
+    },
+    "spa.h18": {
+      "hidden": true
+    },
+    "spa.h19": {
+      "hidden": true
+    },
+    "spa.h20": {
+      "hidden": true
+    },
+    "spa.h21": {
+      "hidden": true
+    },
+    "spa.h22": {
+      "hidden": true
+    },
+    "spa.h23": {
+      "hidden": true
+    },
+    "spa.h24": {
+      "hidden": true
+    },
+    "spa.h25": {
+      "hidden": true
+    },
+    "spa.h26": {
+      "hidden": true
+    },
+    "spa.h27": {
+      "hidden": true
+    },
+    "spa.h28": {
+      "hidden": true
+    },
+    "spa.h29": {
+      "hidden": true
+    },
+    "spa.h30": {
+      "hidden": true
+    },
+    "spa.h31": {
+      "hidden": true
+    },
+    "spa.h32": {
+      "hidden": true
+    },
+    "spa.h33": {
+      "hidden": true
+    },
+    "spa.h34": {
+      "hidden": true
+    },
+    "spa.h35": {
+      "hidden": true
+    },
+    "spa.h36": {
+      "hidden": true
+    },
+    "spa.h37": {
+      "hidden": true
+    },
+    "spa.h38": {
+      "hidden": true
+    },
+    "spa.h39": {
+      "hidden": true
+    },
+    "spa.h40": {
+      "hidden": true
+    },
+    "spa.h41": {
+      "hidden": true
+    },
+    "spa.h42": {
+      "hidden": true
+    },
+    "spa.h43": {
+      "hidden": true
+    },
+    "spa.h44": {
+      "hidden": true
+    },
+    "spa.h45": {
+      "hidden": true
+    },
+    "spa.h46": {
+      "hidden": true
+    },
+    "spa.h47": {
+      "hidden": true
+    },
+    "spa.h48": {
+      "hidden": true
+    },
+    "spa.h49": {
+      "hidden": true
+    },
+    "spa.h50": {
+      "hidden": true
+    },
+    "spa.h51": {
+      "hidden": true
+    },
+    "spa.h52": {
+      "hidden": true
+    },
+    "spa.h53": {
+      "hidden": true
+    },
+    "spa.h54": {
+      "hidden": true
+    },
+    "spa.h55": {
+      "hidden": true
+    },
+    "spa.h56": {
+      "hidden": true
+    },
+    "spa.h57": {
+      "hidden": true
+    },
+    "spa.h58": {
+      "hidden": true
+    },
+    "spa.h59": {
+      "hidden": true
+    },
+    "spa.h60": {
+      "hidden": true
+    },
+    "spa.h61": {
+      "hidden": true
+    },
+    "spa.h62": {
+      "hidden": true
+    },
+    "spa.h63": {
+      "hidden": true
+    },
+    "spa.h64": {
+      "hidden": true
+    },
+    "spb.h01": {
+      "hidden": true
+    },
+    "spb.h02": {
+      "hidden": true
+    },
+    "spb.h03": {
+      "hidden": true
+    },
+    "spb.h04": {
+      "hidden": true
+    },
+    "spb.h05": {
+      "hidden": true
+    },
+    "spb.h06": {
+      "hidden": true
+    },
+    "spb.h07": {
+      "hidden": true
+    },
+    "spb.h08": {
+      "hidden": true
+    },
+    "spb.h09": {
+      "hidden": true
+    },
+    "spb.h10": {
+      "hidden": true
+    },
+    "spb.h11": {
+      "hidden": true
+    },
+    "spb.h12": {
+      "hidden": true
+    },
+    "spb.h13": {
+      "hidden": true
+    },
+    "spb.h14": {
+      "hidden": true
+    },
+    "spb.h15": {
+      "hidden": true
+    },
+    "spb.h16": {
+      "hidden": true
+    },
+    "spb.h17": {
+      "hidden": true
+    },
+    "spb.h18": {
+      "hidden": true
+    },
+    "spb.h19": {
+      "hidden": true
+    },
+    "spb.h20": {
+      "hidden": true
+    },
+    "spb.h21": {
+      "hidden": true
+    },
+    "spb.h22": {
+      "hidden": true
+    },
+    "spb.h23": {
+      "hidden": true
+    },
+    "spb.h24": {
+      "hidden": true
+    },
+    "spb.h25": {
+      "hidden": true
+    },
+    "spb.h26": {
+      "hidden": true
+    },
+    "spb.h27": {
+      "hidden": true
+    },
+    "spb.h28": {
+      "hidden": true
+    },
+    "spb.h29": {
+      "hidden": true
+    },
+    "spb.h30": {
+      "hidden": true
+    },
+    "spb.h31": {
+      "hidden": true
+    },
+    "spb.h32": {
+      "hidden": true
+    },
+    "spb.h33": {
+      "hidden": true
+    },
+    "spb.h34": {
+      "hidden": true
+    },
+    "spb.h35": {
+      "hidden": true
+    },
+    "spb.h36": {
+      "hidden": true
+    },
+    "spb.h37": {
+      "hidden": true
+    },
+    "spb.h38": {
+      "hidden": true
+    },
+    "spb.h39": {
+      "hidden": true
+    },
+    "spb.h40": {
+      "hidden": true
+    },
+    "spb.h41": {
+      "hidden": true
+    },
+    "spb.h42": {
+      "hidden": true
+    },
+    "spb.h43": {
+      "hidden": true
+    },
+    "spb.h44": {
+      "hidden": true
+    },
+    "spb.h45": {
+      "hidden": true
+    },
+    "spb.h46": {
+      "hidden": true
+    },
+    "spb.h47": {
+      "hidden": true
+    },
+    "spb.h48": {
+      "hidden": true
+    },
+    "spb.h49": {
+      "hidden": true
+    },
+    "spb.h50": {
+      "hidden": true
+    },
+    "spb.h51": {
+      "hidden": true
+    },
+    "spb.h52": {
+      "hidden": true
+    },
+    "spb.h53": {
+      "hidden": true
+    },
+    "spb.h54": {
+      "hidden": true
+    },
+    "spb.h55": {
+      "hidden": true
+    },
+    "spb.h56": {
+      "hidden": true
+    },
+    "spb.h57": {
+      "hidden": true
+    },
+    "spb.h58": {
+      "hidden": true
+    },
+    "spb.h59": {
+      "hidden": true
+    },
+    "spb.h60": {
+      "hidden": true
+    },
+    "spb.h61": {
+      "hidden": true
+    },
+    "spb.h62": {
+      "hidden": true
+    },
+    "spb.h63": {
+      "hidden": true
+    },
+    "spb.h64": {
+      "hidden": true
+    },
+    "spec.morph": {
+      "hidden": true
+    },
+    "spec.morph_env": {
+      "hidden": true
+    },
+    "spec.morph_lfo": {
+      "hidden": true
+    },
+    "spec.morph_vel": {
+      "hidden": true
+    },
+    "spec.count": {
+      "hidden": true
+    },
+    "spec.tilt": {
+      "hidden": true
+    },
+    "spec.odd_even": {
+      "hidden": true
+    },
+    "spec.stretch": {
+      "hidden": true
+    },
+    "spec.ratios": {
+      "hidden": true
+    },
+    "spec.spread": {
+      "hidden": true
+    },
+    "grp.mode": {
+      "hidden": true
+    },
+    "env1.delay": {
+      "hidden": true
+    },
+    "env1.attack": {
+      "hidden": true
+    },
+    "env1.hold": {
+      "hidden": true
+    },
+    "env1.decay": {
+      "hidden": true
+    },
+    "env1.sustain": {
+      "hidden": true
+    },
+    "env1.release": {
+      "hidden": true
+    },
+    "env2.delay": {
+      "hidden": true
+    },
+    "env2.attack": {
+      "hidden": true
+    },
+    "env2.hold": {
+      "hidden": true
+    },
+    "env2.decay": {
+      "hidden": true
+    },
+    "env2.sustain": {
+      "hidden": true
+    },
+    "env2.release": {
+      "hidden": true
+    },
+    "env3.delay": {
+      "hidden": true
+    },
+    "env3.attack": {
+      "hidden": true
+    },
+    "env3.hold": {
+      "hidden": true
+    },
+    "env3.decay": {
+      "hidden": true
+    },
+    "env3.sustain": {
+      "hidden": true
+    },
+    "env3.release": {
+      "hidden": true
+    },
+    "env4.delay": {
+      "hidden": true
+    },
+    "env4.attack": {
+      "hidden": true
+    },
+    "env4.hold": {
+      "hidden": true
+    },
+    "env4.decay": {
+      "hidden": true
+    },
+    "env4.sustain": {
+      "hidden": true
+    },
+    "env4.release": {
+      "hidden": true
+    },
+    "env.decay_tilt": {
+      "hidden": true
+    },
+    "env.vel": {
+      "hidden": true
+    },
+    "env.vel_bright": {
+      "hidden": true
+    },
+    "menv.attack": {
+      "hidden": true
+    },
+    "menv.decay": {
+      "hidden": true
+    },
+    "menv.sustain": {
+      "hidden": true
+    },
+    "menv.release": {
+      "hidden": true
+    },
+    "formant.on": {
+      "hidden": true
+    },
+    "formant.vowel": {
+      "hidden": true
+    },
+    "formant.shift": {
+      "hidden": true
+    },
+    "formant.depth": {
+      "hidden": true
+    },
+    "formant.width": {
+      "hidden": true
+    },
+    "formant.env": {
+      "hidden": true
+    },
+    "formant.lfo": {
+      "hidden": true
+    },
+    "formant.vowel_env": {
+      "hidden": true
+    },
+    "formant.vowel_lfo": {
+      "hidden": true
+    },
+    "filter.cutoff": {
+      "hidden": true
+    },
+    "filter.slope": {
+      "hidden": true
+    },
+    "filter.peak": {
+      "hidden": true
+    },
+    "filter.env": {
+      "hidden": true
+    },
+    "filter.key": {
+      "hidden": true
+    },
+    "lfo.shape": {
+      "hidden": true
+    },
+    "lfo.rate": {
+      "hidden": true
+    },
+    "lfo.delay": {
+      "hidden": true
+    },
+    "lfo.pitch": {
+      "hidden": true
+    },
+    "lfo.amp": {
+      "hidden": true
+    },
+    "lfo.wheel": {
+      "hidden": true
+    },
+    "wheel.morph": {
+      "hidden": true
+    },
+    "wheel.formant": {
+      "hidden": true
+    },
+    "amp.pan_spread": {
+      "hidden": true
+    }
+  },
+  "macros": [
+    "leslie.speed",
+    "amp.drive",
+    "upper.db1",
+    "upper.db2",
+    "upper.db3",
+    "upper.db4",
+    "perc.on",
+    "vib.mode"
+  ],
+  "presetCategories": [
+    "Jazz",
+    "Gospel",
+    "Rock",
+    "Ballad",
+    "Percussive",
+    "Full",
+    "Soft",
+    "Theatre",
+    "Bass",
+    "FX"
+  ],
+  "presetPhrases": {
+    "Jazz": "chord",
+    "Gospel": "chord",
+    "Rock": "chord",
+    "Ballad": "chord",
+    "Percussive": "pluck",
+    "Full": "chord",
+    "Soft": "chord",
+    "Theatre": "chord",
+    "Bass": "bass",
+    "FX": "sustain"
+  },
+  "presetRanges": {
+    "amp.drive": [
+      0.0,
+      0.85
+    ],
+    "tg.click": [
+      0.1,
+      0.8
+    ],
+    "leslie.mic_angle": [
+      60,
+      160
+    ],
+    "out.level": [
+      -30,
+      12
+    ]
+  },
+  "skin": {
+    "entry": "skin/index.html",
+    "width": 980,
+    "height": 460,
+    "theme": {
+      "accent": "#e0a03c",
+      "panel": "#2a1a12",
+      "text": "#f3e6d0",
+      "wood": "#6b4226",
+      "chrome": "#c9c2b6",
+      "tabRed": "#b8322a",
+      "tabWhite": "#efe7d6"
+    }
+  },
+  "presetNoPitchCheck": [
+    "Theatre"
+  ]
+}
