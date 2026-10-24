@@ -3,3 +3,4 @@ dist/
 web/public/runtime/
 .DS_Store
 *.log
+__pycache__/

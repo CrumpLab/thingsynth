@@ -68,6 +68,9 @@ What the decisions have shown, to apply to later objects:
   bolder was not wanted.
 - **Expressive, symbolic additions are welcome.** For the pyramid he chose a sunburst behind it and a big eye opening
   on its face, with a little flaming crown, over cracks, heat colour, puffing up, or an eruption.
+- **Pyramid review (2026-10-24):** offered five end frames: flaming crown, puffed up, puffed and burning, erupting,
+  sunburst and eye. Picked sunburst and eye "with a little bit of flaming crown". Before that, cracks of lava and a
+  heat fill were rejected as not working; Matt stepped in to steer with options rather than iterations.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
@@ -80,5 +83,5 @@ its thing in the painting's style.
 
 | object | binding | what it is | what it does |
 | --- | --- | --- | --- |
-| golden-pyramid | `amp.drive` | the big golden pyramid, centre-right, with creatures on it | chosen: a sunburst grows out behind it, a big eye opens on its right face, small flames rise on its slopes (mocked up in `docs/objects/pyramid-drive/sunburst/`, not yet built) |
+| golden-pyramid | `amp.drive` | the big golden pyramid, centre-right, with creatures on it | built: a sunburst grows out behind it (frames 0-0.6), a big eye opens on its right face (0.25-0.8), small flames rise on its slopes (0.55-1), its faces warm throughout; `docs/objects/pyramid-drive/mockup-vs-app.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |

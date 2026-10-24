@@ -37,7 +37,7 @@
 import type { WebSynthlandHost } from '../runtime/types';
 import { layers, type Art } from './art';
 import { glowColour, hexToOklch, mixOklch, oklchToHex, type Oklch } from './color';
-import { positionOf, type Binding, type Ease, type EffectSpec } from './mapping';
+import { positionOf, type Binding, type Ease, type EffectSpec, type FlameSpot } from './mapping';
 import { fillParts, inkParts, resolveObject, type ArtObject } from './objects';
 
 const SVG = 'http://www.w3.org/2000/svg';
@@ -83,7 +83,11 @@ const LITE = ((): boolean => {
 })();
 const PAINT_EVERY_MS = 1000 / (LITE ? 20 : PAINT_HZ);
 
-type Fill = { el: SVGPathElement; hex: string; base: Oklch; opacity: number; hue: number; glow: number; written: string };
+type Fill = {
+  el: SVGPathElement; hex: string; base: Oklch; opacity: number; hue: number; glow: number; written: string;
+  /** tint: the colour it moves to and how far (0..1) */
+  tint: { to: Oklch; u: number } | null;
+};
 type Reveal = {
   copy: SVGPathElement; clip: SVGPathElement; base: Oklch; glow: number; turn: number; to: Oklch | null;
   box: [number, number, number, number]; from: string; wave: boolean; written: string; colour: string;
@@ -110,6 +114,8 @@ interface Track {
   };
   /** grow: the features, each with when it grows and how */
   growth?: Growth;
+  /** rays, eye, flames: draws the track at its own position u (0..1) */
+  draw?: (u: number) => void;
   /** swell, lean, spin, blink: the elements moved, and the centre and base point they move about */
   targets: SVGPathElement[];
   centre: [number, number];
@@ -191,7 +197,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     if (f) return f;
     const el = art.fills.get(id), part = fillParts.get(id);
     if (!el || !part) return undefined;
-    f = { el, hex: part.fill, base: hexToOklch(part.fill), opacity: part.opacity, hue: 0, glow: 0, written: '' };
+    f = { el, hex: part.fill, base: hexToOklch(part.fill), opacity: part.opacity, hue: 0, glow: 0, written: '', tint: null };
     fills.set(id, f);
     return f;
   };
@@ -223,12 +229,50 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     })
     : obj.fills;
 
+  /** The last of these shapes in paint order, past any reveal copies after it. */
+  const afterShapes = (ids: string[]): Element => {
+    const els = ids.map((id) => art.fills.get(id)).filter((p): p is SVGPathElement => !!p);
+    let anchor: Element = els.reduce((a, b) => (Number(a.id.slice(1)) > Number(b.id.slice(1)) ? a : b));
+    while (anchor.nextElementSibling && (anchor.nextElementSibling as HTMLElement).dataset?.revealOf) anchor = anchor.nextElementSibling;
+    return anchor;
+  };
+  /** A group above every painted shape, masked out over the given shapes so they stay in front of it. */
+  let currentAdded: Element[] = [];
+  const topGroup = (own: string[], front: string[], overInk = false): SVGGElement => {
+    const [W, H] = layers.canvas;
+    const maskId = `ts-front-${uid++}`;
+    const mask = document.createElementNS(SVG, 'mask');
+    mask.id = maskId;
+    mask.setAttribute('maskUnits', 'userSpaceOnUse');
+    mask.setAttribute('x', '0'); mask.setAttribute('y', '0'); mask.setAttribute('width', String(W)); mask.setAttribute('height', String(H));
+    const all = document.createElementNS(SVG, 'rect');
+    all.setAttribute('width', String(W)); all.setAttribute('height', String(H)); all.setAttribute('fill', '#fff');
+    mask.append(all);
+    for (const id of [...own, ...front]) {
+      const d = art.fills.get(id)?.getAttribute('d');
+      if (!d) continue;
+      const c = document.createElementNS(SVG, 'path');
+      c.setAttribute('d', d); c.setAttribute('fill', '#000');
+      // Over the ink, the shapes' outlines must stay visible too: mask out a band as wide as the ink around them.
+      if (overInk) { c.setAttribute('stroke', '#000'); c.setAttribute('stroke-width', '44'); c.setAttribute('stroke-linejoin', 'round'); }
+      mask.append(c);
+    }
+    stack.defs.append(mask);
+    const g = document.createElementNS(SVG, 'g');
+    g.setAttribute('mask', `url(#${maskId})`);
+    g.style.pointerEvents = 'none';
+    if (overInk) stack.ink.after(g); else stack.fills.append(g);
+    currentAdded.push(mask, g);
+    return g;
+  };
+
   // ---- build: one binding's animation and the elements it adds to the painting --------------------------------------
   const build = (binding: Binding): Live | null => {
     const obj = resolveObject(objects, binding.object);
     if (!obj) return null; // main.ts warns
     const rand = rng(binding.id);
     const L: Live = { binding, obj, target: 0, shown: 0, tau: binding.glide ?? GLIDE_MS, startAt: 0, tracks: [], retiring: false, added: [], pinned: null };
+    currentAdded = L.added;
     const [bx, by, bw, bh] = obj.bbox;
     for (const spec of binding.effects) {
       const ids = partsOf(obj, spec, binding.id);
@@ -239,8 +283,31 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       switch (spec.effect) {
         case 'glow':
         case 'hue':
+        case 'tint':
           tr.fills = ids.filter((id) => fillState(id));
           break;
+        case 'rays':
+        case 'flames': {
+          // Above every painted shape, masked so the object and the named front shapes stay in front of it.
+          // Rays sit among the fills (the ink and scribbles over them); flames above the ink, like added drawing.
+          const g = topGroup(ids, spec.front ?? [], spec.effect === 'flames');
+          tr.draw = spec.effect === 'rays'
+            ? drawRays(g, spec.at ?? obj.centroid, spec.size ?? [380, 1250, 1550], spec.count ?? 16)
+            : drawFlames(g, spec.spots ?? [], rand);
+          break;
+        }
+        case 'eye': {
+          // On the object, just above its own shapes: anything painted on it later stays in front.
+          const g = document.createElementNS(SVG, 'g');
+          g.style.pointerEvents = 'none';
+          afterShapes(ids).after(g);
+          L.added.push(g);
+          const [ex, ey] = spec.at ?? obj.centroid;
+          const m = Math.min(obj.bbox[2], obj.bbox[3]);
+          const [rx = m * 0.18, ry = m * 0.1] = spec.size ?? [];
+          tr.draw = drawEye(g, ex, ey, rx, ry, `ts-eye-${uid++}`);
+          break;
+        }
         case 'boil':
           tr.ink = obj.ink.filter((s) => art.ink.has(s));
           break;
@@ -447,21 +514,27 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
   // ---- painting: every frame is computed from the bindings' frames alone ----------------------------------------------
   const paint = (): void => {
     // Colours
-    for (const f of fills.values()) { f.hue = 0; f.glow = 0; }
+    for (const f of fills.values()) { f.hue = 0; f.glow = 0; f.tint = null; }
     for (const L of live) for (const tr of L.tracks) {
       if (!tr.fills.length) continue;
       const u = local(tr, L.shown);
       for (const id of tr.fills) {
         const f = fills.get(id);
         if (!f) continue;
-        if (tr.spec.effect === 'hue') f.hue += tr.spec.amount * HUE_DEG * u; else f.glow += tr.spec.amount * u;
+        if (tr.spec.effect === 'hue') f.hue += tr.spec.amount * HUE_DEG * u;
+        else if (tr.spec.effect === 'tint') { if (tr.spec.color && u > 0) f.tint = { to: hexToOklch(tr.spec.color), u: Math.min(1, u * Math.abs(tr.spec.amount)) }; }
+        else f.glow += tr.spec.amount * u;
       }
     }
     for (const f of fills.values()) {
       const g = Math.max(-1, Math.min(1.5, f.glow));
-      const atRest = Math.abs(f.hue) < 0.05 && Math.abs(g) < 1e-3;
-      const col = atRest ? f.hex : glowColour(f.base, f.hue, g);
-      const op = atRest ? f.opacity : Math.max(0, Math.min(1, f.opacity + (1 - f.opacity) * GLOW_OPACITY * Math.max(0, g)));
+      const atRest = Math.abs(f.hue) < 0.05 && Math.abs(g) < 1e-3 && !f.tint;
+      let col = atRest ? f.hex : glowColour(f.base, f.hue, g);
+      let op = atRest ? f.opacity : Math.max(0, Math.min(1, f.opacity + (1 - f.opacity) * GLOW_OPACITY * Math.max(0, g)));
+      if (f.tint) {
+        col = oklchToHex(mixOklch(hexToOklch(col), f.tint.to, f.tint.u));
+        op = op + (1 - op) * f.tint.u;
+      }
       const key = `${col}/${op.toFixed(3)}`;
       if (key === f.written) continue;
       f.written = key;
@@ -519,6 +592,9 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       el.removeAttribute('transform');
       transformed.delete(el);
     }
+
+    // Rays, eye, flames: drawn straight from the track's position.
+    for (const L of live) for (const tr of L.tracks) if (tr.draw) tr.draw(local(tr, L.shown));
 
     // Grow: each feature at its own progress through its window of the timeline.
     for (const L of live) for (const tr of L.tracks) {
@@ -784,6 +860,134 @@ interface GrowFeature {
   written: string;
 }
 interface Growth { features: GrowFeature[] }
+
+// ---- rays, eye, flames ---------------------------------------------------------------------------------------------
+
+const RAY_COLOURS = ['#ff9f43', '#ffd23f'];
+const RAY_HALF_ANGLE = 0.13, RAY_EDGE_PX = 12;
+const FLAME_OUTER = ['#ff8a3d', '#ff6b4a', '#ff9f43', '#ff5e7a'];
+const FLAME_CORE = '#ffe066';
+const FLAME_H = 420, FLAME_W = 200, FLAME_EDGE_PX = 15;
+const EYE_EDGE_PX = 16, IRIS = '#3fb6ff';
+
+const easeOut3 = (u: number): number => 1 - Math.pow(1 - Math.max(0, Math.min(1, u)), 3);
+const f1 = (v: number): string => v.toFixed(1);
+
+/** A sunburst: `count` rays fanning over the upper half from `at`, growing from the inner ring to their full length
+ * (long and short alternating) as u goes 0..1. Outlined, filled triangles. */
+function drawRays(g: SVGGElement, at: [number, number], size: number[], count: number): (u: number) => void {
+  const [inner = 380, long = 1250, short = 1550] = size;
+  const rays = Array.from({ length: count }, (_, k) => {
+    const p = document.createElementNS(SVG, 'path');
+    p.setAttribute('fill', RAY_COLOURS[k % 2]!);
+    p.setAttribute('stroke', '#000'); p.setAttribute('stroke-width', String(RAY_EDGE_PX)); p.setAttribute('stroke-linejoin', 'round');
+    p.style.visibility = 'hidden';
+    g.append(p);
+    return p;
+  });
+  let written = '';
+  return (u) => {
+    const v = easeOut3(u);
+    const key = v.toFixed(4);
+    if (key === written) return;
+    written = key;
+    rays.forEach((p, k) => {
+      if (v <= 0) { p.style.visibility = 'hidden'; return; }
+      p.style.visibility = 'visible';
+      const a = Math.PI + ((k + 0.5) * Math.PI) / count;
+      const full = k % 2 ? short : long;
+      const len = inner + (full - inner) * v;
+      const pt = (ang: number, r: number): string => `${f1(at[0] + Math.cos(ang) * r)} ${f1(at[1] + Math.sin(ang) * r)}`;
+      p.setAttribute('d', `M${pt(a - RAY_HALF_ANGLE, inner)}L${pt(a, len)}L${pt(a + RAY_HALF_ANGLE, inner)}Z`);
+    });
+  };
+}
+
+/** An almond eye opening from a curved slit (u = 0) to wide open (u = 1): white, outlined, with an outlined blue iris,
+ * a pupil that drops a little as it opens, and a highlight, all clipped to the almond. */
+function drawEye(g: SVGGElement, cx: number, cy: number, rx: number, ry: number, clipId: string): (u: number) => void {
+  const clip = document.createElementNS(SVG, 'clipPath');
+  clip.id = clipId;
+  const clipShape = document.createElementNS(SVG, 'path');
+  clip.append(clipShape);
+  const white = document.createElementNS(SVG, 'path');
+  white.setAttribute('fill', '#fff');
+  const inner = document.createElementNS(SVG, 'g');
+  inner.setAttribute('clip-path', `url(#${clipId})`);
+  const ir = rx * 0.42, pr = rx * 0.18;
+  const iris = document.createElementNS(SVG, 'circle');
+  iris.setAttribute('cx', f1(cx)); iris.setAttribute('cy', f1(cy + 10)); iris.setAttribute('r', f1(ir));
+  iris.setAttribute('fill', IRIS); iris.setAttribute('stroke', '#000'); iris.setAttribute('stroke-width', '13');
+  const pupil = document.createElementNS(SVG, 'circle');
+  pupil.setAttribute('cx', f1(cx)); pupil.setAttribute('r', f1(pr)); pupil.setAttribute('fill', '#000');
+  const shine = document.createElementNS(SVG, 'ellipse');
+  shine.setAttribute('cx', f1(cx + rx * 0.153)); shine.setAttribute('cy', f1(cy - 40));
+  shine.setAttribute('rx', f1(rx * 0.087)); shine.setAttribute('ry', f1(rx * 0.073)); shine.setAttribute('fill', '#fff');
+  inner.append(iris, pupil, shine);
+  const outline = document.createElementNS(SVG, 'path');
+  outline.setAttribute('fill', 'none'); outline.setAttribute('stroke', '#000');
+  outline.setAttribute('stroke-width', String(EYE_EDGE_PX)); outline.setAttribute('stroke-linejoin', 'round');
+  g.append(clip, white, inner, outline);
+  g.style.visibility = 'hidden';
+  let written = '';
+  return (u) => {
+    const o = easeOut3(u);
+    const key = o.toFixed(4);
+    if (key === written) return;
+    written = key;
+    g.style.visibility = o > 0 ? 'visible' : 'hidden';
+    if (o <= 0) return;
+    const top = ry * 1.5 * Math.max(0.06, o), bottom = ry * 1.5 * Math.max(0.06, o * 0.9 + 0.1);
+    const d = `M${f1(cx - rx)} ${f1(cy)}C${f1(cx - rx * 0.5)} ${f1(cy - top)} ${f1(cx + rx * 0.5)} ${f1(cy - top)} ${f1(cx + rx)} ${f1(cy)}` +
+      `C${f1(cx + rx * 0.5)} ${f1(cy + bottom)} ${f1(cx - rx * 0.5)} ${f1(cy + bottom)} ${f1(cx - rx)} ${f1(cy)}Z`;
+    clipShape.setAttribute('d', d); white.setAttribute('d', d); outline.setAttribute('d', d);
+    inner.style.visibility = o > 0.12 ? 'visible' : 'hidden';
+    pupil.setAttribute('cy', f1(cy + 15 + 25 * o));
+  };
+}
+
+/** One flame in local coordinates: base centred at the origin, pointing up, open across its base. */
+function flamePaths(w: number, h: number, lean: number, wob: number): { fill: string; line: string } {
+  const p = (x: number, y: number): string => `${f1(x)} ${f1(y)}`;
+  const side = `M${p(-w / 2, 0)}C${p(-w * (0.75 + wob), -h * 0.32)} ${p(-w * 0.05, -h * 0.62)} ${p(w * lean, -h)}` +
+    `C${p(w * (0.32 + wob), -h * 0.6)} ${p(w * 0.85, -h * 0.34)} ${p(w / 2, 0)}`;
+  return { fill: `${side}Z`, line: side };
+}
+
+/** Flames at the given spots, each an outlined tongue with an outlined core, rising from its base (wider and
+ * taller together) from its own delay to the end of the span. */
+function drawFlames(g: SVGGElement, spots: FlameSpot[], rand: () => number): (u: number) => void {
+  const tongues = spots.map((s, k) => {
+    const el = document.createElementNS(SVG, 'g');
+    el.style.visibility = 'hidden';
+    const lean = (rand() - 0.5) * 0.5, wob = rand() * 0.15;
+    const h = FLAME_H * s.size, w = FLAME_W * s.size;
+    const outer = flamePaths(w, h, lean, wob), core = flamePaths(w * 0.5, h * 0.56, lean, wob);
+    const addPath = (d: string, attrs: Record<string, string>): void => {
+      const e = document.createElementNS(SVG, 'path');
+      e.setAttribute('d', d);
+      for (const [a, v] of Object.entries(attrs)) e.setAttribute(a, v);
+      el.append(e);
+    };
+    const line = { fill: 'none', stroke: '#000', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' };
+    addPath(outer.fill, { fill: FLAME_OUTER[k % FLAME_OUTER.length]! });
+    addPath(outer.line, { ...line, 'stroke-width': String(FLAME_EDGE_PX) });
+    addPath(core.fill, { fill: FLAME_CORE });
+    addPath(core.line, { ...line, 'stroke-width': String(FLAME_EDGE_PX * 0.75) });
+    g.append(el);
+    return { el, s, written: '' };
+  });
+  return (u) => {
+    for (const t of tongues) {
+      const v = u > t.s.delay ? easeOut3((u - t.s.delay) / (1 - t.s.delay)) : 0;
+      const key = v.toFixed(4);
+      if (key === t.written) continue;
+      t.written = key;
+      t.el.style.visibility = v > 0 ? 'visible' : 'hidden';
+      if (v > 0) t.el.setAttribute('transform', `translate(${f1(t.s.at[0])} ${f1(t.s.at[1])}) rotate(${t.s.angle}) scale(${(0.3 + 0.7 * v).toFixed(4)} ${v.toFixed(4)})`);
+    }
+  };
+}
 
 /** A pop that overshoots a little and settles, like something unfurling. */
 function popEase(p: number): number {

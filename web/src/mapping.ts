@@ -31,8 +31,12 @@ export interface RegionEntry extends Control {
   region: RegionShape;
 }
 
-export type EffectKind = 'glow' | 'hue' | 'fill' | 'scribble' | 'grow' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
-export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'fill', 'scribble', 'grow', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
+export type EffectKind = 'glow' | 'hue' | 'tint' | 'fill' | 'scribble' | 'grow' | 'rays' | 'eye' | 'flames' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
+export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'tint', 'fill', 'scribble', 'grow', 'rays', 'eye', 'flames', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
+
+/** flames: one tongue, standing at `at` (canvas px), tilted `angle` degrees, `size` times the standard flame, starting
+ * `delay` (0..1) into the effect's span. */
+export interface FlameSpot { at: [number, number]; angle: number; size: number; delay: number }
 /** Older names still read: pulse and wobble were free-running; as frames of the timeline they are swell and lean. */
 const EFFECT_ALIASES: Record<string, EffectKind> = { pulse: 'swell', wobble: 'lean' };
 export type FillFrom = 'bottom' | 'top' | 'left' | 'right';
@@ -61,8 +65,17 @@ export interface EffectSpec {
   /** fill: the revealed colour at the last frame (hex); it moves there from the shape's glowing colour as the fill
    * advances. Overrides `turn` and `toward`. */
   color?: string;
-  /** scribble: how many pencil strokes at full value (default 14). grow: how many branches (default 8). */
+  /** scribble: how many pencil strokes at full value (default 14). grow: how many branches (default 8). rays: how
+   * many rays (default 16). */
   count?: number;
+  /** rays: the centre they fan out from. eye: the eye's centre. Canvas px. */
+  at?: [number, number];
+  /** rays: [inner radius, long ray length, short ray length]. eye: [half width, half height]. Canvas px. */
+  size?: number[];
+  /** rays, flames: shapes (fill ids) that stay in front of them, besides the object itself. */
+  front?: string[];
+  /** flames: where the tongues stand. */
+  spots?: FlameSpot[];
 }
 
 interface BindingBase {
@@ -196,6 +209,24 @@ function parseBinding(raw: unknown, i: number): Binding {
     if (o.turn !== undefined) {
       if (typeof o.turn !== 'number' || Math.abs(o.turn) > 360) fail(w, 'turn must be degrees, -360..360');
       spec.turn = o.turn;
+    }
+    const isPt = (v: unknown): v is [number, number] => Array.isArray(v) && v.length === 2 && v.every((n) => typeof n === 'number');
+    if (o.at !== undefined) { if (!isPt(o.at)) fail(w, 'at must be [x, y]'); spec.at = o.at; }
+    if (o.size !== undefined) {
+      if (!Array.isArray(o.size) || !o.size.every((n) => typeof n === 'number' && n > 0)) fail(w, 'size must be a list of positive numbers');
+      spec.size = o.size as number[];
+    }
+    if (o.front !== undefined) {
+      if (!Array.isArray(o.front) || !o.front.every((f) => typeof f === 'string' && /^f\d+$/.test(f))) fail(w, 'front must be a list of fill ids');
+      spec.front = o.front as string[];
+    }
+    if (o.spots !== undefined) {
+      if (!Array.isArray(o.spots)) fail(w, 'spots must be a list');
+      spec.spots = o.spots.map((x, k) => {
+        const q = x as Record<string, unknown>;
+        if (!q || !isPt(q.at) || typeof q.angle !== 'number') fail(`${w}.spots[${k}]`, 'needs at [x, y] and angle');
+        return { at: q.at, angle: q.angle, size: typeof q.size === 'number' ? q.size : 1, delay: typeof q.delay === 'number' ? q.delay : 0 };
+      });
     }
     if (o.color !== undefined) {
       if (typeof o.color !== 'string' || !/^#[0-9a-f]{6}$/i.test(o.color)) fail(w, 'color must be a hex colour like "#9cf27c"');

@@ -7,7 +7,7 @@ the object shows the value but touching it does nothing (routing, tuning and lev
 
 | parameter | name | object | gesture | effects | lock |
 | --- | --- | --- | --- | --- | --- |
-| `amp.drive` | Drive | golden-pyramid | drag-x | fill 0.6 from bottom edge wave toward 65, glow 0.5 span [0.2, 1], boil 1.3 span [0.55, 1] ease in | locked |
+| `amp.drive` | Drive | golden-pyramid | drag-x | rays 1 count 16 span [0, 0.6], eye 1 parts face-right span [0.25, 0.8], flames 1 span [0.55, 1], tint 1 parts face-left color #FFE070, tint 1 parts face-right color #FFA46A | locked |
 | `upper.db1` | Upper 16' | stalk-left | drag-y | fill 0.5 parts body from bottom edge wave color #9cf27c, swell 3 parts bud-1 span [0.21, 0.33] ease out, glow 0.8 parts bud-1 span [0.21, 0.33], swell 3 parts bud-2 span [0.55, 0.67] ease out, glow 0.8 parts bud-2 span [0.55, 0.67], grow 1 parts body count 8 |  |
 | `upper.db2` | Upper 5 1/3' | stalk-right | drag-y | fill 0.5 parts body from bottom edge wave color #9cf27c, swell 3 parts bud-1 span [0.34, 0.46] ease out, glow 0.8 parts bud-1 span [0.34, 0.46], swell 3 parts bud-2 span [0.37, 0.49] ease out, glow 0.8 parts bud-2 span [0.37, 0.49], swell 3 parts bud-3 span [0.61, 0.73] ease out, glow 0.8 parts bud-3 span [0.61, 0.73], grow 1 parts body count 8 |  |
 | `leslie.speed` | Rotor Speed | spiral-curl | tap | spin 1 |  |

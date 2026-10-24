@@ -9,6 +9,8 @@ import partsJson from '../../art/golden-pyramid-with-tunnel-celebration/layers/p
 export interface FillPart {
   id: string; layer: number; n: number; fill: string; opacity: number;
   bbox: [number, number, number, number]; centroid: [number, number]; area: number;
+  /** pixels the shape covers on its own, and the share of them left showing in the painting (from the extractor) */
+  pixelArea?: number; visible?: number;
   /** Ink strokes that run along this fill's edge, most adjacent first. */
   ink: string[];
 }

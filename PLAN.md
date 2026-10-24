@@ -151,6 +151,10 @@ span (`web/src/effects.ts`):
 | `fill` | fills | a vivid copy of the object fully revealed from an edge, one level across all its shapes, like a drawbar pulled out | `from`: bottom, top, left, right; `edge`: straight or wave (a hand-drawn surface that rolls as it moves); `turn` (degrees the colour turns as it advances), `toward` (a hue, OKLCH degrees, every shape's colour moves to) or `color` (an exact colour it moves to) |
 | `scribble` | fills | pencil loops in the painting's own scribble style, all drawn in, clipped to the shape | `count` (default 14) |
 | `grow` | object | new growth sprouts in the painting's idiom, everything a coloured shape with a black outline (no bare lines): tapered branches in the shape's own colour, outlined in its finer ink (11 px) and open at the base so they join without a seam, each ending in a spiral tendril or an eye-bud, with candy-coloured leaves; one branch per 1/count of the timeline, climbing the shape from its base on alternating sides; each draws itself out, then its leaves unfurl, then its tip appears; seeded, so a frame always shows the same drawing | `count` (default 8), `parts` (the shape it grows from) |
+| `rays` | above fills | a sunburst: `count` outlined triangles fanning over the upper half from `at`, growing from the inner ring to full length; masked so the object and the `front` shapes stay in front | `at`, `size` [inner, long, short], `count`, `front` |
+| `eye` | object | an almond eye on the object, opening from a slit to wide: white, outlined, blue iris, pupil, highlight; just above the object's own shapes, so things painted on it stay in front | `at`, `size` [half width, half height] |
+| `flames` | above ink | outlined tongues with yellow cores at `spots`, each rising from its base from its own delay; masked (with an outline-wide margin) so the object and the `front` shapes stay in front | `spots` [{at, angle, size, delay}], `front` |
+| `tint` | fills | the colour moves to `color` and the shape turns solid | `color` |
 | `line` | ink | the linework from less of itself to more of itself: at the first frame thinner (4 px eroded from each side) and broken by gaps like an unfinished sketch, the object's own colour showing where lines thin; exactly as painted at the middle; at the last frame bolder (5 px) with a second hand-drawn pass of every stroke beside the first | |
 | `boil` | ink | the outline redrawn, its lines bent up to 12 canvas px; a new drawing every 1/12 of the way, so dragging makes them writhe and holding keeps them still | |
 | `swell` | object | 8% larger about its centre (negative shrinks) | |
@@ -176,9 +180,10 @@ animation from its first frame to its last without touching the organ, to see an
 server running) into `docs/objects/<binding-id>/`: a strip of frames 0 to 1 and a loop from first frame to last and
 back, for reviewing objects one at a time.
 
-Objects reworked so far (`docs/objects/`): **pyramid-drive**, molten heat rising: an orange level with a wavy
-surface climbs from the pyramid's base to its apex as Drive goes 0 to 1, both faces converging on one orange as it
-rises; the faces above the level warm from 20%; the outline starts to boil past 55%, easing in.
+Objects reworked so far (`docs/objects/`, process in `docs/object-animation-pattern.md`): **pyramid-drive**, sunburst
+and eye: rays grow out behind the pyramid (Drive 0 to 0.6), a big eye opens on its right face (0.25 to 0.8), small
+flames rise on its slopes (0.55 to 1), and its faces warm throughout; chosen by Matt from five mocked-up end frames
+(`scripts/pyramid_endframes.py`).
 **stalk-drawbar-16 and stalk-drawbar-513**, sap rising: a green sap with a wavy surface climbs each stalk with the
 drawbar, turning a luminous light green (#9cf27c) towards the top; each bud on the stalk (roles `bud-1`..) swells
 24% and glows just as the sap reaches its height; and the stalk grows (`grow`): one new branch per drawbar step,

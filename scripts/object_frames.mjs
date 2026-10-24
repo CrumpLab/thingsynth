@@ -95,7 +95,8 @@ try {
   const W = 360;
   const inputs = stripFiles.flatMap((s) => ['-i', s.file]);
   const labels = stripFiles.map((s, k) => `[${k}:v]scale=${W}:-2,pad=iw+8:ih+8:4:4:white[v${k}]`).join(';');
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputs, '-filter_complex',
+  if (stripFiles.length === 1) execFileSync('cp', [stripFiles[0].file, join(OUT, `${tag}-strip.png`)]);
+  else execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputs, '-filter_complex',
     `${labels};${stripFiles.map((_, k) => `[v${k}]`).join('')}hstack=inputs=${stripFiles.length}`, join(OUT, `${tag}-strip.png`)]);
   // sweep: 0 -> 1 -> 0
   const n = 24, sweep = [];
