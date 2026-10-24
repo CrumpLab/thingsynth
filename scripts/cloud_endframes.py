@@ -186,3 +186,128 @@ def main() -> None:
 
 if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- chosen: overgrown -------------------------------------------------------------------------------------------
+def clamp01(u):
+    return max(0.0, min(1.0, u))
+
+
+def ease_out(u):
+    return 1 - (1 - clamp01(u)) ** 3
+
+
+def ease_back(u):
+    u = clamp01(u)
+    c1 = 1.7
+    return 1 + (c1 + 1) * (u - 1) ** 3 + c1 * (u - 1) ** 2
+
+
+CAPS = ['#f64c76', '#ffb36b', '#c4a3f0']
+
+
+def sprouts():
+    """Where each sprout stands on the cloud's top edge, what it is, and when it starts growing: they come up in a
+    scattered order, not a sweep, like moss taking hold."""
+    edge = top_edge(2420, 3320, 30)
+    rnd = random.Random(4)
+    out = []
+    for k, (x, y) in enumerate(edge[1::3]):
+        h = 60 + rnd.random() * 40
+        out.append({'k': k, 'x': x, 'y': y, 'h': h, 'kind': 'mush' if k % 2 == 0 else 'flower'})
+    order = list(range(len(out)))
+    random.Random(9).shuffle(order)
+    for rank, i in enumerate(order):
+        out[i]['start'] = 0.04 + 0.5 * rank / max(1, len(out) - 1)
+    return out
+
+
+def mushroom(s, u) -> str:
+    """A spotted mushroom by growth u: the stem pushes up (0..0.55), the cap swells from a closed bud and opens with
+    a little overshoot (0.3..1), the white spots come last."""
+    x, y, h = s['x'], s['y'], s['h'] * ease_out(u / 0.55)
+    out = ''
+    if h > 4:
+        out += outlined(f'M{p(x - 14, y + 10)}L{p(x - 10, y - h)}L{p(x + 10, y - h)}L{p(x + 14, y + 10)}Z', '#fff3e6', INK * 0.8)
+    c = ease_back((u - 0.3) / 0.7)
+    w, ch = 18 + 37 * c, 30 + 40 * c
+    if u > 0.05:
+        out += outlined(f'M{p(x - w, y - h + 5)}C{p(x - w * 0.9, y - h - ch)} {p(x + w * 0.9, y - h - ch)} {p(x + w, y - h + 5)}Z',
+                        CAPS[s['k'] % 3], INK * 0.8)
+    if u > 0.75:
+        r = 8 * clamp01((u - 0.75) / 0.25)
+        out += ''.join(f'<path d="{circle(x + dx * c, y - h - 28 * c + dy, r)}" fill="#fff"/>' for dx, dy in [(-22, 4), (8, -14), (26, 6)])
+    return out
+
+
+def flower(s, u) -> str:
+    """A little flower by growth u: the stem curls up (0..0.6), a pink bud sits on it, the yellow petals pop open
+    round it (0.55..1)."""
+    x, y = s['x'], s['y']
+    g = ease_out(u / 0.6)
+    top = y - 95 * g
+    stem = f'M{p(x, y + 5)}C{p(x - 10, y + 5 - 45 * g)} {p(x + 10, y + 5 - 65 * g)} {p(x, top + 10 * g)}'
+    out = ''
+    if g > 0.05:
+        out += (f'<path d="{stem}" fill="none" stroke="#000" stroke-width="{INK * 1.6}" stroke-linecap="round"/>'
+                f'<path d="{stem}" fill="none" stroke="#7fd36b" stroke-width="{INK * 0.6}" stroke-linecap="round"/>')
+    pr = ease_back((u - 0.55) / 0.45)
+    if pr > 0.02:
+        for j in range(5):
+            a = math.radians(j * 72 - 90)
+            out += outlined(circle(x + math.cos(a) * 22 * pr, top + math.sin(a) * 22 * pr, 16 * pr), '#ffe066', INK * 0.6)
+    if g > 0.25:
+        out += outlined(circle(x, top, 12 * min(1, g * 1.2)), '#f64c76', INK * 0.6)
+    return out
+
+
+def overgrown_frame(t: float) -> Image.Image:
+    """Wheel age at t: mushrooms and flowers come up one after another along the cloud's top, each taking about half
+    the timeline to grow, the last opening at the very end."""
+    SCRIB_MASK[0] = ''
+    if t <= 0:
+        return m.compose()
+    out = ''
+    for s in sprouts():
+        u = clamp01((t - s['start']) / 0.46)
+        if u > 0:
+            out += mushroom(s, u) if s['kind'] == 'mush' else flower(s, u)
+    return comp(out)
+
+
+def overgrown_main() -> None:
+    out = OUT.parent / 'overgrown'
+    out.mkdir(parents=True, exist_ok=True)
+    overgrown_frame(1.0).save(out / 'end-frame.png')
+    frames = [0, 0.25, 0.5, 0.75, 1.0]
+    tiles = [overgrown_frame(t) for t in frames]
+    w, h = tiles[0].size
+    sc = 0.42
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * 5 + 60, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (tt, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {tt:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    import shutil
+    import subprocess
+    tmp = out / '_frames'
+    tmp.mkdir(exist_ok=True)
+    seq = [k / 24 for k in range(25)] + [k / 24 for k in range(23, 0, -1)]
+    for i, tt in enumerate(seq):
+        overgrown_frame(tt).convert('RGB').resize((520, round(520 * h / w)), Image.LANCZOS).save(tmp / f'{i:03d}.png')
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', '12', '-i', str(tmp / '%03d.png'), '-vf',
+                    'split[a][b];[a]palettegen=max_colors=192[p];[b][p]paletteuse=dither=bayer:bayer_scale=4', '-loop', '0',
+                    str(out / 'sweep.gif')], check=True)
+    shutil.rmtree(tmp)
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'overgrown' in __import__('sys').argv[1:]:
+    overgrown_main()
