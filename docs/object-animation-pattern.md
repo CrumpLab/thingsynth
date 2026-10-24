@@ -129,6 +129,10 @@ What the decisions have shown, to apply to later objects:
 - **Snout review, Leslie mic distance (2026-10-24, object picked by Claude):** offered elephant trunk, listening
   ears, bubblegum, telescope, accordion snout. Picked the telescope: the idea that reads the parameter (distance)
   most literally, as a playful object.
+- **Coral tongue review, Leslie mic angle (2026-10-24, object picked by Claude):** offered candy cane, snake,
+  pointing glove, rolled up, microphone. Matt passed on all five and asked for "something where the tongue splits":
+  the object's own form dividing, rather than a costume or a prop. Built as a fork: the tip splits in two, then each
+  half splits again into four tips; the branches stay as thick as the tongue (the size rule) and curl only gently.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
@@ -153,5 +157,6 @@ its thing in the painting's style.
 | orange-sprite (pedal-sustain) | `pedal.sustain` | the orange star-shaped creature with a yellow head and a sleepy cyan eye, on the green bush | built: three morphs in turn: starfish arms grow out of it (0-0.25) and draw back as butterfly wings open (0.35-0.58), the wings fold away as the sprite fades (0.66-0.8) and a jellyfish bell swells out of its head, its eye opening and tentacles dropping over the bush (0.68-1); `docs/objects/pedal-sustain/mockup-vs-app.png` |
 | lying-creature (tg-click) | `tg.click` | the big grey creature lying across the bottom, mitten arm up, closed peach slit eye | built: party narwhal: the slit eye fades as a round friendly eye opens, a pink-and-white candy tusk grows band by band out of its head, a fountain spouts from its blowhole and splashes, sparkles pop at the tusk's tip; `docs/objects/tg-click/mockup-vs-app.png` |
 | lavender-snout (leslie-mic-distance) | `leslie.mic_distance` | the cream snout creature on the left: pink snout with a straw in its nostril, sleepy yellow eye | built: its sleepy eye fades as a wide-open eye opens, then a brass telescope slides out of it one section after another and its cyan lens glints; `docs/objects/leslie-mic-distance/mockup-vs-app.png` |
+| coral-tongue (leslie-mic-angle) | `leslie.mic_angle` | the long salmon band under the acorn frog, hooking up at the right into a rounded tip | built: its tip splits in two and the halves spread (0-0.5), then each half splits again into two curling tips (0.45-1); outlined and fill layers so the forks join seamlessly; `docs/objects/leslie-mic-angle/mockup-vs-app.png` |
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |

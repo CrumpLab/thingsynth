@@ -206,7 +206,8 @@ each mode brings rings up out of the tunnel's depth, then two eyes open in the d
 ball (`scripts/bigeye_endframes.py`). **orange-sprite** (pedal sustain), three morphs: starfish, then butterfly, then
 jellyfish (`scripts/sprite_endframes.py`). **lying-creature** (key click), party narwhal: a candy tusk, a blowhole fountain and
 sparkles (`scripts/lying_endframes.py`). **lavender-snout** (Leslie mic distance), telescope: its eye opens and a brass
-telescope slides out of it (`scripts/snout_endframes.py`).
+telescope slides out of it (`scripts/snout_endframes.py`). **coral-tongue** (Leslie mic angle), splitting: its tip forks in two,
+then four (`scripts/tongue_endframes.py`).
 **stalk-drawbar-16 and stalk-drawbar-513**, sap rising: a green sap with a wavy surface climbs each stalk with the
 drawbar, turning a luminous light green (#9cf27c) towards the top; each bud on the stalk (roles `bud-1`..) swells
 24% and glows just as the sap reaches its height; and the stalk grows (`grow`): one new branch per drawbar step,

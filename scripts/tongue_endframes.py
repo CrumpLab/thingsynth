@@ -151,3 +151,91 @@ def main() -> None:
 
 if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- chosen: the tongue splits ------------------------------------------------------------------------------------
+# Matt: "do something where the tongue splits". Mic angle from 0 to 180 forks the tongue's tip: it splits in two and
+# the halves spread apart (0..0.5), then each half splits again into two curling tips (0.45..1): four tips in all.
+# Every branch is drawn twice, an outlined layer then a fill-only layer on top, so the joins melt into one shape.
+SPLIT = (TIP[0], TIP[1] + 30)
+
+
+def branches() -> list[tuple[list, float, float, float, float]]:
+    """(centreline, start width, end width, start, end) for every branch, parents first."""
+    out = []
+
+    def grow(x, y, ang, L, w0, w1, depth, s):
+        a = math.radians(ang)
+        curl = -10 if ang < -90 else 10
+        P = bez((x, y), (x + math.cos(a) * L * 0.4, y + math.sin(a) * L * 0.4),
+                (x + math.cos(math.radians(ang + curl * 0.5)) * L * 0.75, y + math.sin(math.radians(ang + curl * 0.5)) * L * 0.75),
+                (x + math.cos(math.radians(ang + curl)) * L, y + math.sin(math.radians(ang + curl)) * L), 16)
+        span = 0.5 if depth == 0 else 0.55
+        out.append((P, w0, w1, s, s + span))
+        if depth < 1:
+            ex, ey = P[-1]
+            spread = 22
+            for side in (-1, 1):
+                grow(ex - math.cos(a) * w1 * 0.4, ey - math.sin(a) * w1 * 0.4, ang + curl + side * spread, L * 0.85, w1 * 0.92, w1 * 0.8, depth + 1, s + span - 0.05)
+
+    for side in (-1, 1):
+        grow(SPLIT[0] + side * 26, SPLIT[1], -90 + side * 18, 270, 58, 50, 0, 0.0)
+    return out
+
+
+def split_items() -> list[dict]:
+    items = []
+    B = branches()
+    for P, w0, w1, s, e in B:  # the outlined layer
+        items.append({'d': tube(P, w0, w1), 'fill': CORAL, 'edge': INK, 'at': [round(P[0][0], 1), round(P[0][1], 1)], 'start': round(s, 3), 'end': round(min(1.0, e), 3), 'grow': 'scale'})
+    for P, w0, w1, s, e in B:  # the fill-only layer that melts the joins
+        items.append({'d': tube(P, w0 - INK / 2, w1 - INK / 2), 'fill': CORAL, 'edge': 0, 'at': [round(P[0][0], 1), round(P[0][1], 1)], 'start': round(s, 3), 'end': round(min(1.0, e), 3), 'grow': 'scale'})
+    return items
+
+
+def split_frame(t: float) -> Image.Image:
+    if t <= 0:
+        return m.compose()
+    im = m.compose()
+    im.alpha_composite(m.svg(g.sprite_svg(split_items(), t)))
+    return im
+
+
+def split_main() -> None:
+    out = OUT.parent / 'splitting'
+    out.mkdir(parents=True, exist_ok=True)
+    frames = [0, 0.25, 0.5, 0.75, 1.0]
+    tiles = [split_frame(t) for t in frames]
+    tiles[-1].save(out / 'end-frame.png')
+    w, h = tiles[0].size
+    sc = 0.42
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * 5 + 60, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (tt, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {tt:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'split' in __import__('sys').argv[1:]:
+    m.CROP = (3550, 1150, 1100, 1000)
+    m.WASH, m.SCRIB = m.raster('wash.webp'), m.raster('scribbles.webp')
+    split_main()
+
+if __name__ == '__main__' and 'export' in __import__('sys').argv[1:]:
+    import json as _j
+    mp = ROOT / 'mapping.json'
+    M = _j.loads(mp.read_text())
+    for b in M['bindings']:
+        if b['id'] == 'leslie-mic-angle':
+            b['label'] = 'The long coral tongue: drag for the Leslie mic angle; its tip splits and splits again, fanning out'
+            b['effects'] = [{'effect': 'sprites', 'place': 'over', 'items': split_items()}]
+    mp.write_text(_j.dumps(M, indent=2) + '\n')
+    print('exported', len(split_items()), 'shapes')
