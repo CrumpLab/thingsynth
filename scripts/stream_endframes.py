@@ -323,3 +323,111 @@ def round2() -> None:
 
 if __name__ == '__main__' and 'froth' in __import__('sys').argv[1:]:
     round2()
+
+
+# ---- chosen: bubble cloud + rainbow ---------------------------------------------------------------------------------
+def ease(u: float) -> float:
+    u = max(0.0, min(1.0, u))
+    return 1 - (1 - u) ** 3
+
+
+def win(t, a, b):
+    return ease((t - a) / (b - a))
+
+
+RAINBOW = ['#ff7a8a', '#ffb36b', '#ffe066', '#9cf27c', '#7fd8f5', '#c4a3f0']
+
+
+def arc_band(ax, ay, r_out, r_in, a_end, n=40) -> str:
+    """A rainbow band from the left foot (180 degrees) round over the top to a_end (degrees, 0 = right foot)."""
+    pts_o, pts_i = [], []
+    for i in range(n + 1):
+        a = math.radians(180 - (180 - a_end) * i / n)
+        pts_o.append((ax + math.cos(a) * r_out, ay - math.sin(a) * r_out))
+        pts_i.append((ax + math.cos(a) * r_in, ay - math.sin(a) * r_in))
+    return 'M' + 'L'.join(p(*q) for q in pts_o + pts_i[::-1]) + 'Z'
+
+
+def combo_frame(t: float) -> Image.Image:
+    """Vibrato at t: the froth bubbles up (0..0.3), a column of bubbles rises (0.1..0.45), the bubble cloud gathers
+    above (0.25..0.6), the rainbow arcs out of it and down into the pool (0.5..0.85), droplets fall last (0.75..1)."""
+    if t <= 0:
+        return m.compose()
+    SCRIB_MASK[0] = ''
+    out = ''
+    x0, y0 = FROTH_C
+    rnd = random.Random(1)
+    fb = win(t, 0.0, 0.3)
+    for k in range(10):
+        r = (55 - 3 * k + rnd.random() * 10) * fb
+        x = x0 + (rnd.random() - 0.5) * 260
+        y = y0 + 80 - 18 * k + (rnd.random() - 0.5) * 30
+        if r > 2:
+            out += bubble(x, y, r, ['#e3fbff', '#ffffff', '#f3e9ff'][k % 3])
+    for k, (x, y, r) in enumerate([(2090, 2400, 38), (2110, 2320, 32), (2085, 2255, 26), (2105, 2195, 20)]):
+        g = win(t, 0.1 + k * 0.07, 0.25 + k * 0.07)
+        if g > 0.01:
+            out += bubble(x, y, r * g)
+    cx, cy = FROTH_C[0] + 20, FROTH_C[1] - 300
+    cg = win(t, 0.25, 0.6)
+    ax, ay, R = cx + 330, cy + 300, 300
+    rg = win(t, 0.5, 0.85)
+    bow = ''
+    if rg > 0.01:
+        for k, col in enumerate(RAINBOW):
+            bow += outlined(arc_band(ax, ay, R - k * 26, R - (k + 1) * 26, 180 - 180 * rg), col, INK * 0.7)
+        if rg > 0.95:
+            bow += puffs([(ax + R - 40, ay - 10, 55), (ax + R + 20, ay + 20, 45)], CLOUD_WHITE, INK)
+    out += bow
+    if cg > 0.01:
+        circles = [(cx + (x - cx) * cg, cy + (y - cy) * cg, r * cg) for x, y, r in cloud_circles(cx, cy, 0.9)]
+        out += puffs(circles, '#eafcff')
+        out += ''.join(f'<path d="{circle(x + r * 0.35, y - r * 0.4, r * 0.18)}" fill="#fff"/>' for x, y, r in circles[:6])
+    dg = win(t, 0.75, 1.0)
+    if dg > 0.01:
+        for k, (x, y, s) in enumerate([(cx - 90, cy + 190, 26), (cx + 10, cy + 230, 22), (cx - 30, cy + 300, 20)]):
+            g = win(t, 0.75 + k * 0.06, 0.9 + k * 0.03)
+            if g > 0.01:
+                s *= g
+                drop = f'M{p(x, y - s * 1.6)}C{p(x + s, y - s * 0.4)} {p(x + s, y + s)} {p(x, y + s)}C{p(x - s, y + s)} {p(x - s, y - s * 0.4)} {p(x, y - s * 1.6)}Z'
+                out += outlined(drop, '#bff6ff', INK * 0.7)
+    kw = no_froth() if fb > 0.6 else {}
+    return m.compose(front=out, rescrib=SCRIB_MASK[0], **kw)
+
+
+def combo_main() -> None:
+    out = OUT.parent / 'bubble-rainbow'
+    out.mkdir(parents=True, exist_ok=True)
+    combo_frame(1.0).save(out / 'end-frame.png')
+    frames = [0, 0.25, 0.5, 0.75, 1.0]
+    tiles = [combo_frame(t) for t in frames]
+    w, h = tiles[0].size
+    sc = 0.36
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * 5 + 60, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (tt, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {tt:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    import shutil
+    import subprocess
+    tmp = out / '_frames'
+    tmp.mkdir(exist_ok=True)
+    seq = [k / 20 for k in range(21)] + [k / 20 for k in range(19, 0, -1)]
+    for i, tt in enumerate(seq):
+        combo_frame(tt).convert('RGB').resize((560, round(560 * h / w)), Image.LANCZOS).save(tmp / f'{i:03d}.png')
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', '12', '-i', str(tmp / '%03d.png'), '-vf',
+                    'split[a][b];[a]palettegen=max_colors=192[p];[b][p]paletteuse=dither=bayer:bayer_scale=4', '-loop', '0',
+                    str(out / 'sweep.gif')], check=True)
+    shutil.rmtree(tmp)
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'combo' in __import__('sys').argv[1:]:
+    combo_main()
