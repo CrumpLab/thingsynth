@@ -114,6 +114,9 @@ What the decisions have shown, to apply to later objects:
   rings, singing mouth, tunnel flower. Picked eyes in the dark with rainbow rings, and said a pick means build it.
   Most of the tunnel is hidden behind the frog and bush, so ideas had to live in the visible band or come out in
   front of it.
+- **Big eye review, percussion harmonic (2026-10-24, object picked by Claude):** offered hypno eye, ringed planet,
+  three eyes, disco ball, peacock fan. Picked disco ball and peacock fan together: again a layered celebratory
+  display, the eye morphing into something new while a big fan opens behind.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
@@ -134,5 +137,6 @@ its thing in the painting's style.
 | horned-ghost (lower-db6) | `lower.db6` | the tall two-tone blue ghost with orange horns and a slit eye, under the big cloud | built: two little twin ghosts pop up from behind it, one each side (0-0.55), then a blue arm with a big lime hand grows out from its right side (0.45-0.85) and motion crescents flick out round the hand; `docs/objects/lower-db6/mockup-vs-app.png` |
 | acorn-frog (tg-complex) | `tg.complex` | the pale yellow frog body with a little blue head and two acorns on its back | built: on complex the acorns fade and two big spray-painted eyeballs pop up in their place, drop shadows land behind them, irises and pupils open, white paint drips run down; 0.8 s glide; notes A3 and C4 moved from the acorns to the pink petals f216 and f217; `docs/objects/tg-complex/mockup-vs-app.png` |
 | tunnel (vib-mode) | `vib.mode` | the dark teal arch in the golden pyramid, its mouth mostly hidden by the acorn frog and bush | built: each of the six modes brings rainbow rings up out of the tunnel's depth (outer first, the innermost night-dark), then two glowing yellow eyes open in dark sockets, peeking out; drawn on the tunnel, under the frog and ink; 0.6 s glide; `docs/objects/vib-mode/mockup-vs-app.png` |
+| big-eye (perc-harmonic) | `perc.harmonic` | the round orange-magenta eye of the lavender, triangle-headed creature at the right edge | built: on Third six peacock feathers fan open behind its head one after another, the eye turns into a disco ball (base, then rings of mirror tiles) and sparkles pop last; 0.8 s glide; `docs/objects/perc-harmonic/mockup-vs-app.png` |
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
