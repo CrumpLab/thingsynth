@@ -12,7 +12,7 @@ the object shows the value but touching it does nothing (routing, tuning and lev
 | `upper.db2` | Upper 5 1/3' | stalk-right | drag-y | fill 0.5 parts body from bottom edge wave color #9cf27c, swell 3 parts bud-1 span [0.34, 0.46] ease out, glow 0.8 parts bud-1 span [0.34, 0.46], swell 3 parts bud-2 span [0.37, 0.49] ease out, glow 0.8 parts bud-2 span [0.37, 0.49], swell 3 parts bud-3 span [0.61, 0.73] ease out, glow 0.8 parts bud-3 span [0.61, 0.73], grow 1 parts body count 8 |  |
 | `leslie.speed` | Rotor Speed | sleepy-creature | tap | wind 1 count 5, swing 1 parts arm span [0.45, 1], eye 1 color #111111 span [0.1, 0.45] |  |
 | `amp.expression` | Expression | pyramid-worm | drag-y | sprites 1, sprites 1, sprites 1 |  |
-| `vib.upper` | Vibrato Upper | stream | tap | lean 1, hue 0.3 parts water |  |
+| `vib.upper` | Vibrato Upper | stream | tap | vanish 1 parts splash span [0.03, 0.12], sprites 1 |  |
 | `tg.age` | Wheel Age | cloud | drag-x | scribble 1 count 18 |  |
 | `perc.on` | Percussion | bottom-eye | tap | blink 1, glow 1 parts lid |  |
 | `upper.db3` | Upper 8' | mushroom-stem | drag-y | fill 1 from bottom |  |

@@ -433,3 +433,58 @@ def combo_main() -> None:
 
 if __name__ == '__main__' and 'combo' in __import__('sys').argv[1:]:
     combo_main()
+
+
+def export_effects() -> list[dict]:
+    """The approved progression as the app's sprites (same shapes, colours and windows as combo_frame)."""
+    items = []
+    R2 = lambda v: [round(q, 1) for q in v]
+
+    def bub(x, y, r, fill, start, end, o0, o1):
+        items.append({'d': circle(x, y, r), 'fill': fill, 'edge': INK * 0.8, 'at': R2((x, y)), 'start': start, 'end': end, 'grow': 'scale', 'outStart': o0, 'outEnd': o1})
+        items.append({'d': circle(x + r * 0.35, y - r * 0.35, r * 0.22), 'fill': '#ffffff', 'edge': 0, 'at': R2((x, y)), 'start': start, 'end': end, 'grow': 'scale', 'outStart': o0, 'outEnd': o1})
+
+    x0, y0 = FROTH_C
+    rnd = random.Random(1)
+    for k in range(10):
+        r = 55 - 3 * k + rnd.random() * 10
+        x = x0 + (rnd.random() - 0.5) * 260
+        y = y0 + 80 - 18 * k + (rnd.random() - 0.5) * 30
+        bub(x, y, r, ['#e3fbff', '#ffffff', '#f3e9ff'][k % 3], 0.0, 0.3, 0.45, 0.65)
+    for k, (x, y, r) in enumerate([(2090, 2400, 38), (2110, 2320, 32), (2085, 2255, 26), (2105, 2195, 20)]):
+        bub(x, y, r, '#e3fbff', 0.1 + k * 0.07, 0.25 + k * 0.07, 0.45 + k * 0.03, 0.62 + k * 0.03)
+    cx, cy = FROTH_C[0] + 20, FROTH_C[1] - 300
+    ax, ay, R = cx + 330, cy + 300, 300
+    for k, col in enumerate(RAINBOW):
+        items.append({'d': arc_band(ax, ay, R - k * 26, R - (k + 1) * 26, 0), 'fill': col, 'edge': round(INK * 0.7, 1), 'at': R2((ax, ay)),
+                      'start': 0.5, 'end': 0.85, 'grow': 'scale', 'sweep': {'from': 180, 'to': 0}})
+
+    def cloud(circles, fill, at, start, end):
+        for x, y, r in circles:
+            items.append({'d': circle(x, y, r), 'fill': '#000', 'edge': INK * 2, 'at': R2(at), 'start': start, 'end': end, 'grow': 'scale'})
+        for x, y, r in circles:
+            items.append({'d': circle(x, y, r), 'fill': fill, 'edge': 0, 'at': R2(at), 'start': start, 'end': end, 'grow': 'scale'})
+    foot = [(ax + R - 40, ay - 10, 55), (ax + R + 20, ay + 20, 45)]
+    cloud(foot, CLOUD_WHITE, (ax + R - 10, ay + 10), 0.82, 0.88)
+    circles = cloud_circles(cx, cy, 0.9)
+    cloud(circles, '#eafcff', (cx, cy), 0.25, 0.6)
+    for x, y, r in circles[:6]:
+        items.append({'d': circle(x + r * 0.35, y - r * 0.4, r * 0.18), 'fill': '#ffffff', 'edge': 0, 'at': R2((cx, cy)), 'start': 0.25, 'end': 0.6, 'grow': 'scale'})
+    for k, (x, y, s) in enumerate([(cx - 90, cy + 190, 26), (cx + 10, cy + 230, 22), (cx - 30, cy + 300, 20)]):
+        drop = f'M{p(x, y - s * 1.6)}C{p(x + s, y - s * 0.4)} {p(x + s, y + s)} {p(x, y + s)}C{p(x - s, y + s)} {p(x - s, y - s * 0.4)} {p(x, y - s * 1.6)}Z'
+        items.append({'d': drop, 'fill': '#bff6ff', 'edge': round(INK * 0.7, 1), 'at': R2((x, y)), 'start': 0.75 + k * 0.06, 'end': 0.9 + k * 0.03, 'grow': 'scale'})
+    return [{'effect': 'vanish', 'parts': 'splash', 'span': [0.03, 0.12]},
+            {'effect': 'sprites', 'place': 'over', 'items': items}]
+
+
+if __name__ == '__main__' and 'export' in __import__('sys').argv[1:]:
+    import json as _j
+    mp = ROOT / 'mapping.json'
+    M = _j.loads(mp.read_text())
+    for b in M['bindings']:
+        if b['id'] == 'stream-vibrato':
+            b['label'] = 'The stream: tap to switch upper vibrato; its froth bubbles up into a cloud of bubbles, a rainbow arcs into the pool and it rains'
+            b['glide'] = 900
+            b['effects'] = export_effects()
+    mp.write_text(_j.dumps(M, indent=2) + '\n')
+    print('exported', len(export_effects()[1]['items']), 'shapes')

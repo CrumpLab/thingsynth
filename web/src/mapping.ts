@@ -31,8 +31,8 @@ export interface RegionEntry extends Control {
   region: RegionShape;
 }
 
-export type EffectKind = 'glow' | 'hue' | 'tint' | 'fill' | 'scribble' | 'grow' | 'rays' | 'eye' | 'flames' | 'wind' | 'swing' | 'sprites' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
-export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'tint', 'fill', 'scribble', 'grow', 'rays', 'eye', 'flames', 'wind', 'swing', 'sprites', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
+export type EffectKind = 'glow' | 'hue' | 'tint' | 'fill' | 'scribble' | 'grow' | 'rays' | 'eye' | 'flames' | 'wind' | 'swing' | 'sprites' | 'vanish' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
+export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'tint', 'fill', 'scribble', 'grow', 'rays', 'eye', 'flames', 'wind', 'swing', 'sprites', 'vanish', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
 
 /** flames: one tongue, standing at `at` (canvas px), tilted `angle` degrees, `size` times the standard flame, starting
  * `delay` (0..1) into the effect's span. */
@@ -42,7 +42,13 @@ export interface FlameSpot { at: [number, number]; angle: number; size: number; 
  * its middle, starting `start` (0..1) into the effect's span. */
 /** sprites: one outlined shape, drawn at full size by `d` (canvas px), growing from `at` over [start, end] of the
  * effect's span: `grow` scale (both ways), x or y (one way). */
-export interface Sprite { d: string; fill: string; edge: number; at: [number, number]; start: number; end: number; grow: 'scale' | 'x' | 'y' }
+export interface Sprite {
+  d: string; fill: string; edge: number; at: [number, number]; start: number; end: number; grow: 'scale' | 'x' | 'y';
+  /** shrinks back to nothing over [outStart, outEnd] of the span */
+  outStart?: number; outEnd?: number;
+  /** instead of growing, revealed by a wedge round `at` sweeping from `from` to `to` degrees (0 = right, 90 = up) */
+  sweep?: { from: number; to: number };
+}
 
 export interface WindBand { radius: number; from: number; to: number; width: number; color: string; start: number }
 /** Older names still read: pulse and wobble were free-running; as frames of the timeline they are swell and lean. */
@@ -255,8 +261,12 @@ function parseBinding(raw: unknown, i: number): Binding {
         const q = x as Record<string, unknown>;
         if (!q || typeof q.d !== 'string' || !isPt(q.at)) fail(`${w}.items[${k}]`, 'needs d and at');
         const g = q.grow === 'x' || q.grow === 'y' ? q.grow : 'scale';
-        return { d: q.d, fill: typeof q.fill === 'string' ? q.fill : '#ffffff', edge: typeof q.edge === 'number' ? q.edge : 14, at: q.at,
+        const it: Sprite = { d: q.d, fill: typeof q.fill === 'string' ? q.fill : '#ffffff', edge: typeof q.edge === 'number' ? q.edge : 14, at: q.at,
           start: typeof q.start === 'number' ? q.start : 0, end: typeof q.end === 'number' ? q.end : 1, grow: g };
+        if (typeof q.outStart === 'number' && typeof q.outEnd === 'number') { it.outStart = q.outStart; it.outEnd = q.outEnd; }
+        const sw = q.sweep as Record<string, unknown> | undefined;
+        if (sw && typeof sw.from === 'number' && typeof sw.to === 'number') it.sweep = { from: sw.from, to: sw.to };
+        return it;
       });
     }
     if (o.angle !== undefined) { if (typeof o.angle !== 'number') fail(w, 'angle must be degrees'); spec.angle = o.angle; }

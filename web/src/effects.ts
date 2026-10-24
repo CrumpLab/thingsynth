@@ -87,6 +87,8 @@ type Fill = {
   el: SVGPathElement; hex: string; base: Oklch; opacity: number; hue: number; glow: number; written: string;
   /** tint: the colour it moves to and how far (0..1) */
   tint: { to: Oklch; u: number } | null;
+  /** vanish: how far (0..1) it has faded away */
+  gone: number;
 };
 type Reveal = {
   copy: SVGPathElement; clip: SVGPathElement; base: Oklch; glow: number; turn: number; to: Oklch | null;
@@ -197,7 +199,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     if (f) return f;
     const el = art.fills.get(id), part = fillParts.get(id);
     if (!el || !part) return undefined;
-    f = { el, hex: part.fill, base: hexToOklch(part.fill), opacity: part.opacity, hue: 0, glow: 0, written: '', tint: null };
+    f = { el, hex: part.fill, base: hexToOklch(part.fill), opacity: part.opacity, hue: 0, glow: 0, written: '', tint: null, gone: 0 };
     fills.set(id, f);
     return f;
   };
@@ -296,6 +298,13 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
         fills: [], ink: [], reveals: [], targets: [], centre: obj.centroid, base: [bx + bw / 2, by + bh],
       };
       switch (spec.effect) {
+        case 'vanish':
+          tr.ink = obj.ownInk.filter((s) => {
+            const b = inkParts.get(s)?.bbox;
+            return !!b && ids.some((id) => { const f = fillParts.get(id)?.bbox; return !!f && b[0] >= f[0] - 40 && b[1] >= f[1] - 40 && b[0] + b[2] <= f[0] + f[2] + 40 && b[1] + b[3] <= f[1] + f[3] + 40; });
+          });
+          tr.fills = ids.filter((id) => fillState(id));
+          break;
         case 'glow':
         case 'hue':
         case 'tint':
@@ -582,13 +591,15 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
   // ---- painting: every frame is computed from the bindings' frames alone ----------------------------------------------
   const paint = (): void => {
     // Colours
-    for (const f of fills.values()) { f.hue = 0; f.glow = 0; f.tint = null; }
+    for (const f of fills.values()) { f.hue = 0; f.glow = 0; f.tint = null; f.gone = 0; }
+    const inkGone = new Map<string, number>();
     for (const L of live) for (const tr of L.tracks) {
       if (!tr.fills.length) continue;
       const u = local(tr, L.shown);
       for (const id of tr.fills) {
         const f = fills.get(id);
         if (!f) continue;
+        if (tr.spec.effect === 'vanish') { f.gone = Math.max(f.gone, u); continue; }
         if (tr.spec.effect === 'hue') f.hue += tr.spec.amount * HUE_DEG * u;
         else if (tr.spec.effect === 'tint') { if (tr.spec.color && u > 0) f.tint = { to: hexToOklch(tr.spec.color), u: Math.min(1, u * Math.abs(tr.spec.amount)) }; }
         else f.glow += tr.spec.amount * u;
@@ -603,11 +614,24 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
         col = oklchToHex(mixOklch(hexToOklch(col), f.tint.to, f.tint.u));
         op = op + (1 - op) * f.tint.u;
       }
+      if (f.gone > 0) op *= 1 - f.gone;
       const key = `${col}/${op.toFixed(3)}`;
       if (key === f.written) continue;
       f.written = key;
       f.el.setAttribute('fill', col);
       if (op < 1) f.el.setAttribute('fill-opacity', op.toFixed(3)); else f.el.removeAttribute('fill-opacity');
+    }
+
+    // Vanish: the shapes' own lines fade with them.
+    for (const L of live) for (const tr of L.tracks) {
+      if (tr.spec.effect !== 'vanish') continue;
+      const u = local(tr, L.shown);
+      for (const sid of tr.ink) inkGone.set(sid, Math.max(inkGone.get(sid) ?? 0, u));
+    }
+    for (const [sid, u] of inkGone) {
+      const el = art.ink.get(sid);
+      if (!el) continue;
+      if (u > 0.001) el.setAttribute('opacity', (1 - u).toFixed(3)); else el.removeAttribute('opacity');
     }
 
     // Reveals and scribbles
@@ -731,7 +755,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     // Boil: per stroke, the depth is the largest any track asks for; the drawing is the one for that depth.
     const depth = new Map<string, number>();
     for (const L of live) for (const tr of L.tracks) {
-      if (!tr.ink.length) continue;
+      if (!tr.ink.length || tr.spec.effect !== 'boil') continue;
       const v = Math.abs(tr.spec.amount) * local(tr, L.shown);
       for (const id of tr.ink) depth.set(id, Math.max(depth.get(id) ?? 0, v));
     }
@@ -1068,17 +1092,38 @@ function drawWind(g: SVGGElement, at: [number, number], bands: WindBand[], count
 
 /** Outlined shapes, each growing from its point over its own window of the span. */
 function drawSprites(g: SVGGElement, items: Sprite[]): (u: number) => void {
-  const els = items.map((it) => {
+  const els = items.map((it, k) => {
     const p = document.createElementNS(SVG, 'path');
     p.setAttribute('d', it.d); p.setAttribute('fill', it.fill);
     if (it.edge > 0) { p.setAttribute('stroke', '#000'); p.setAttribute('stroke-width', String(it.edge)); p.setAttribute('stroke-linejoin', 'round'); }
     p.style.visibility = 'hidden';
+    let wedge: SVGPathElement | null = null;
+    if (it.sweep) {
+      const clip = document.createElementNS(SVG, 'clipPath');
+      clip.id = `${g.id || 'ts-spr'}-${Math.random().toString(36).slice(2, 8)}-${k}`;
+      wedge = document.createElementNS(SVG, 'path');
+      clip.append(wedge);
+      g.append(clip);
+      p.setAttribute('clip-path', `url(#${clip.id})`);
+    }
     g.append(p);
-    return { it, p, written: '' };
+    return { it, p, wedge, written: '' };
   });
   return (u) => {
     for (const e of els) {
-      const v = easeOut3((u - e.it.start) / Math.max(1e-6, e.it.end - e.it.start));
+      let v = easeOut3((u - e.it.start) / Math.max(1e-6, e.it.end - e.it.start));
+      if (e.it.outStart !== undefined && e.it.outEnd !== undefined) v *= 1 - easeOut3((u - e.it.outStart) / Math.max(1e-6, e.it.outEnd - e.it.outStart));
+      if (e.wedge && e.it.sweep) {
+        const key = v.toFixed(4);
+        if (key === e.written) continue;
+        e.written = key;
+        e.p.style.visibility = v > 0.005 ? 'visible' : 'hidden';
+        const [x, y] = e.it.at, R = 5000, a0 = e.it.sweep.from, a1 = a0 + (e.it.sweep.to - a0) * v;
+        const pts = [`${f1(x)} ${f1(y)}`];
+        for (let i = 0; i <= 24; i++) { const a = ((a0 + (a1 - a0) * (i / 24)) * Math.PI) / 180; pts.push(`${f1(x + Math.cos(a) * R)} ${f1(y - Math.sin(a) * R)}`); }
+        e.wedge.setAttribute('d', `M${pts.join('L')}Z`);
+        continue;
+      }
       const key = v.toFixed(4);
       if (key === e.written) continue;
       e.written = key;
