@@ -37,7 +37,7 @@
 import type { WebSynthlandHost } from '../runtime/types';
 import { layers, type Art } from './art';
 import { glowColour, hexToOklch, mixOklch, oklchToHex, type Oklch } from './color';
-import { positionOf, type Binding, type Ease, type EffectSpec, type FlameSpot, type WindBand } from './mapping';
+import { positionOf, type Binding, type Ease, type EffectSpec, type FlameSpot, type Sprite, type WindBand } from './mapping';
 import { fillParts, inkParts, resolveObject, type ArtObject } from './objects';
 
 const SVG = 'http://www.w3.org/2000/svg';
@@ -326,6 +326,32 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
           const m = Math.min(obj.bbox[2], obj.bbox[3]);
           const [rx = m * 0.18, ry = m * 0.1] = spec.size ?? [];
           tr.draw = drawEye(g, ex, ey, rx, ry, `ts-eye-${uid++}`, spec.color);
+          break;
+        }
+        case 'sprites': {
+          const place = spec.place ?? 'over';
+          let g: SVGGElement;
+          if (place === 'over') g = overGroup();
+          else if (place === 'around') g = topGroup(ids, spec.front ?? [], true); // above the ink, the object in front
+          else {
+            g = document.createElementNS(SVG, 'g');
+            g.style.pointerEvents = 'none';
+            if (place === 'under') {
+              const els = ids.map((id) => art.fills.get(id)).filter((p): p is SVGPathElement => !!p);
+              els.reduce((a, b) => (Number(a.id.slice(1)) < Number(b.id.slice(1)) ? a : b)).before(g);
+            } else {
+              const clipId = `ts-on-${uid++}`;
+              const clip = document.createElementNS(SVG, 'clipPath');
+              clip.id = clipId;
+              for (const id of ids) { const u = document.createElementNS(SVG, 'use'); u.setAttribute('href', `#${id}`); clip.append(u); }
+              stack.defs.append(clip);
+              L.added.push(clip);
+              g.setAttribute('clip-path', `url(#${clipId})`);
+              afterShapes(ids).after(g);
+            }
+            L.added.push(g);
+          }
+          tr.draw = drawSprites(g, spec.items ?? []);
           break;
         }
         case 'wind':
@@ -1036,6 +1062,31 @@ function drawWind(g: SVGGElement, at: [number, number], bands: WindBand[], count
       const s = 34 * v;
       l.el.setAttribute('d', `M${f1(l.x - s)} ${f1(l.y)}Q${f1(l.x)} ${f1(l.y - s * 0.9)} ${f1(l.x + s)} ${f1(l.y)}Q${f1(l.x)} ${f1(l.y + s * 0.9)} ${f1(l.x - s)} ${f1(l.y)}Z`);
       l.el.setAttribute('transform', `rotate(${l.rot.toFixed(0)} ${f1(l.x)} ${f1(l.y)})`);
+    }
+  };
+}
+
+/** Outlined shapes, each growing from its point over its own window of the span. */
+function drawSprites(g: SVGGElement, items: Sprite[]): (u: number) => void {
+  const els = items.map((it) => {
+    const p = document.createElementNS(SVG, 'path');
+    p.setAttribute('d', it.d); p.setAttribute('fill', it.fill);
+    if (it.edge > 0) { p.setAttribute('stroke', '#000'); p.setAttribute('stroke-width', String(it.edge)); p.setAttribute('stroke-linejoin', 'round'); }
+    p.style.visibility = 'hidden';
+    g.append(p);
+    return { it, p, written: '' };
+  });
+  return (u) => {
+    for (const e of els) {
+      const v = easeOut3((u - e.it.start) / Math.max(1e-6, e.it.end - e.it.start));
+      const key = v.toFixed(4);
+      if (key === e.written) continue;
+      e.written = key;
+      e.p.style.visibility = v > 0.01 ? 'visible' : 'hidden';
+      if (v <= 0.01) continue;
+      const [x, y] = e.it.at;
+      const sc = e.it.grow === 'x' ? `${v.toFixed(4)} 1` : e.it.grow === 'y' ? `1 ${v.toFixed(4)}` : v.toFixed(4);
+      e.p.setAttribute('transform', `translate(${f1(x)} ${f1(y)}) scale(${sc}) translate(${f1(-x)} ${f1(-y)})`);
     }
   };
 }

@@ -31,8 +31,8 @@ export interface RegionEntry extends Control {
   region: RegionShape;
 }
 
-export type EffectKind = 'glow' | 'hue' | 'tint' | 'fill' | 'scribble' | 'grow' | 'rays' | 'eye' | 'flames' | 'wind' | 'swing' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
-export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'tint', 'fill', 'scribble', 'grow', 'rays', 'eye', 'flames', 'wind', 'swing', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
+export type EffectKind = 'glow' | 'hue' | 'tint' | 'fill' | 'scribble' | 'grow' | 'rays' | 'eye' | 'flames' | 'wind' | 'swing' | 'sprites' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
+export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'tint', 'fill', 'scribble', 'grow', 'rays', 'eye', 'flames', 'wind', 'swing', 'sprites', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
 
 /** flames: one tongue, standing at `at` (canvas px), tilted `angle` degrees, `size` times the standard flame, starting
  * `delay` (0..1) into the effect's span. */
@@ -40,6 +40,10 @@ export interface FlameSpot { at: [number, number]; angle: number; size: number; 
 
 /** wind: one band, a crescent round the centre at `radius`, sweeping from `from` to `to` degrees, `width` thick at
  * its middle, starting `start` (0..1) into the effect's span. */
+/** sprites: one outlined shape, drawn at full size by `d` (canvas px), growing from `at` over [start, end] of the
+ * effect's span: `grow` scale (both ways), x or y (one way). */
+export interface Sprite { d: string; fill: string; edge: number; at: [number, number]; start: number; end: number; grow: 'scale' | 'x' | 'y' }
+
 export interface WindBand { radius: number; from: number; to: number; width: number; color: string; start: number }
 /** Older names still read: pulse and wobble were free-running; as frames of the timeline they are swell and lean. */
 const EFFECT_ALIASES: Record<string, EffectKind> = { pulse: 'swell', wobble: 'lean' };
@@ -86,6 +90,9 @@ export interface EffectSpec {
   angle?: number;
   /** eye: draw it above the painting's ink (and over anything else drawn there before it). */
   over?: boolean;
+  /** sprites: the shapes, and where they go: under the object, on it (clipped to it, under its ink), or over the ink. */
+  items?: Sprite[];
+  place?: 'under' | 'on' | 'over' | 'around';
 }
 
 interface BindingBase {
@@ -236,6 +243,20 @@ function parseBinding(raw: unknown, i: number): Binding {
         const q = x as Record<string, unknown>;
         if (!q || !isPt(q.at) || typeof q.angle !== 'number') fail(`${w}.spots[${k}]`, 'needs at [x, y] and angle');
         return { at: q.at, angle: q.angle, size: typeof q.size === 'number' ? q.size : 1, delay: typeof q.delay === 'number' ? q.delay : 0 };
+      });
+    }
+    if (o.place !== undefined) {
+      if (!['under', 'on', 'over', 'around'].includes(o.place as string)) fail(w, 'place must be under, on, over or around');
+      spec.place = o.place as 'under' | 'on' | 'over' | 'around';
+    }
+    if (o.items !== undefined) {
+      if (!Array.isArray(o.items)) fail(w, 'items must be a list');
+      spec.items = o.items.map((x, k) => {
+        const q = x as Record<string, unknown>;
+        if (!q || typeof q.d !== 'string' || !isPt(q.at)) fail(`${w}.items[${k}]`, 'needs d and at');
+        const g = q.grow === 'x' || q.grow === 'y' ? q.grow : 'scale';
+        return { d: q.d, fill: typeof q.fill === 'string' ? q.fill : '#ffffff', edge: typeof q.edge === 'number' ? q.edge : 14, at: q.at,
+          start: typeof q.start === 'number' ? q.start : 0, end: typeof q.end === 'number' ? q.end : 1, grow: g };
       });
     }
     if (o.angle !== undefined) { if (typeof o.angle !== 'number') fail(w, 'angle must be degrees'); spec.angle = o.angle; }

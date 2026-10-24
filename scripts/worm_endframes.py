@@ -258,3 +258,73 @@ def combo_main() -> None:
 
 if __name__ == '__main__' and 'combo' in __import__('sys').argv[1:]:
     combo_main()
+
+
+def export_effects() -> list[dict]:
+    """The approved worm progression as the app's sprites effects (same shapes, colours and windows as combo_frame)."""
+    import math as _m
+
+    def poly(pts):
+        return 'M' + 'L'.join(p(*q) for q in pts) + 'Z'
+
+    def crescent_d(cx, cy, r, a0, a1, w):
+        n, outer, inner = 28, [], []
+        for i in range(n + 1):
+            t = i / n
+            a = _m.radians(a0 + (a1 - a0) * t)
+            th = w * _m.sin(_m.pi * t) ** 0.9
+            outer.append((cx + _m.cos(a) * (r + th / 2), cy + _m.sin(a) * (r + th / 2)))
+            inner.append((cx + _m.cos(a) * (r - th / 2), cy + _m.sin(a) * (r - th / 2)))
+        return poly(outer + inner[::-1])
+
+    bx, by = BASE
+    rings = []
+    for k, (rx, col) in enumerate(RINGS):
+        st = (len(RINGS) - 1 - k) * 0.12
+        rings.append({'d': ellipse(bx, by + 10, rx, rx * 0.35), 'fill': col, 'edge': INK * 0.8, 'at': [bx, by + 10], 'start': st, 'end': st + 0.3, 'grow': 'scale'})
+    bands = []
+    for k, (x, y) in enumerate(CENTRE):
+        nx, ny = CENTRE[min(k + 1, len(CENTRE) - 1)]
+        px_, py_ = CENTRE[max(k - 1, 0)]
+        a = _m.atan2(ny - py_, nx - px_)
+        rot = lambda dx, dy: (x + dx * _m.cos(a) - dy * _m.sin(a), y + dx * _m.sin(a) + dy * _m.cos(a))
+        d = poly([rot(-22, -70), rot(22, -70), rot(22, 70), rot(-22, 70)])
+        bands.append({'d': d, 'fill': BAND_COLS[k], 'edge': INK * 0.8, 'at': [x, y], 'start': 0.15 + k * 0.1, 'end': 0.3 + k * 0.1, 'grow': 'x'})
+    import random as _r
+    rnd = _r.Random(3)
+    cx, cy = TUFT
+    cols = ['#f2a6c6', '#ffe066', '#c4a3f0', '#7fd8f5', '#b4e0a2', '#ffb36b', '#f2a6c6']
+    crest = []
+    for k in range(7):
+        a = _m.radians(200 + k * 24)
+        rr = 70 + rnd.random() * 30
+        crest.append({'d': circle(cx + _m.cos(a) * 210, cy + 70 + _m.sin(a) * 210, rr), 'fill': cols[k], 'edge': INK, 'at': [cx, cy + 70], 'start': 0.4, 'end': 0.85, 'grow': 'scale'})
+    for dx, dy, rr in [(-110, -40, 60), (0, -80, 70), (110, -40, 60)]:
+        crest.append({'d': circle(cx + dx, cy + dy, rr), 'fill': '#fff3fb', 'edge': INK * 0.8, 'at': [cx, cy], 'start': 0.4, 'end': 0.85, 'grow': 'scale'})
+    x, y = HEAD[0] + 40, HEAD[1] + 20
+    flare = (f'M{p(x - 40, y - 55)}C{p(x + 60, y - 70)} {p(x + 120, y - 150)} {p(x + 175, y - 170)}'
+             f'L{p(x + 200, y + 150)}C{p(x + 130, y + 120)} {p(x + 60, y + 60)} {p(x - 40, y + 55)}Z')
+    bell = [{'d': flare, 'fill': '#f7b3f0', 'edge': INK, 'at': [x - 40, y], 'start': 0.55, 'end': 1.0, 'grow': 'scale'},
+            {'d': ellipse(x + 188, y - 10, 38, 160), 'fill': '#7a2a4f', 'edge': INK, 'at': [x - 40, y], 'start': 0.55, 'end': 1.0, 'grow': 'scale'}]
+    for k, (r, w, col) in enumerate([(110, 40, '#ffffff'), (190, 36, '#fbe0ff'), (270, 30, '#ffffff')]):
+        bell.append({'d': crescent_d(x + 190, y - 10, r, -40, 40, w), 'fill': col, 'edge': INK * 0.8, 'at': [x + 190, y - 10],
+                     'start': 0.7 + k * 0.08, 'end': 0.9 + k * 0.05, 'grow': 'scale'})
+    rnd2 = lambda v: [round(q, 1) for q in v]
+    for it in rings + bands + crest + bell:
+        it['at'] = rnd2(it['at'])
+        it['edge'] = round(it['edge'], 1)
+    return [{'effect': 'sprites', 'place': 'around', 'items': rings},
+            {'effect': 'sprites', 'place': 'on', 'items': bands},
+            {'effect': 'sprites', 'place': 'over', 'items': crest + bell}]
+
+
+if __name__ == '__main__' and 'export' in __import__('sys').argv[1:]:
+    import json as _j
+    mp = ROOT / 'mapping.json'
+    M = _j.loads(mp.read_text())
+    for b in M['bindings']:
+        if b['id'] == 'worm-expression':
+            b['label'] = 'The worm swells with Expression: drag up and down; ripples spread, bands climb it, its crest blooms and its head flares into a trumpet'
+            b['effects'] = export_effects()
+    mp.write_text(_j.dumps(M, indent=2) + '\n')
+    print('exported', sum(len(e['items']) for e in export_effects()), 'shapes')
