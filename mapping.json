@@ -1831,7 +1831,7 @@
     },
     {
       "id": "eye-percussion",
-      "label": "The eye: tap to switch percussion; it blinks awake and its lid glows",
+      "label": "The sleepy eye: tap to switch percussion; it wakes and springs out on a coil",
       "object": "bottom-eye",
       "param": "perc.on",
       "range": [
@@ -1842,15 +1842,30 @@
       "gesture": "tap",
       "effects": [
         {
-          "effect": "blink",
-          "amount": 1
+          "effect": "vanish",
+          "span": [
+            0,
+            0.02
+          ]
         },
         {
-          "effect": "glow",
-          "parts": "lid",
-          "amount": 1
+          "effect": "boing",
+          "at": [
+            2110,
+            4365
+          ],
+          "to": [
+            2230,
+            4035
+          ],
+          "size": [
+            122,
+            108,
+            126
+          ]
         }
-      ]
+      ],
+      "glide": 700
     },
     {
       "id": "upper-db3",
@@ -4303,7 +4318,7 @@
     {
       "id": "note-103",
       "label": "G7: hold to play",
-      "part": "f021",
+      "part": "f087",
       "note": 103,
       "gesture": "hold",
       "effects": [

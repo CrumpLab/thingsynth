@@ -96,13 +96,17 @@
       "ink": "auto"
     },
     "bottom-eye": {
-      "label": "The eye with the purple lid, bottom centre",
+      "label": "The sleepy round eye at the end of the grey lying creature",
       "parts": {
         "lid": [
           "f020"
         ],
         "lower": [
           "f019"
+        ],
+        "iris": [
+          "f021",
+          "f022"
         ]
       },
       "ink": "auto"

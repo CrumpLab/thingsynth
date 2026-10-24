@@ -156,6 +156,7 @@ span (`web/src/effects.ts`):
 | `flames` | above ink | outlined tongues with yellow cores at `spots`, each rising from its base from its own delay; masked (with an outline-wide margin) so the object and the `front` shapes stay in front | `spots` [{at, angle, size, delay}], `front` |
 | `wind` | above ink | outlined crescent bands round `at`, each sweeping from `from` to `to` degrees and thickening from its own `start`, then `count` leaves and petals caught up in it | `at`, `bands` [{radius, from, to, width, color, start}], `count` |
 | `swing` | parts | the parts (a limb) turn about the pivot `at` by `angle` degrees, as an outlined copy with their own ribs above the ink; the neighbouring shapes grow into the place they leave | `parts`, `at`, `angle` |
+| `boing` | over ink | the eye springing out: an empty cup where it sat, the eye opening in place, then springing out to `to` on a coil with an overshoot, motion lines last | `at`, `to`, `size` [eye radius, cup rx, cup ry] |
 | `vanish` | fills | the shapes and their own lines fade away (the froth giving way to bubbles) | |
 | `sprites` | anywhere | a list of outlined shapes, each growing from its own point (both ways, or only x or y) over its own window of the span, optionally shrinking back out over a later window (`outStart`, `outEnd`) or revealed by a sweeping wedge instead of growing (`sweep` {from, to} degrees); `place` under the object, on it (clipped to it), over the ink, or around it (over the ink, masked so the object stays in front). Mockup scripts export their geometry straight into it | `items` [{d, fill, edge, at, start, end, grow}], `place` |
 | `tint` | fills | the colour moves to `color` and the shape turns solid | `color` |
@@ -193,7 +194,9 @@ green creature and its eye opens by Slow; its little baguette arm swings up and 
 ripples spread from its hole, candy bands climb its body, its tuft blooms into a crest, and its head flares into a
 trumpet with sound waves (`scripts/worm_endframes.py`, whose `export` writes the shapes into `mapping.json`). **stream** (upper vibrato),
 bubble cloud and rainbow: the froth bubbles up, bubbles rise and gather into a cloud of bubbles and shrink away into
-it, a candy rainbow sweeps out of it into the pool, and it rains (`scripts/stream_endframes.py`).
+it, a candy rainbow sweeps out of it into the pool, and it rains (`scripts/stream_endframes.py`). **bottom-eye**
+(percussion), boing: the sleepy eye opens and springs out on a coil from a grey cup (`scripts/eye_endframes.py`); note
+103 moved off its iris to f087.
 **stalk-drawbar-16 and stalk-drawbar-513**, sap rising: a green sap with a wavy surface climbs each stalk with the
 drawbar, turning a luminous light green (#9cf27c) towards the top; each bud on the stalk (roles `bud-1`..) swells
 24% and glows just as the sap reaches its height; and the stalk grows (`grow`): one new branch per drawbar step,

@@ -31,8 +31,8 @@ export interface RegionEntry extends Control {
   region: RegionShape;
 }
 
-export type EffectKind = 'glow' | 'hue' | 'tint' | 'fill' | 'scribble' | 'grow' | 'rays' | 'eye' | 'flames' | 'wind' | 'swing' | 'sprites' | 'vanish' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
-export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'tint', 'fill', 'scribble', 'grow', 'rays', 'eye', 'flames', 'wind', 'swing', 'sprites', 'vanish', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
+export type EffectKind = 'glow' | 'hue' | 'tint' | 'fill' | 'scribble' | 'grow' | 'rays' | 'eye' | 'flames' | 'wind' | 'swing' | 'sprites' | 'vanish' | 'boing' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
+export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'tint', 'fill', 'scribble', 'grow', 'rays', 'eye', 'flames', 'wind', 'swing', 'sprites', 'vanish', 'boing', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
 
 /** flames: one tongue, standing at `at` (canvas px), tilted `angle` degrees, `size` times the standard flame, starting
  * `delay` (0..1) into the effect's span. */
@@ -92,6 +92,8 @@ export interface EffectSpec {
   spots?: FlameSpot[];
   /** wind: its bands. */
   bands?: WindBand[];
+  /** boing: where the eye springs to (canvas px), from `at`. */
+  to?: [number, number];
   /** swing: degrees the parts turn about `at` by the last frame (negative = anticlockwise). */
   angle?: number;
   /** eye: draw it above the painting's ink (and over anything else drawn there before it). */
@@ -251,6 +253,7 @@ function parseBinding(raw: unknown, i: number): Binding {
         return { at: q.at, angle: q.angle, size: typeof q.size === 'number' ? q.size : 1, delay: typeof q.delay === 'number' ? q.delay : 0 };
       });
     }
+    if (o.to !== undefined) { if (!isPt(o.to)) fail(w, 'to must be [x, y]'); spec.to = o.to; }
     if (o.place !== undefined) {
       if (!['under', 'on', 'over', 'around'].includes(o.place as string)) fail(w, 'place must be under, on, over or around');
       spec.place = o.place as 'under' | 'on' | 'over' | 'around';

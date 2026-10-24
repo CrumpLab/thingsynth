@@ -363,6 +363,12 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
           tr.draw = drawSprites(g, spec.items ?? []);
           break;
         }
+        case 'boing': {
+          const [bx, by] = spec.at ?? obj.centroid;
+          const [r = 122, cupRx = 108, cupRy = 126] = spec.size ?? [];
+          tr.draw = drawBoing(overGroup(), [bx, by], spec.to ?? [bx + 120, by - 330], r, cupRx, cupRy, `ts-boing-${uid++}`);
+          break;
+        }
         case 'wind':
           tr.draw = drawWind(overGroup(), spec.at ?? obj.centroid, spec.bands ?? [], spec.count ?? 5, rand);
           break;
@@ -1133,6 +1139,88 @@ function drawSprites(g: SVGGElement, items: Sprite[]): (u: number) => void {
       const sc = e.it.grow === 'x' ? `${v.toFixed(4)} 1` : e.it.grow === 'y' ? `1 ${v.toFixed(4)}` : v.toFixed(4);
       e.p.setAttribute('transform', `translate(${f1(x)} ${f1(y)}) scale(${sc}) translate(${f1(-x)} ${f1(-y)})`);
     }
+  };
+}
+
+const BOING = { edge: 18, lid: '#9195B2', coil: '#91ADB2', cup: '#D2D3D4', iris: '#f5d76e' };
+
+/** Out-back easing: overshoots a little and settles, the spring's boing. */
+function easeBack(u: number): number {
+  const v = Math.max(0, Math.min(1, u)), c = 1.9;
+  return 1 + (c + 1) * Math.pow(v - 1, 3) + c * Math.pow(v - 1, 2);
+}
+
+/** The eye springing out: an empty grey cup where it sat, the eye opening in place (its lid rolling up, lashes
+ * appearing) over 0..0.25, springing out to `to` on a coil with an overshoot over 0.2..0.8, motion lines over
+ * 0.65..1. The painted eye itself is faded out by a `vanish` on its shapes. */
+function drawBoing(g: SVGGElement, base: [number, number], to: [number, number], r: number, cupRx: number, cupRy: number, clipId: string): (u: number) => void {
+  const E = BOING.edge;
+  const mk = <K extends keyof SVGElementTagNameMap>(tag: K, attrs: Record<string, string>, parent: Element = g): SVGElementTagNameMap[K] => {
+    const e = document.createElementNS(SVG, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    parent.append(e);
+    return e;
+  };
+  const [bx, by] = base;
+  mk('ellipse', { cx: f1(bx), cy: f1(by + 2), rx: f1(cupRx), ry: f1(cupRy), fill: BOING.cup, stroke: '#000', 'stroke-width': String(E) });
+  const coilInk = mk('path', { fill: 'none', stroke: '#000', 'stroke-width': String(E * 2.2), 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+  const coil = mk('path', { fill: 'none', stroke: BOING.coil, 'stroke-width': String(E), 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+  const lines = [0, 1].map(() => mk('path', { fill: '#ffffff', stroke: '#000', 'stroke-width': String(E * 0.75), 'stroke-linejoin': 'round' }));
+  const eye = mk('g', {});
+  const clip = mk('clipPath', { id: clipId }, eye);
+  const clipBall = mk('circle', { r: f1(r) }, clip);
+  const ball = mk('circle', { r: f1(r), fill: '#fff', stroke: '#000', 'stroke-width': String(E) }, eye);
+  const iris = mk('circle', { r: f1(r * 0.48), fill: BOING.iris, stroke: '#000', 'stroke-width': String(E * 0.8) }, eye);
+  const pupil = mk('circle', { r: f1(r * 0.22), fill: '#000' }, eye);
+  const shine = mk('circle', { r: f1(r * 0.08), fill: '#fff' }, eye);
+  const lidG = mk('g', { 'clip-path': `url(#${clipId})` }, eye);
+  const lid = mk('path', { fill: BOING.lid, stroke: '#000', 'stroke-width': String(E) }, lidG);
+  const rim = mk('circle', { r: f1(r), fill: 'none', stroke: '#000', 'stroke-width': String(E) }, eye);
+  const lashes = [-2, -1, 0, 1, 2].map(() => mk('path', { fill: '#000', stroke: '#000', 'stroke-width': '6', 'stroke-linejoin': 'round' }, eye));
+  g.style.visibility = 'hidden';
+  let written = '';
+  return (u) => {
+    const key = u.toFixed(4);
+    if (key === written) return;
+    written = key;
+    g.style.visibility = u > 0.001 ? 'visible' : 'hidden';
+    if (u <= 0.001) return;
+    const o = easeOut3(u / 0.25), e = easeBack((u - 0.2) / 0.6);
+    const ex = bx + (to[0] - bx) * e, ey = by + (to[1] - by) * e;
+    if (e > 0.02) {
+      const turns = 8 * Math.max(0.2, Math.abs(e));
+      const pts: string[] = [];
+      for (let i = 0; i < 80; i++) {
+        const t = i / 79;
+        pts.push(`${f1(bx + (ex - bx) * t + 45 * Math.sin(t * Math.PI * turns))} ${f1(by + 20 + (ey - by - 20) * t)}`);
+      }
+      const d = `M${pts.join('L')}`;
+      coilInk.setAttribute('d', d); coil.setAttribute('d', d);
+      coilInk.style.visibility = coil.style.visibility = 'visible';
+    } else coilInk.style.visibility = coil.style.visibility = 'hidden';
+    const lg = easeOut3((u - 0.65) / 0.35);
+    lines.forEach((l, k) => {
+      l.style.visibility = lg > 0.02 ? 'visible' : 'hidden';
+      if (lg > 0.02) l.setAttribute('d', k === 0 ? crescent(ex, ey, 190, 110, 110 + 40 * lg, 30 * lg) : crescent(ex, ey, 190, 70 - 40 * lg, 70, 30 * lg));
+    });
+    const lx = 10 * o, ly = -6 * o;
+    for (const c of [clipBall, ball, rim]) { c.setAttribute('cx', f1(ex)); c.setAttribute('cy', f1(ey)); }
+    iris.setAttribute('cx', f1(ex + lx)); iris.setAttribute('cy', f1(ey + 12 + ly));
+    pupil.setAttribute('cx', f1(ex + lx)); pupil.setAttribute('cy', f1(ey + 12 + ly));
+    shine.setAttribute('cx', f1(ex + lx + r * 0.14)); shine.setAttribute('cy', f1(ey - r * 0.05 + ly));
+    const edge = ey + r * (0.05 - 0.75 * o);
+    lid.setAttribute('d', `M${f1(ex - r * 1.1)} ${f1(ey - r * 1.2)}L${f1(ex + r * 1.1)} ${f1(ey - r * 1.2)}L${f1(ex + r * 1.1)} ${f1(edge - r * 0.1)}` +
+      `C${f1(ex + r * 0.5)} ${f1(edge + r * 0.25)} ${f1(ex - r * 0.5)} ${f1(edge + r * 0.25)} ${f1(ex - r * 1.1)} ${f1(edge - r * 0.1)}Z`);
+    const k = Math.max(0, (o - 0.7) / 0.3);
+    lashes.forEach((l, j) => {
+      l.style.visibility = k > 0 ? 'visible' : 'hidden';
+      if (k <= 0) return;
+      const a = ((-90 + (j - 2) * 26) * Math.PI) / 180;
+      const x1 = ex + Math.cos(a) * r * 0.98, y1 = ey + Math.sin(a) * r * 0.98;
+      const x2 = ex + Math.cos(a) * r * (1 + 0.38 * k), y2 = ey + Math.sin(a) * r * (1 + 0.38 * k);
+      const nx = -Math.sin(a) * 9, ny = Math.cos(a) * 9;
+      l.setAttribute('d', `M${f1(x1 - nx)} ${f1(y1 - ny)}L${f1(x2)} ${f1(y2)}L${f1(x1 + nx)} ${f1(y1 + ny)}Z`);
+    });
   };
 }
 

@@ -14,7 +14,7 @@ the object shows the value but touching it does nothing (routing, tuning and lev
 | `amp.expression` | Expression | pyramid-worm | drag-y | sprites 1, sprites 1, sprites 1 |  |
 | `vib.upper` | Vibrato Upper | stream | tap | vanish 1 parts splash span [0.03, 0.12], sprites 1 |  |
 | `tg.age` | Wheel Age | cloud | drag-x | scribble 1 count 18 |  |
-| `perc.on` | Percussion | bottom-eye | tap | blink 1, glow 1 parts lid |  |
+| `perc.on` | Percussion | bottom-eye | tap | vanish 1 span [0, 0.02], boing 1 |  |
 | `upper.db3` | Upper 8' | mushroom-stem | drag-y | fill 1 from bottom |  |
 | `upper.db4` | Upper 4' | pink-column | drag-y | fill 1 from bottom |  |
 | `upper.db5` | Upper 2 2/3' | horned-mask | drag-y | fill 1 from bottom |  |
@@ -66,7 +66,7 @@ the object shows the value but touching it does nothing (routing, tuning and lev
 | pyramid-worm | The pink worm hanging on the pyramid | f220 | `amp.expression` |
 | stream | The stream and the waterfall's splash | f134 f156 | `vib.upper` |
 | cloud | The big pale cloud at the top | f193 | `tg.age` |
-| bottom-eye | The eye with the purple lid, bottom centre | f020 f019 | `perc.on` |
+| bottom-eye | The sleepy round eye at the end of the grey lying creature | f020 f019 f021 f022 | `perc.on` |
 | big-lips | The big purple lips, bottom left | f001 f009 f010 | spare (shuffle only) |
 | bunny-slab | The magenta slab under the white bunny, bottom right | f048 f049 f050 f312 | `voice.manuals` |
 | lying-creature | The long magenta creature lying at the bottom, arms up | f014 f023 f024 | `tg.click` |
@@ -144,5 +144,5 @@ Bigger shapes play lower notes; the shapes are spread over the whole canvas so a
 | F6 (89) | f294 | | F#6 (90) | f114 | | G6 (91) | f307 | | G#6 (92) | f008 |
 | A6 (93) | f018 | | A#6 (94) | f258 | | B6 (95) | f154 | | C7 (96) | f200 |
 | C#7 (97) | f046 | | D7 (98) | f041 | | D#7 (99) | f246 | | E7 (100) | f123 |
-| F7 (101) | f044 | | F#7 (102) | f160 | | G7 (103) | f021 | | G#7 (104) | f096 |
+| F7 (101) | f044 | | F#7 (102) | f160 | | G7 (103) | f087 | | G#7 (104) | f096 |
 | A7 (105) | f270 | | A#7 (106) | f273 | | B7 (107) | f095 | | C8 (108) | f278 |
