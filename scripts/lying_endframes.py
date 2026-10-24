@@ -178,3 +178,148 @@ def main() -> None:
 
 if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- round two: the narwhal direction ------------------------------------------------------------------------------
+# Matt: "go more in a narwhal direction". Narwhals click to echolocate, so key click turns the grey creature into a
+# narwhal: a long spiral tusk grows from its head, in five variations.
+NOUT = ROOT / 'docs/objects/tg-click/narwhal'
+TUSK_BASE, TUSK_ANG, TUSK_LEN = (2380.0, 3925.0), -14.0, 480.0
+SPOTS = [(1640, 4230, 46, 30), (1760, 4170, 60, 38), (1700, 4330, 40, 26), (1880, 4250, 52, 34), (1980, 4170, 38, 26), (2010, 4320, 44, 28),
+         (1850, 4080, 34, 22), (2230, 3860, 40, 26), (2320, 3950, 30, 20), (1570, 4380, 36, 24)]
+
+
+def tusk(cols=('#fff6dc', '#e9dcb8'), bands=8) -> str:
+    """A long tapering tusk with a spiral twist: skewed bands of alternating ivory, each outlined."""
+    x, y = TUSK_BASE
+    a = math.radians(TUSK_ANG)
+    ca, sa = math.cos(a), math.sin(a)
+    R = lambda u, v: (x + ca * u - sa * v, y + sa * u + ca * v)
+    w = lambda u: 58 * (1 - u / TUSK_LEN) + 6
+    out = ''
+    for k in range(bands):
+        u0, u1 = TUSK_LEN * k / bands, TUSK_LEN * (k + 1) / bands
+        sk = (u1 - u0) * 0.45
+        quad = [R(u0, -w(u0)), R(u1, -w(u1)), R(u1 + sk if k < bands - 1 else u1, w(u1)), R(u0 + sk, w(u0))]
+        if k == bands - 1:
+            quad = [R(u0, -w(u0)), R(TUSK_LEN + 20, 0), R(u0 + sk, w(u0))]
+        out += outlined('M' + 'L'.join(p(*q) for q in quad) + 'Z', cols[k % 2], INK)
+    return out
+
+
+def tusk_tip():
+    a = math.radians(TUSK_ANG)
+    return (TUSK_BASE[0] + math.cos(a) * (TUSK_LEN + 20), TUSK_BASE[1] + math.sin(a) * (TUSK_LEN + 20))
+
+
+def friendly_eye() -> str:
+    sx, sy = SLIT
+    return (outlined(ellipse(sx, sy, 78, 58, -12), '#ffffff', INK) + f'<path d="{circle(sx + 16, sy + 6, 30)}" fill="#1b2a5a"/>'
+            + f'<path d="{circle(sx + 26, sy - 6, 10)}" fill="#ffffff"/>')
+
+
+def spots() -> str:
+    return ''.join(outlined(ellipse(x, y, rx, ry, -14), '#9fa8bf', INK * 0.6) for x, y, rx, ry in SPOTS)
+
+
+def crescent_arc(x, y, r, a0, a1, w, col) -> str:
+    return outlined(g.crescent(x, y, r, a0, a1, w), col, INK * 0.8)
+
+
+def fluke() -> str:
+    """The raised mitten becomes a narwhal's tail fluke: two broad lobes with a notch, held up in a wave."""
+    x, y = 1810.0, 3860.0
+    a = math.radians(-90)
+    ca, sa = math.cos(a), math.sin(a)
+    k = 1.1
+    R = lambda u, v: (x + (ca * u - sa * v) * k, y + (sa * u + ca * v) * k)
+    d = (f'M{p(*R(-30, 0))}C{p(*R(60, -30))} {p(*R(110, -170))} {p(*R(230, -250))}'
+         f'C{p(*R(200, -170))} {p(*R(230, -80))} {p(*R(175, 0))}'
+         f'C{p(*R(230, 80))} {p(*R(200, 170))} {p(*R(230, 250))}'
+         f'C{p(*R(110, 170))} {p(*R(60, 30))} {p(*R(-30, 0))}Z')
+    return outlined(d, '#9fb6d6', INK)
+
+
+def n1_tusk() -> Image.Image:
+    """Ivory tusk: a long spiral ivory tusk grows out of its head, and its slit eye opens into a friendly round eye."""
+    return draw('', [], tusk() + friendly_eye())
+
+
+def n2_echo() -> Image.Image:
+    """Echo clicks: the tusk plus rings of echolocation clicks rolling out from its tip."""
+    tx, ty = tusk_tip()
+    rings = ''.join(crescent_arc(tx, ty, 80 + 65 * k, -40 + 14, 40 + 14, 40 - 6 * k, ['#2DFFF4', '#ffffff', '#ffe066'][k]) for k in range(3))
+    return draw('', [], tusk() + friendly_eye() + rings)
+
+
+def n3_spotted() -> Image.Image:
+    """Spotted narwhal: the tusk, and the grey hide takes on a narwhal's blue-grey mottled spots."""
+    return draw('', [], spots() + tusk() + friendly_eye())
+
+
+def n4_fluke() -> Image.Image:
+    """Tail wave: the tusk, and the raised mitten arm turns into a narwhal's tail fluke waving up."""
+    return draw('', [], fluke() + tusk() + friendly_eye())
+
+
+def n5_party() -> Image.Image:
+    """Party narwhal: a candy-striped tusk, sparkles at its tip, and a fountain spouting from its blowhole."""
+    x, y = 2230.0, 3790.0
+    out = ''
+    col = [(x, y - 40), (x - 10, y - 140), (x + 10, y - 240)]
+    out += outlined(tube(col, 34, 26), '#bff6ff', INK)
+    for k, ang in enumerate((-160, -125, -55, -20)):
+        a = math.radians(ang)
+        P = bez((x + 10, y - 250), (x + math.cos(a) * 80, y - 300), (x + math.cos(a) * 170, y - 280 + 60), (x + math.cos(a) * 200, y - 160), 16)
+        out += outlined(tube(P, 20, 12), '#bff6ff', INK * 0.9)
+        dx, dy = P[-1]
+        out += outlined(f'M{p(dx, dy + 10)}C{p(dx + 22, dy + 40)} {p(dx + 18, dy + 70)} {p(dx, dy + 70)}C{p(dx - 18, dy + 70)} {p(dx - 22, dy + 40)} {p(dx, dy + 10)}Z', '#bff6ff', INK * 0.8)
+    tx, ty = tusk_tip()
+    stars = ''
+    for sx, sy, s in [(tx + 40, ty - 70, 55), (tx + 90, ty + 30, 40), (tx - 30, ty - 120, 34)]:
+        pts = []
+        for q in range(8):
+            a = math.radians(-90 + q * 45)
+            rr = s if q % 2 == 0 else s * 0.3
+            pts.append((sx + math.cos(a) * rr, sy + math.sin(a) * rr))
+        stars += outlined('M' + 'L'.join(p(*q) for q in pts) + 'Z', '#ffe066', INK * 0.8)
+    return draw('', [], out + tusk(('#ff9fc4', '#ffffff')) + friendly_eye() + stars)
+
+
+NARWHALS = [
+    ('1-ivory-tusk', 'Ivory tusk', n1_tusk),
+    ('2-echo-clicks', 'Echo clicks', n2_echo),
+    ('3-spotted', 'Spotted narwhal', n3_spotted),
+    ('4-tail-wave', 'Tail wave', n4_fluke),
+    ('5-party-narwhal', 'Party narwhal', n5_party),
+]
+
+
+def narwhal_main() -> None:
+    NOUT.mkdir(parents=True, exist_ok=True)
+    tiles = [('0  As painted (no click)', m.compose())]
+    for slug, title, fn in NARWHALS:
+        im = fn()
+        im.save(NOUT / f'{slug}.png')
+        tiles.append((f'{slug[0]}  {title}', im))
+    w, h = tiles[0][1].size
+    s = 0.5
+    tw, th = int(w * s), int(h * s)
+    sheet = Image.new('RGB', (tw * 3 + 40, (th + 60) * 2 + 10), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(sheet)
+    for i, (label, im) in enumerate(tiles):
+        x, y = 10 + (i % 3) * (tw + 10), 10 + (i // 3) * (th + 60)
+        d.text((x, y), label, fill='black', font=font)
+        sheet.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, y + 36))
+    sheet.save(NOUT / 'sheet.png')
+    print('wrote', NOUT / 'sheet.png')
+
+
+if __name__ == '__main__' and 'narwhal' in __import__('sys').argv[1:]:
+    m.CROP = (1450, 3300, 1800, 1250)
+    m.WASH, m.SCRIB = m.raster('wash.webp'), m.raster('scribbles.webp')
+    narwhal_main()
