@@ -212,13 +212,15 @@
       "ink": "auto"
     },
     "lavender-snout": {
-      "label": "The lavender snout with an eye, left",
+      "label": "The cream snout creature, left: a pink snout with a straw in its nostril and a sleepy yellow eye",
       "parts": {
         "body": [
           "f250"
         ],
+        "snout": [
+          "f252"
+        ],
         "eye": [
-          "f252",
           "f256"
         ]
       },

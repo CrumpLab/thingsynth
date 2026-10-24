@@ -154,3 +154,85 @@ def main() -> None:
 
 if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- chosen: telescope --------------------------------------------------------------------------------------------
+# Mic distance from close to far: the sleepy eye fades (0..0.15) as a wide-open eye opens (0.05..0.25), then the
+# brass telescope slides out of it one section after another (0.2..0.45, 0.4..0.65, 0.6..0.85), and the cyan lens
+# and its glint come last (0.8..1).
+def telescope_items() -> list[dict]:
+    x, y = EYE
+    a = math.radians(-8)
+    ca, sa = math.cos(a), math.sin(a)
+    R = lambda u, v: (x + ca * u - sa * v, y + sa * u + ca * v)
+    items = []
+    A = lambda d, f, e, at, s, t, grow='scale': items.append({'d': d, 'fill': f, 'edge': round(e, 1), 'at': [round(at[0], 1), round(at[1], 1)],
+                                                               'start': round(s, 3), 'end': round(t, 3), 'grow': grow})
+    ex, ey = EYE
+    A(ellipse(ex, ey, 88, 62, -5), '#ffffff', INK, (ex, ey), 0.05, 0.22, 'y')
+    A(circle(ex - 14, ey + 4, 62 * 0.62), YEL, INK * 0.8, (ex - 14, ey + 4), 0.1, 0.25)
+    A(circle(ex - 14, ey + 4, 62 * 0.3), '#000000', 0, (ex - 14, ey + 4), 0.12, 0.27)
+    A(circle(ex - 4, ey - 8, 62 * 0.12), '#ffffff', 0, (ex - 4, ey - 8), 0.18, 0.28)
+    secs = [(320, 470, 58, '#f0c75a', 0.6, 0.85), (180, 340, 70, '#e6b44c', 0.4, 0.65), (40, 200, 84, '#d9a23c', 0.2, 0.45)]
+    for u0, u1, w, col, s, t in secs:
+        A('M' + 'L'.join(p(*R(u, v)) for u, v in [(u0, -w), (u1, -w), (u1, w), (u0, w)]) + 'Z', col, INK, R(u0, 0), s, t, 'x')
+        A('M' + 'L'.join(p(*R(u, v)) for u, v in [(u1 - 22, -w - 8), (u1, -w - 8), (u1, w + 8), (u1 - 22, w + 8)]) + 'Z', '#b8862e', INK * 0.8, R(u0, 0), s, t, 'x')
+    A(ellipse(*R(470, 0), 30, 64, -8), '#2DFFF4', INK, R(470, 0), 0.8, 0.92)
+    A(ellipse(*R(462, -24), 8, 16, -8), '#ffffff', INK * 0.4, R(462, -24), 0.88, 1.0)
+    return items
+
+
+def tele_frame(t: float) -> Image.Image:
+    if t <= 0:
+        return m.compose()
+    kw = {}
+    if t >= 0.08:
+        kw = {'fill_over': {'f256': 'M0 0Z'}, 'ink_over': {i: 'M0 0Z' for i in m.own_ink('f256')}}
+    im = m.compose(front='<g/>', **kw)
+    im.alpha_composite(m.svg(g.sprite_svg(telescope_items(), t)))
+    return im
+
+
+def tele_main() -> None:
+    out = OUT.parent / 'telescope'
+    out.mkdir(parents=True, exist_ok=True)
+    frames = [0, 0.25, 0.5, 0.75, 1.0]
+    tiles = [tele_frame(t) for t in frames]
+    tiles[-1].save(out / 'end-frame.png')
+    w, h = tiles[0].size
+    sc = 0.42
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * 5 + 60, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (tt, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {tt:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'telescope' in __import__('sys').argv[1:]:
+    tele_main()
+
+if __name__ == '__main__' and 'export' in __import__('sys').argv[1:]:
+    import json as _j
+    op = ROOT / 'art/golden-pyramid-with-tunnel-celebration/objects.json'
+    O = _j.loads(op.read_text())
+    objs = O['objects'] if 'objects' in O else O
+    objs['lavender-snout']['label'] = 'The cream snout creature, left: a pink snout with a straw in its nostril and a sleepy yellow eye'
+    objs['lavender-snout']['parts'] = {'body': ['f250'], 'snout': ['f252'], 'eye': ['f256']}
+    op.write_text(_j.dumps(O, indent=2) + '\n')
+    mp = ROOT / 'mapping.json'
+    M = _j.loads(mp.read_text())
+    for b in M['bindings']:
+        if b['id'] == 'leslie-mic-distance':
+            b['label'] = 'The snout creature: drag for the Leslie mic distance; its eye opens and a telescope slides out of it'
+            b['effects'] = [{'effect': 'vanish', 'parts': ['eye'], 'span': [0.0, 0.15]},
+                            {'effect': 'sprites', 'place': 'over', 'items': telescope_items()}]
+    mp.write_text(_j.dumps(M, indent=2) + '\n')
+    print('exported', len(telescope_items()), 'shapes')
