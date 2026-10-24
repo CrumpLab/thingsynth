@@ -134,6 +134,27 @@ envelope: 10 ms attack, 300 ms release, longer for the pedal cells.
   parameter drives `pulse` rates. To check upstream.
 - **Meter.** `host.onMeter` gives output level and voice count; the stream's cells can brighten with level.
 
+### 4.1 Shuffle: random reassignment
+
+The bindings are data, so the pairing of parameters to objects and notes to cells can be regenerated at will.
+`mapping.json` v2 separates three things: the **pool** of objects and cells with the effects each is allowed to
+show (a round thing may `spin`, an eye may `blink`, a tall thing may `fill`), the **sources** (the 47 parameters,
+the 88 notes, telemetry), and the **assignment**, which is either listed explicitly or produced by a seeded
+shuffle:
+
+- `?seed=<n>` (or a Shuffle button in the bottom bar) deals the parameters and notes onto the pools with a
+  deterministic random permutation, so a seed is shareable and reproducible. No seed means Matt's curated
+  assignment.
+- The shuffle is type-aware: a drawbar (0..8) only lands on an object that can `fill`, a bool on one that can
+  `glow` or `blink`, a choice on one with as many visible states as choices, and so on. Each object keeps the
+  gesture that fits its shape (tall: drag-y, wide: drag-x, small: tap or hold).
+- Bindings can be **locked** (`"locked": true`): the shuffle leaves them in place. So the pyramid can stay
+  drive for ever while everything else re-deals.
+- Reassigning on the fly animates: the old object fades its effect out over a second while the new one fades
+  in, so a shuffle is itself a visible event in the painting.
+- Notes shuffle separately from parameters (`?seed=12&notes=random`), since re-dealing 88 cells changes what a
+  chord looks like without changing what a knob does.
+
 ## 5. Authoring workflow (for Matt)
 
 1. `uv run tools/segment.py art/<slug>` after any change to overrides; outputs are committed.
@@ -159,9 +180,11 @@ envelope: 10 ms attack, 300 ms release, longer for the pedal cells.
 
 ## 7. Open questions for Matt
 
-- **The original file.** Is there a layered source (ink on its own layer, fills below, scribbles separate)?
-  A clean ink layer removes every segmentation leak and lets the boil and blink work on real lines rather than
-  a mask pulled from a JPEG. Even a PNG without JPEG artefacts helps.
+- **The original file.** Matt has an Adobe file somewhere. A layered PSD can be read with `psd-tools` and each
+  layer exported at full resolution (ink, fills, scribbles separately); an Illustrator file is PDF-compatible and
+  may give the ink as true vector paths. Either removes every segmentation leak and lets the boil and blink
+  work on real lines rather than a mask pulled from a JPEG. The source file stays out of the repo; only the
+  exported layers are committed.
 - **How much motion.** The plan keeps everything small and local. Is a stronger reading wanted anywhere, for
   example the stream actually flowing, or the sky's scribbles drifting with the Leslie?
 - **Note layout.** Bigger-cell-is-lower-note across the whole canvas, or a spatial keyboard (low notes left,
