@@ -32,6 +32,12 @@ Open the printed URL (http://localhost:5173). Click or press a key to start audi
   `?wander-speed=` and `?wander-amount=`, 0 to 1). Drag a dial up and down, scroll it, or use the arrow keys;
   double-click resets it. Choosing a preset re-centres the walks; setting a parameter yourself re-centres that
   one; stopping returns to the preset.
+- **Shuffle** deals the parameters onto other objects of the painting from a random seed, written into the address
+  (`?seed=4821`) so it can be shared; shift-click also re-deals the notes (`&notes=shuffle`); × goes back to the
+  curated mapping. The pyramid keeps Drive (it is locked).
+- **Bind editor** (`?debug`, then **Bind…**): click shapes of the painting, make them an object, bind a parameter or
+  a note with a gesture and effects, preview it, and save it into `objects.json` and `mapping.json` (dev server
+  only). See PLAN.md section 6. The current mapping is listed in `docs/mapping-proposal.md`.
 - `?flat` shows the published JPEG instead of the painting rebuilt from its layers. `?mute=1` keeps the engine
   running silently (for automated checks).
 
@@ -55,6 +61,8 @@ web/                    Vite app, plain TypeScript, no framework
   src/color.ts          OKLCH colour math with darken-first gamut mapping
   src/wander.ts         preset wander: a random walk per parameter around the preset
   src/dial.ts           the small rotary dial used for wander speed and amount
+  src/shuffle.ts        seeded, shape-aware re-dealing of parameters (and notes) onto objects
+  src/editor.ts         the bind editor (debug only; saves through the dev server, web/vite.config.ts)
   src/debug.ts          ?debug overlay, HUD and region editor
   runtime/              copy of SynthLand's web runtime (do not edit here)
   public/wasm/          additive.wasm (Tonewheel's engine)
@@ -62,6 +70,8 @@ web/                    Vite app, plain TypeScript, no framework
 upstream/               reference copies of the Tonewheel manifest and engine params.json
 scripts/                sync_upstream.sh, build_preset_index.mjs, build_worklet.mjs
 tools/extract_psd.py    PSD -> art/<slug>/layers (run with uv, authoring time only; see below)
+tools/propose_objects.py  which shapes are details of which (a starting point for naming objects; uv)
+tools/mapping_report.py   mapping.json + objects.json -> docs/mapping-proposal.md
 ```
 
 ## Re-extracting the painting from the PSD

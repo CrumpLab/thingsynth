@@ -85,6 +85,510 @@
         ]
       },
       "ink": "auto"
+    },
+    "big-lips": {
+      "label": "The big purple lips, bottom left",
+      "parts": {
+        "body": [
+          "f001"
+        ],
+        "detail": [
+          "f009",
+          "f010"
+        ]
+      },
+      "ink": "auto"
+    },
+    "bunny-slab": {
+      "label": "The magenta slab under the white bunny, bottom right",
+      "parts": {
+        "body": [
+          "f048"
+        ],
+        "detail": [
+          "f049",
+          "f050",
+          "f312"
+        ]
+      },
+      "ink": "auto"
+    },
+    "lying-creature": {
+      "label": "The long magenta creature lying at the bottom, arms up",
+      "parts": {
+        "body": [
+          "f014"
+        ],
+        "detail": [
+          "f023",
+          "f024"
+        ]
+      },
+      "ink": "auto"
+    },
+    "drip-slide": {
+      "label": "The dripping slide right of the pyramid",
+      "parts": {
+        "body": [
+          "f183"
+        ],
+        "detail": [
+          "f180"
+        ]
+      },
+      "ink": "auto"
+    },
+    "fan-hand": {
+      "label": "The fan-shaped hand with white fingers, lower right",
+      "parts": {
+        "body": [
+          "f071"
+        ],
+        "fingers": [
+          "f088",
+          "f089",
+          "f090",
+          "f091"
+        ]
+      },
+      "ink": "auto"
+    },
+    "left-cushion": {
+      "label": "The big magenta cushion shape, lower left",
+      "parts": {
+        "body": [
+          "f137"
+        ]
+      },
+      "ink": "auto"
+    },
+    "right-cloud": {
+      "label": "The tall white cloud at the right edge",
+      "parts": {
+        "body": [
+          "f190"
+        ],
+        "detail": [
+          "f199"
+        ]
+      },
+      "ink": "auto"
+    },
+    "coral-hand": {
+      "label": "The coral antler hand, bottom centre",
+      "parts": {
+        "body": [
+          "f076"
+        ],
+        "detail": [
+          "f086"
+        ]
+      },
+      "ink": "auto"
+    },
+    "lavender-snout": {
+      "label": "The lavender snout with an eye, left",
+      "parts": {
+        "body": [
+          "f250"
+        ],
+        "eye": [
+          "f252",
+          "f256"
+        ]
+      },
+      "ink": "auto"
+    },
+    "straw-creature": {
+      "label": "The lavender creature with a straw, top right",
+      "parts": {
+        "body": [
+          "f187"
+        ]
+      },
+      "ink": "auto"
+    },
+    "eye-tree": {
+      "label": "The magenta tree with one eye, left",
+      "parts": {
+        "body": [
+          "f117"
+        ],
+        "eye": [
+          "f119"
+        ]
+      },
+      "ink": "auto"
+    },
+    "pink-cloud": {
+      "label": "The pink cloud left of the pyramid",
+      "parts": {
+        "body": [
+          "f192"
+        ]
+      },
+      "ink": "auto"
+    },
+    "purple-ledge": {
+      "label": "The purple ledge right of the stream",
+      "parts": {
+        "body": [
+          "f165"
+        ]
+      },
+      "ink": "auto"
+    },
+    "rocket-hill": {
+      "label": "The pink hill under the rocket, top right",
+      "parts": {
+        "body": [
+          "f191"
+        ],
+        "detail": [
+          "f311"
+        ]
+      },
+      "ink": "auto"
+    },
+    "eye-bush": {
+      "label": "The pink bush with an eye, left",
+      "parts": {
+        "body": [
+          "f118"
+        ],
+        "eye": [
+          "f121",
+          "f122"
+        ]
+      },
+      "ink": "auto"
+    },
+    "turtle-shell": {
+      "label": "The purple turtle shell, bottom centre",
+      "parts": {
+        "body": [
+          "f035"
+        ],
+        "detail": [
+          "f036"
+        ]
+      },
+      "ink": "auto"
+    },
+    "party-cone": {
+      "label": "The party-hat cone by the big eye, right",
+      "parts": {
+        "body": [
+          "f174"
+        ]
+      },
+      "ink": "auto"
+    },
+    "waving-pink": {
+      "label": "The pink creature waving, lower left",
+      "parts": {
+        "body": [
+          "f240"
+        ]
+      },
+      "ink": "auto"
+    },
+    "pink-column": {
+      "label": "The pink column between the stalks",
+      "parts": {
+        "body": [
+          "f305"
+        ]
+      },
+      "ink": "auto"
+    },
+    "splash-bush": {
+      "label": "The pink splash bush, left",
+      "parts": {
+        "body": [
+          "f116"
+        ]
+      },
+      "ink": "auto"
+    },
+    "pink-figure": {
+      "label": "The pink figure with a face, bottom centre",
+      "parts": {
+        "body": [
+          "f075"
+        ],
+        "detail": [
+          "f082"
+        ]
+      },
+      "ink": "auto"
+    },
+    "coral-tongue": {
+      "label": "The long coral tongue, right",
+      "parts": {
+        "body": [
+          "f184"
+        ]
+      },
+      "ink": "auto"
+    },
+    "horn-blob": {
+      "label": "The magenta blob with horn hats, left",
+      "parts": {
+        "body": [
+          "f127"
+        ],
+        "detail": [
+          "f155"
+        ]
+      },
+      "ink": "auto"
+    },
+    "blue-fish": {
+      "label": "The blue-purple fish creature, right",
+      "parts": {
+        "body": [
+          "f179"
+        ]
+      },
+      "ink": "auto"
+    },
+    "pink-pyramid": {
+      "label": "The small pink pyramid, centre",
+      "parts": {
+        "body": [
+          "f228"
+        ]
+      },
+      "ink": "auto"
+    },
+    "river-bank": {
+      "label": "The dark green river bank",
+      "parts": {
+        "body": [
+          "f157"
+        ]
+      },
+      "ink": "auto"
+    },
+    "waterfall-bush": {
+      "label": "The bush where the waterfall lands",
+      "parts": {
+        "body": [
+          "f164"
+        ],
+        "detail": [
+          "f225"
+        ]
+      },
+      "ink": "auto"
+    },
+    "antler-trunk": {
+      "label": "The pink trunk with antlers, centre",
+      "parts": {
+        "body": [
+          "f072"
+        ]
+      },
+      "ink": "auto"
+    },
+    "tunnel": {
+      "label": "The tunnel in the golden pyramid",
+      "parts": {
+        "body": [
+          "f219"
+        ]
+      },
+      "ink": "auto"
+    },
+    "pyramid-bush": {
+      "label": "The green bush below the pyramids",
+      "parts": {
+        "body": [
+          "f163"
+        ]
+      },
+      "ink": "auto"
+    },
+    "striped-shell": {
+      "label": "The brown striped shell, bottom centre",
+      "parts": {
+        "stripes": [
+          "f027",
+          "f028",
+          "f029",
+          "f030"
+        ]
+      },
+      "ink": "auto"
+    },
+    "mitten": {
+      "label": "The lavender mitten hand, bottom left",
+      "parts": {
+        "body": [
+          "f241"
+        ]
+      },
+      "ink": "auto"
+    },
+    "mushroom-stem": {
+      "label": "The pink mushroom stem, top centre",
+      "parts": {
+        "body": [
+          "f263"
+        ]
+      },
+      "ink": "auto"
+    },
+    "mushroom-cap": {
+      "label": "The mushroom cap, top centre",
+      "parts": {
+        "body": [
+          "f268"
+        ],
+        "detail": [
+          "f287"
+        ]
+      },
+      "ink": "auto"
+    },
+    "orange-sprite": {
+      "label": "The orange sprite on the bush",
+      "parts": {
+        "body": [
+          "f221"
+        ]
+      },
+      "ink": "auto"
+    },
+    "tunnel-rim": {
+      "label": "The pale blue rim round the tunnel",
+      "parts": {
+        "body": [
+          "f218"
+        ]
+      },
+      "ink": "auto"
+    },
+    "pink-cap": {
+      "label": "The pink cap of the green creature, bottom left",
+      "parts": {
+        "body": [
+          "f004"
+        ]
+      },
+      "ink": "auto"
+    },
+    "horned-collar": {
+      "label": "The pink collar of the horned creature, top left",
+      "parts": {
+        "body": [
+          "f251"
+        ],
+        "detail": [
+          "f301"
+        ]
+      },
+      "ink": "auto"
+    },
+    "purple-path": {
+      "label": "The purple path down the left of the stream",
+      "parts": {
+        "body": [
+          "f105",
+          "f106"
+        ]
+      },
+      "ink": "auto"
+    },
+    "straw-saucer": {
+      "label": "The pink saucer of the straw creature, right",
+      "parts": {
+        "body": [
+          "f186"
+        ]
+      },
+      "ink": "auto"
+    },
+    "acorn-frog": {
+      "label": "The frog body under the acorns",
+      "parts": {
+        "body": [
+          "f206"
+        ]
+      },
+      "ink": "auto"
+    },
+    "horned-mask": {
+      "label": "The tall horned mask, top left",
+      "parts": {
+        "body": [
+          "f289"
+        ],
+        "detail": [
+          "f290",
+          "f296"
+        ]
+      },
+      "ink": "auto"
+    },
+    "big-eye": {
+      "label": "The big eyeball, right",
+      "parts": {
+        "body": [
+          "f176"
+        ],
+        "eye": [
+          "f239"
+        ]
+      },
+      "ink": "auto"
+    },
+    "horned-ghost": {
+      "label": "The blue ghost with orange horns, top centre",
+      "parts": {
+        "body": [
+          "f231"
+        ]
+      },
+      "ink": "auto"
+    },
+    "sand-ground": {
+      "label": "The sandy ground, bottom right",
+      "parts": {
+        "body": [
+          "f047",
+          "f053"
+        ]
+      },
+      "ink": "auto"
+    },
+    "bottom-ground": {
+      "label": "The grey ground, bottom centre",
+      "parts": {
+        "body": [
+          "f074"
+        ]
+      },
+      "ink": "auto"
+    },
+    "left-cliff": {
+      "label": "The grey cliff, left",
+      "parts": {
+        "body": [
+          "f104"
+        ]
+      },
+      "ink": "auto"
+    },
+    "sky": {
+      "label": "The sky round the top",
+      "parts": {
+        "body": [
+          "f303"
+        ]
+      },
+      "ink": "auto"
     }
   }
 }

@@ -65,9 +65,14 @@ interface Live {
   angle: number;
   blinks: boolean;
   blinkAt: number;
+  /** Being replaced: fading to 0, then its added elements are removed. */
+  retiring: boolean;
+  added: Element[];
 }
 
 export interface Effects {
+  /** Replace the bindings: unchanged ones stay, new ones fade in and old ones fade out over `handoverMs`. */
+  setBindings(bindings: Binding[], handoverMs?: number): void;
   /** The value each binding currently shows (0..1), for the debug HUD and tests. */
   shown(): Array<{ id: string; value: number }>;
   /** Notes currently sounding (held or releasing). */
@@ -94,7 +99,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
   const fills = new Map<string, Fill>();
   const boilWritten = new Map<SVGPathElement, string>();
   const transformed = new Set<SVGPathElement>();
-  const live: Live[] = [];
+  let live: Live[] = [];
   const byNote = new Map<number, Live[]>();
   let uid = 0;
 
@@ -115,15 +120,15 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     })
     : obj.fills;
 
-  // ---- build ------------------------------------------------------------------------------------------------------
-  for (const binding of bindings) {
+  // ---- build: one binding's state and the elements it adds to the painting ------------------------------------------
+  const build = (binding: Binding): Live | null => {
     const obj = resolveObject(objects, binding.object);
-    if (!obj) continue; // painting.ts warns
+    if (!obj) return null; // main.ts warns
     const rand = rng(binding.id);
     const L: Live = {
       binding, obj, target: 0, shown: 0, tau: binding.glide ?? GLIDE_MS, startAt: 0,
       hueGlow: new Map(), boil: new Map(), moves: [], reveals: [], scribbles: [],
-      spinRate: 0, angle: 0, blinks: false, blinkAt: -Infinity,
+      spinRate: 0, angle: 0, blinks: false, blinkAt: -Infinity, retiring: false, added: [],
     };
     for (const spec of binding.effects) {
       const ids = partsOf(obj, spec, binding.id);
@@ -152,6 +157,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
             for (const a of ['x', 'y', 'width', 'height']) rect.setAttribute(a, '0');
             clip.append(rect);
             stack.defs.append(clip);
+            L.added.push(clip);
             const copy = orig.cloneNode(false) as SVGPathElement;
             copy.removeAttribute('id');
             copy.dataset.revealOf = id;
@@ -161,6 +167,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
             copy.setAttribute('clip-path', `url(#${clipId})`);
             copy.style.pointerEvents = 'none';
             orig.after(copy);
+            L.added.push(copy);
             L.reveals.push({ copy, rect, box: part.bbox, from: spec.from ?? 'bottom', written: '' });
           }
           break;
@@ -174,6 +181,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
             clip.append(use);
           }
           stack.defs.append(clip);
+          L.added.push(clip);
           const g = document.createElementNS(SVG, 'g');
           g.setAttribute('clip-path', `url(#${clipId})`);
           g.setAttribute('fill', 'none');
@@ -190,6 +198,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
           const strokes: SVGPathElement[] = [];
           for (let k = 0; k < count; k++) strokes.push(scribbleStroke(g, rand, bx, by, bw, bh));
           stack.ink.before(g);
+          L.added.push(g);
           L.scribbles.push({ strokes, count, written: '' });
           break;
         }
@@ -213,24 +222,41 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     }
     // Reveal copies move with their originals.
     for (const m of L.moves) for (const r of L.reveals) if (m.targets.some((t) => t.id === r.copy.dataset.revealOf)) m.targets.push(r.copy);
-    live.push(L);
-    if (binding.kind === 'note') {
-      const list = byNote.get(binding.note) ?? [];
+    return L;
+  };
+  const retire = (L: Live): void => {
+    for (const el of L.added) el.remove();
+    L.added = [];
+  };
+  const indexNotes = (): void => {
+    byNote.clear();
+    for (const L of live) {
+      if (L.retiring || L.binding.kind !== 'note') continue;
+      const list = byNote.get(L.binding.note) ?? [];
       list.push(L);
-      byNote.set(binding.note, list);
+      byNote.set(L.binding.note, list);
     }
+  };
+  for (const binding of bindings) {
+    const L = build(binding);
+    if (L) live.push(L);
   }
+  indexNotes();
 
-  // ---- idle scenery: unbound mid-sized fills, a deterministic sample ------------------------------------------------
-  const bound = new Set(live.flatMap((L) => L.obj.fills));
-  const idleRand = rng('idle');
-  const idleFills = Array.from(fillParts.values())
-    .filter((f) => !bound.has(f.id) && f.area > 15_000 && f.area < 200_000)
-    .map((f) => ({ f, k: idleRand() }))
-    .sort((a, b) => a.k - b.k)
-    .slice(0, IDLE_FILLS)
-    .map(({ f }) => ({ id: f.id, period: 7000 + idleRand() * 6000, phase: idleRand() * Math.PI * 2 }))
-    .filter((x) => fillState(x.id));
+  // ---- idle scenery: unbound mid-sized fills, a deterministic sample (re-chosen when the bindings change) ----------
+  let idleFills: Array<{ id: string; period: number; phase: number }> = [];
+  const chooseIdle = (): void => {
+    const bound = new Set(live.filter((L) => !L.retiring).flatMap((L) => L.obj.fills));
+    const idleRand = rng('idle');
+    idleFills = Array.from(fillParts.values())
+      .filter((f) => !bound.has(f.id) && f.area > 15_000 && f.area < 200_000)
+      .map((f) => ({ f, k: idleRand() }))
+      .sort((a, b) => a.k - b.k)
+      .slice(0, IDLE_FILLS)
+      .map(({ f }) => ({ id: f.id, period: 7000 + idleRand() * 6000, phase: idleRand() * Math.PI * 2 }))
+      .filter((x) => fillState(x.id));
+  };
+  chooseIdle();
 
   // ---- values -------------------------------------------------------------------------------------------------------
   const read = (L: Live): number => (L.binding.kind === 'param' ? positionOf(L.binding, host.get(L.binding.param)) : L.target);
@@ -373,6 +399,11 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     const dt = last ? Math.max(0, now - last) : 16;
     last = now;
     let moving = false;
+    if (live.some((L) => L.retiring && L.shown === 0)) {
+      for (const L of live) if (L.retiring && L.shown === 0) retire(L);
+      live = live.filter((L) => !(L.retiring && L.shown === 0));
+      colourDirty = true;
+    }
     for (const L of live) {
       if (now < L.startAt) { moving = true; continue; }
       const d = L.target - L.shown;
@@ -431,7 +462,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
   const offParam = host.onParam((id) => {
     let hit = false;
     for (const L of live) {
-      if (L.binding.kind !== 'param' || L.binding.param !== id) continue;
+      if (L.retiring || L.binding.kind !== 'param' || L.binding.param !== id) continue;
       const before = L.target;
       L.target = read(L);
       L.tau = L.binding.glide ?? GLIDE_MS;
@@ -447,7 +478,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     if (index < 0) return; // an edit, not a load
     const now = performance.now();
     for (const L of live) {
-      if (L.binding.kind !== 'param') continue;
+      if (L.retiring || L.binding.kind !== 'param') continue;
       L.target = read(L);
       L.tau = L.binding.glide ?? PRESET_GLIDE_MS;
       const [cx, cy] = L.obj.centroid;
@@ -491,8 +522,33 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
   paintReveals();
   kick();
 
+  const setBindings = (next: Binding[], handoverMs = 1200): void => {
+    const key = (b: Binding): string => JSON.stringify(b);
+    const old = new Map<string, Live>();
+    for (const L of live) if (!L.retiring) old.set(key(L.binding), L);
+    const fresh: Live[] = [];
+    for (const b of next) {
+      const same = old.get(key(b));
+      if (same) { fresh.push(same); old.delete(key(b)); continue; }
+      const L = build(b);
+      if (!L) continue;
+      L.shown = 0;
+      L.target = L.binding.kind === 'param' ? read(L) : 0;
+      L.tau = handoverMs / 3;
+      fresh.push(L);
+    }
+    const leaving = Array.from(old.values());
+    for (const L of leaving) { L.retiring = true; L.target = 0; L.tau = handoverMs / 3; L.startAt = 0; }
+    live = [...fresh, ...leaving, ...live.filter((L) => L.retiring)];
+    indexNotes();
+    chooseIdle();
+    colourDirty = true;
+    kick();
+  };
+
   return {
-    shown: () => live.map((L) => ({ id: L.binding.id, value: L.shown })),
+    setBindings,
+    shown: () => live.filter((L) => !L.retiring).map((L) => ({ id: L.binding.id, value: L.shown })),
     notes: () => Array.from(sounding).sort((a, b) => a - b),
     idle: () => idleLevel > 0,
     dispose: () => {

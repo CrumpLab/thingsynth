@@ -59,6 +59,8 @@ interface BindingBase {
   effects: EffectSpec[];
   /** How long the picture takes to follow a change, ms (default 150; e.g. 1500 for a rotor spinning up). */
   glide?: number;
+  /** Shuffle leaves a locked binding where it is. */
+  locked?: boolean;
 }
 
 /** v2: an object of the painting bound to a parameter. Without `gesture` it only shows the value. */
@@ -183,6 +185,10 @@ function parseBinding(raw: unknown, i: number): Binding {
   } else b = { kind: 'param', ...parseCommon(r, where, i), object, effects };
   if (r.gesture !== undefined) b.gesture = r.gesture as Gesture;
   if (typeof r.glide === 'number') b.glide = r.glide;
+  if (r.locked !== undefined) {
+    if (typeof r.locked !== 'boolean') fail(where, 'locked must be true or false');
+    if (r.locked) b.locked = true;
+  }
   return b;
 }
 

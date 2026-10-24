@@ -270,28 +270,56 @@ bound object stays alive:
   that walk on your value. Stopping reloads the preset if nothing was changed by hand (clearing the edited mark),
   otherwise returns each parameter to its centre, keeping your changes.
 
+## 5.2 Shuffle
+
+The **Shuffle** button deals the parameters onto other objects (`web/src/shuffle.ts`). It picks a seed and
+writes it into the address (`?seed=4821`), so a shuffle can be shared and reopened; shift-click (or
+`&notes=shuffle`) also re-deals the 88 notes over the same note shapes; the × next to it returns to the curated
+mapping. Rules:
+
+- Bindings with `"locked": true` stay (the pyramid keeps Drive). Every other parameter gets an object from the
+  pool: every named object in objects.json not held by a locked binding (56 objects for 46 parameters, so 10 are
+  left out of each deal). Same seed, same deal.
+- The look follows the parameter: Drive still heats, a drawbar still fills, wherever it lands. What adapts is the
+  shape: drags run along the new object's long side, fills rise from the bottom of tall objects and from the
+  left of wide ones, and role-specific effects (`parts`) cover the whole new object.
+- The handover is animated: old objects fade their effect out while the new ones fade in, over 1.2 s.
+
 ## 6. Authoring workflow (what Matt does to assign parameters)
 
-1. `pnpm dev`, open `http://localhost:5173/?debug`.
-2. Hover: the HUD's first line shows the pointer in image pixels. Click anywhere: the console prints
-   `click at image px [x, y]` (and the region hit, if any).
-3. Draw a region: shift+click around the painted thing (3+ points, any shape). Backspace removes the last
-   point, Escape clears. Press Enter: the console prints a complete `mapping.json` entry for that polygon and
-   copies it to the clipboard. For a rectangle, two clicks give you `[x, y, w, h]` by hand.
-4. Paste the entry into `mapping.json` under `regions`, set `id`, `label`, `gesture`, `param` (section 4),
-   `range` and `curve`. Vite reloads the page on save; the new region appears outlined in debug mode with its
-   label, and its fill brightens with the parameter's value.
-5. Try it: drag or tap the region while holding a key; the HUD table shows the parameter's live value.
-6. Repeat. When the painting is fully mapped, drop `?debug`; the plain page shows no outlines, only the
-   bottom bar (preset, status, a `debug` link). The status line prints the last parameter change so the
-   mapping is still discoverable without the overlay.
+The current mapping is a proposal (`docs/mapping-proposal.md` lists it: all 47 parameters on 47 named objects,
+88 notes on single shapes, 9 spare objects). To change it:
+
+1. `pnpm dev`, open `http://localhost:5173/?debug`, press **Bind…** in the HUD. Parts mode turns on.
+2. Click a shape of the painting to select it, shift+click to add or remove shapes. The editor says which
+   object the shapes belong to and shows what that object is bound to.
+3. **Object**: keep the one it found, pick another, take *the selected shape on its own* (a `part` binding), or
+   *new object from the selection*: give it a name (`lower-case-with-dashes`) and a few words of label.
+4. **Bind to**: a parameter (the list shows where each one is now) or *a note…* with its MIDI number. The form
+   fills in from the existing binding for that parameter or note, or from defaults by type (drawbars fill and
+   drag up and down, switches glow and blink on tap, choices turn hue on tap, the rest glow on a sideways drag).
+5. Adjust gesture (*display only* = no touch), range and curve, glide, label, locked, and the effects with their
+   amounts and options.
+6. **Preview** applies it live without saving. **Save** writes `objects.json` and `mapping.json` through the dev
+   server; the page reloads with the editor still open on the same shapes. **Remove binding** unbinds the
+   parameter or note. **Copy JSON** puts the binding on the clipboard (Save does that too when there is no dev
+   server, on a built site).
+7. Afterwards: `python3 -I tools/mapping_report.py` refreshes `docs/mapping-proposal.md`.
+
+Saving replaces the binding for the same parameter (or the same note), so a parameter is never bound twice; the
+editor does not stop two bindings sharing an object, which is allowed (effects add up). It edits the curated
+mapping whatever shuffle is showing.
+
+Hand-drawn regions (v1) still work for anything that is not a shape of the painting: in `?debug`, shift+click
+around it, Enter prints a `regions` entry for `mapping.json`.
 
 From the console in debug mode, `thingsynth.params()` lists the ids with ranges and units,
-`thingsynth.set('amp.drive', 0.5)` / `thingsynth.get(id)` poke the engine, and `thingsynth.host` is the
-full runtime host (`docs/skin-bridge.md` upstream describes it).
+`thingsynth.set('amp.drive', 0.5)` / `thingsynth.get(id)` poke the engine, `thingsynth.shuffle(seed, notes)`
+deals, and `thingsynth.host` is the full runtime host.
 
-Mapping instructions can arrive in any form (a list of "the pyramid is drive, left to right", or a sketch);
-the conversion to coordinates is step 3 and takes about a minute per region.
+Tools for starting over with a different painting: `tools/extract_psd.py` (layers and parts),
+`tools/propose_objects.py` (which shapes are details of which, from how they enclose each other across the ink:
+a starting point for naming objects).
 
 ## 7. Repo and sync
 
@@ -323,8 +351,8 @@ layer, 3 MB of WebP, is the largest piece). Nothing is deployed yet.
 
 [docs/animation-layer-plan.md](docs/animation-layer-plan.md) (approved 2026-10-24) rebuilds the painting from
 the PSD's vector layers and animates its own fill shapes and ink strokes so the 47 parameters and 88 notes each
-own something visible. Milestones 1 to 3 are done: `tools/extract_psd.py` exports the layers into
-`art/<slug>/layers/`, the page draws the painting from them, `?debug` has a parts mode for picking shapes, and
-mapping.json v2 binds objects and single parts to parameters and notes with nine effects (section 3.1). The
-current mapping is a demo: 8 parameters on 8 objects and the 17 computer-keyboard notes on small shapes. Next is
-milestone 4, the proposal for all 47 parameters and 88 notes, and shuffle.
+own something visible. Milestones 1 to 4 are done: the painting is drawn from its PSD layers, nine effects
+show the bound values, wander keeps the parameters moving (5.1), all 47 parameters and 88 notes are bound in a
+proposal (`docs/mapping-proposal.md`) that the bind editor changes (section 6), and shuffle re-deals it (5.2).
+Next is milestone 5, polish: boil quality, scribble style against the real scribbles, phone performance, and a
+recorded demo.

@@ -18,24 +18,29 @@ const SVG = 'http://www.w3.org/2000/svg';
 
 export interface ControlShape {
   control: Control;
-  /** The hit element: a <polygon> for regions, a <g> of the object's outlines for bindings. */
-  el: SVGGraphicsElement;
+  /** The hit elements: one <polygon> for a region; one <path> per fill of a bound object (in paint order). */
+  els: SVGGraphicsElement[];
   /** Bounding box in mapping (image-pixel) coordinates; gestures measure positions against it. */
   box: Box;
   binding?: Binding;
 }
+
+export interface NotePad { binding: NoteBinding; els: SVGGraphicsElement[]; box: Box }
 
 export interface PaintingLayer {
   svg: SVGSVGElement;
   art: Art;
   /** Screen (client) coordinates -> image pixels. */
   toImage(clientX: number, clientY: number): Point;
-  /** Every parameter control, regions first then bindings, in mapping order. Binding shapes arrive with `ready`. */
+  /** Every parameter control, regions first then bindings. Binding shapes arrive with `ready` and change on rebind. */
   controls: ControlShape[];
   /** Note bindings with a gesture: the object plays its note when touched. */
-  notePads: Array<{ binding: NoteBinding; el: SVGGraphicsElement; box: Box }>;
+  notePads: NotePad[];
   /** Resolves when every control's hit shape is in place. */
   ready: Promise<void>;
+  /** Replace the bindings' hit shapes (shuffle, the bind editor). Regions stay. */
+  setBindings(bindings: Binding[]): void;
+  onRebind(cb: () => void): void;
   /** Called with the control and the value just sent to the host. */
   onChange(cb: (control: Control, value: number) => void): void;
 }
@@ -59,77 +64,119 @@ export function mountPainting(
   };
 
   const listeners: Array<(control: Control, value: number) => void> = [];
+  const rebindListeners: Array<() => void> = [];
   const send = (control: Control, value: number): void => {
     host.set(control.param, value);
     const v = host.get(control.param);
     for (const cb of listeners) cb(control, v);
   };
   const desc = (id: string) => host.params().find((p) => p.id === id);
-  const label = (el: SVGElement, control: Control): void => {
-    el.classList.add('region', `g-${control.gesture}`);
-    el.dataset.id = control.id;
-    if (control.label) {
+  const label = (el: SVGElement, id: string, gesture: string, text?: string): void => {
+    el.classList.add('region', `g-${gesture}`);
+    el.dataset.id = id;
+    if (text) {
       const title = document.createElementNS(SVG, 'title');
-      title.textContent = control.label;
+      title.textContent = text;
       el.append(title);
     }
   };
 
   const controls: ControlShape[] = [];
-  const notePads: PaintingLayer['notePads'] = [];
+  const notePads: NotePad[] = [];
   for (const entry of mapping.regions) {
     const el = document.createElementNS(SVG, 'polygon');
     el.setAttribute('points', shapePoints(entry.region).map(([x, y]) => `${x},${y}`).join(' '));
-    label(el, entry);
+    label(el, entry.id, entry.gesture, entry.label);
     svg.append(el);
     const box = boundingBox(entry.region);
-    controls.push({ control: entry, el, box });
+    controls.push({ control: entry, els: [el], box });
     bindGesture(el, entry, box, toImage, send, () => desc(entry.param), host);
   }
+  const regionCount = controls.length;
 
-  // Bindings with a gesture: the object's fills, in canvas units, scaled into mapping units.
+  // Bound objects: one hit path per fill, all of them in the painting's paint order (fill ids are paint order), so a
+  // shape painted on top of another also takes the pointer first, whichever bindings they belong to.
   const k = W / layers.canvas[0];
-  const ready = art.ready.catch(() => undefined).then(() => {
-    for (const binding of mapping.bindings) {
+  let bindingEls: SVGElement[] = [];
+  const setBindings = (bindings: Binding[]): void => {
+    for (const el of bindingEls) el.remove();
+    bindingEls = [];
+    controls.splice(regionCount);
+    notePads.length = 0;
+    const items: Array<{ order: number; make: () => SVGGraphicsElement; attach: (el: SVGGraphicsElement) => void }> = [];
+    for (const binding of bindings) {
       if (!binding.gesture) continue;
       const obj = resolveObject(objects, binding.object);
       if (!obj) continue; // main.ts warns
-      const g = document.createElementNS(SVG, 'g');
-      g.setAttribute('transform', `scale(${k})`);
-      const ds = obj.fills.map((id) => art.fills.get(id)?.getAttribute('d')).filter((d): d is string => !!d);
-      if (ds.length > 0) {
-        for (const d of ds) {
-          const p = document.createElementNS(SVG, 'path');
-          p.setAttribute('d', d);
-          g.append(p);
-        }
-      } else {
-        // ?flat has no vector fills: fall back to the object's bounding box.
-        const [x, y, w, h] = obj.bbox;
-        const r = document.createElementNS(SVG, 'rect');
-        r.setAttribute('x', String(x)); r.setAttribute('y', String(y)); r.setAttribute('width', String(w)); r.setAttribute('height', String(h));
-        g.append(r);
-      }
-      svg.append(g);
       const [x, y, w, h] = obj.bbox;
       const box: Box = { x: x * k, y: y * k, w: Math.max(1, w * k), h: Math.max(1, h * k) };
+      let attach: (el: SVGGraphicsElement) => void;
       if (binding.kind === 'note') {
-        g.classList.add('region', 'note-pad', `g-${binding.gesture}`);
-        g.dataset.id = binding.id;
-        notePads.push({ binding, el: g, box });
-        bindNote(g, binding, host);
-        continue;
+        const pad: NotePad = { binding, els: [], box };
+        notePads.push(pad);
+        attach = (el) => {
+          label(el, binding.id, binding.gesture!, binding.label);
+          el.classList.add('obj', 'note-pad');
+          pad.els.push(el);
+          bindNote(el, binding, host);
+        };
+      } else {
+        const control: Control = { id: binding.id, gesture: binding.gesture, param: binding.param, range: binding.range, curve: binding.curve };
+        if (binding.label) control.label = binding.label;
+        if (binding.step !== undefined) control.step = binding.step;
+        const shape: ControlShape = { control, els: [], box, binding };
+        controls.push(shape);
+        attach = (el) => {
+          label(el, control.id, control.gesture, control.label);
+          el.classList.add('obj');
+          shape.els.push(el);
+          bindGesture(el, control, box, toImage, send, () => desc(control.param), host);
+        };
       }
-      const control: Control = { id: binding.id, gesture: binding.gesture, param: binding.param, range: binding.range, curve: binding.curve };
-      if (binding.label) control.label = binding.label;
-      if (binding.step !== undefined) control.step = binding.step;
-      label(g, control);
-      controls.push({ control, el: g, box, binding });
-      bindGesture(g, control, box, toImage, send, () => desc(control.param), host);
+      const paths = obj.fills.map((id) => ({ id, d: art.fills.get(id)?.getAttribute('d') })).filter((p): p is { id: string; d: string } => !!p.d);
+      if (paths.length > 0) {
+        for (const p of paths) {
+          items.push({
+            order: Number(p.id.slice(1)),
+            make: () => {
+              const el = document.createElementNS(SVG, 'path');
+              el.setAttribute('d', p.d);
+              el.setAttribute('transform', `scale(${k})`);
+              return el;
+            },
+            attach,
+          });
+        }
+      } else {
+        // ?flat has no vector fills: the object's bounding box, under the shapes.
+        items.push({
+          order: -1,
+          make: () => {
+            const r = document.createElementNS(SVG, 'rect');
+            r.setAttribute('x', String(box.x)); r.setAttribute('y', String(box.y));
+            r.setAttribute('width', String(box.w)); r.setAttribute('height', String(box.h));
+            return r;
+          },
+          attach,
+        });
+      }
     }
-  });
+    items.sort((a, b) => a.order - b.order);
+    for (const it of items) {
+      const el = it.make();
+      svg.append(el);
+      bindingEls.push(el);
+      it.attach(el);
+    }
+    for (const cb of rebindListeners) cb();
+  };
+  const ready = art.ready.catch(() => undefined).then(() => setBindings(mapping.bindings));
 
-  return { svg, art, toImage, controls, notePads, ready, onChange: (cb) => { listeners.push(cb); } };
+  return {
+    svg, art, toImage, controls, notePads, ready, setBindings,
+    onRebind: (cb) => { rebindListeners.push(cb); },
+    onChange: (cb) => { listeners.push(cb); },
+  };
 }
 
 /** A note binding's object as a pad: hold sounds while pressed, tap sounds for a moment. */

@@ -9,6 +9,7 @@ import { parseMapping } from './mapping';
 import { loadObjects, resolveObject } from './objects';
 import { createDial } from './dial';
 import { createWander } from './wander';
+import { shuffleBindings } from './shuffle';
 import { mountPainting } from './painting';
 
 const base = import.meta.env.BASE_URL;
@@ -101,6 +102,29 @@ async function boot(): Promise<void> {
   wanderBtn.addEventListener('click', () => { if (wander.running()) wander.stop(); else wander.start(); });
   if (query.has('wander')) wander.start();
 
+  // Shuffle: deal the parameters onto other objects from a seed (web/src/shuffle.ts). ?seed=<n> opens a shuffle,
+  // &notes=shuffle re-deals the notes too; the Shuffle button deals a new seed (shift-click: notes too) and writes it
+  // into the address so it can be shared; the x goes back to the curated mapping.
+  const shuffleBtn = document.getElementById('shuffle') as HTMLButtonElement;
+  const unshuffleBtn = document.getElementById('unshuffle') as HTMLButtonElement;
+  const paramName = (id: string): string => host.params().find((p) => p.id === id)?.name ?? id;
+  const applyShuffle = async (seed: number | null, notes: boolean): Promise<void> => {
+    const next = seed === null ? mapping.bindings : shuffleBindings(mapping.bindings, objects, seed, { notes, paramName });
+    await layer.ready;
+    layer.setBindings(next);
+    (await effectsReady)?.setBindings(next, 1200);
+    const url = new URL(location.href);
+    if (seed === null) { url.searchParams.delete('seed'); url.searchParams.delete('notes'); }
+    else { url.searchParams.set('seed', String(seed)); if (notes) url.searchParams.set('notes', 'shuffle'); else url.searchParams.delete('notes'); }
+    history.replaceState(null, '', url);
+    unshuffleBtn.hidden = seed === null;
+    shuffleBtn.textContent = seed === null ? 'Shuffle' : `Shuffle · ${seed}`;
+  };
+  shuffleBtn.addEventListener('click', (ev) => { void applyShuffle(1 + Math.floor(Math.random() * 9999), ev.shiftKey); });
+  unshuffleBtn.addEventListener('click', () => { void applyShuffle(null, false); });
+  const seedParam = Number(query.get('seed'));
+  if (query.has('seed') && Number.isInteger(seedParam)) void applyShuffle(seedParam, query.get('notes') === 'shuffle');
+
   // Audio state.
   host.audio.onState((running) => {
     startOverlay.classList.toggle('hidden', running);
@@ -116,7 +140,7 @@ async function boot(): Promise<void> {
     const { mountDebug } = await import('./debug');
     await layer.ready;
     mountDebug(layer, mapping, host, await effectsReady);
-    Object.assign((window as unknown as { thingsynth: object }).thingsynth, { wander });
+    Object.assign((window as unknown as { thingsynth: object }).thingsynth, { wander, shuffle: applyShuffle, layer });
   }
 }
 

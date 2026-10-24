@@ -1,7 +1,7 @@
 # Animation layer: plan for review
 
 *Written 2026-10-24, revised the same day after reading the PSD, approved by Matt the same day.
-Status: milestones 1 to 3 done (see section 6).*
+Status: milestones 1 to 4 done (see section 6).*
 
 ## 0. In one paragraph
 
@@ -259,7 +259,23 @@ shuffle:
      visible; 10 of 312 are fully hidden.
    - Parameter changes count as activity for idle only once audio runs, so the boot-time preset load does not
      start idle.
-4. **Objects and bindings**: grouping, names, the proposal for all 47 + 88, the bind editor; Matt's review.
+4. **Objects and bindings** (done 2026-10-24, for Matt's review): `tools/propose_objects.py` finds which shapes
+   are details of which by looking across each shape's ink outline (a shape at least 70% surrounded by one larger
+   shape is its detail; very large shapes adopt nothing): 43 details, 255 top-level shapes, 6 backgrounds, 8
+   hidden. From its largest candidates I reviewed contact sheets and named 48 objects (merging the brown shell's
+   four stripes and the purple path's two halves), plus the 8 curated ones: 56. The proposal binds all 47
+   parameters to 47 of them, by meaning where there is one (drawbars on the tall shapes of the stalk forest and
+   other tall figures, key click making a creature jitter, vibrato mode walking the tunnel through six colours;
+   routing, tuning and level on background shapes as display only), and 88 notes, A0 to C8, to 88 shapes outside
+   every object, spread over the canvas, bigger = lower. `docs/mapping-proposal.md` lists it all.
+   Shuffle (PLAN.md 5.2) and the bind editor (PLAN.md 6) are in. Hit shapes are now in paint order, so a note
+   shape painted on the sand takes the touch before the sand's drawbar. Verified in the browser: 42 touchable
+   controls (67 hit shapes) and 88 note pads; seed 4821 moved 40 controls with Drive locked; the same seed deals
+   the same; a note shuffle moved 87 of 88 notes over the same shapes; handover cleans up retired fills and
+   scribbles; × restores the curated mapping. The editor's endpoint refuses requests without its header, other
+   files and wrong schemas; selecting by click and shift-click, preview, save (one binding changed, nothing else in
+   the file) and creating a new object (both files in one write) all worked, with the page reloading into the
+   editor. Not yet seen by Matt: the names and the pairings.
 5. **Polish**: line boil quality, scribble style tuned against the real scribbles, phone performance, a
    recorded demo.
 

@@ -31,7 +31,8 @@
           "effect": "boil",
           "amount": 1
         }
-      ]
+      ],
+      "locked": true
     },
     {
       "id": "stalk-drawbar-16",
@@ -176,9 +177,1554 @@
       ]
     },
     {
+      "id": "upper-db3",
+      "label": "The pink mushroom stem, top centre: the Upper 8' drawbar",
+      "object": "mushroom-stem",
+      "param": "upper.db3",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "upper-db4",
+      "label": "The pink column between the stalks: the Upper 4' drawbar",
+      "object": "pink-column",
+      "param": "upper.db4",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "upper-db5",
+      "label": "The tall horned mask, top left: the Upper 2 2/3' drawbar",
+      "object": "horned-mask",
+      "param": "upper.db5",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "upper-db6",
+      "label": "The magenta tree with one eye, left: the Upper 2' drawbar",
+      "object": "eye-tree",
+      "param": "upper.db6",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "upper-db7",
+      "label": "The lavender creature with a straw, top right: the Upper 1 3/5' drawbar",
+      "object": "straw-creature",
+      "param": "upper.db7",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "upper-db8",
+      "label": "The tall white cloud at the right edge: the Upper 1 1/3' drawbar",
+      "object": "right-cloud",
+      "param": "upper.db8",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "upper-db9",
+      "label": "The party-hat cone by the big eye, right: the Upper 1' drawbar",
+      "object": "party-cone",
+      "param": "upper.db9",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "lower-db1",
+      "label": "The pink trunk with antlers, centre: the Lower 16' drawbar",
+      "object": "antler-trunk",
+      "param": "lower.db1",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "lower-db2",
+      "label": "The coral antler hand, bottom centre: the Lower 5 1/3' drawbar",
+      "object": "coral-hand",
+      "param": "lower.db2",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "lower-db3",
+      "label": "The pink creature waving, lower left: the Lower 8' drawbar",
+      "object": "waving-pink",
+      "param": "lower.db3",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "lower-db4",
+      "label": "The pink figure with a face, bottom centre: the Lower 4' drawbar",
+      "object": "pink-figure",
+      "param": "lower.db4",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "lower-db5",
+      "label": "The blue-purple fish creature, right: the Lower 2 2/3' drawbar",
+      "object": "blue-fish",
+      "param": "lower.db5",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "lower-db6",
+      "label": "The blue ghost with orange horns, top centre: the Lower 2' drawbar",
+      "object": "horned-ghost",
+      "param": "lower.db6",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "lower-db7",
+      "label": "The pink hill under the rocket, top right: the Lower 1 3/5' drawbar",
+      "object": "rocket-hill",
+      "param": "lower.db7",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "lower-db8",
+      "label": "The lavender mitten hand, bottom left: the Lower 1 1/3' drawbar",
+      "object": "mitten",
+      "param": "lower.db8",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "lower-db9",
+      "label": "The pink collar of the horned creature, top left: the Lower 1' drawbar",
+      "object": "horned-collar",
+      "param": "lower.db9",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "pedal-db16",
+      "label": "The sandy ground: the Pedal 16' drawbar",
+      "object": "sand-ground",
+      "param": "pedal.db16",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "pedal-db8",
+      "label": "The magenta cushion: the Pedal 8' drawbar",
+      "object": "left-cushion",
+      "param": "pedal.db8",
+      "range": [
+        0,
+        8
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "fill",
+          "from": "bottom"
+        }
+      ]
+    },
+    {
+      "id": "pedal-sustain",
+      "label": "The orange sprite glows with Pedal Sustain",
+      "object": "orange-sprite",
+      "param": "pedal.sustain",
+      "range": [
+        0,
+        2000
+      ],
+      "curve": "linear",
+      "gesture": "drag-y",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1
+        },
+        {
+          "effect": "pulse",
+          "amount": 0.5
+        }
+      ]
+    },
+    {
+      "id": "perc-harmonic",
+      "label": "The big eyeball: tap for percussion Second or Third",
+      "object": "big-eye",
+      "param": "perc.harmonic",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "effects": [
+        {
+          "effect": "hue",
+          "parts": "body",
+          "amount": 0.6
+        },
+        {
+          "effect": "blink"
+        }
+      ]
+    },
+    {
+      "id": "perc-decay",
+      "label": "The pink cap: tap for percussion decay Slow or Fast",
+      "object": "pink-cap",
+      "param": "perc.decay",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "effects": [
+        {
+          "effect": "hue",
+          "amount": 0.5
+        }
+      ]
+    },
+    {
+      "id": "perc-volume",
+      "label": "The saucer: tap for percussion volume Normal or Soft (soft is paler)",
+      "object": "straw-saucer",
+      "param": "perc.volume",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": -0.8
+        }
+      ]
+    },
+    {
+      "id": "vib-mode",
+      "label": "The tunnel: tap through the six vibrato and chorus modes",
+      "object": "tunnel",
+      "param": "vib.mode",
+      "range": [
+        0,
+        5
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "effects": [
+        {
+          "effect": "hue",
+          "amount": 1
+        },
+        {
+          "effect": "glow",
+          "amount": 0.5
+        }
+      ]
+    },
+    {
+      "id": "vib-lower",
+      "label": "The river bank shimmers while vibrato is on for the lower manual: tap",
+      "object": "river-bank",
+      "param": "vib.lower",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "glide": 300,
+      "effects": [
+        {
+          "effect": "wobble",
+          "amount": 0.8
+        },
+        {
+          "effect": "glow",
+          "amount": 0.4
+        }
+      ]
+    },
+    {
+      "id": "leslie-on",
+      "label": "The tunnel rim lights while the rotating speaker is on: tap",
+      "object": "tunnel-rim",
+      "param": "leslie.on",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "id": "leslie-balance",
+      "label": "The pink cloud: drag across for the horn/drum balance",
+      "object": "pink-cloud",
+      "param": "leslie.balance",
+      "range": [
+        -12,
+        12
+      ],
+      "curve": "linear",
+      "gesture": "drag-x",
+      "effects": [
+        {
+          "effect": "hue",
+          "amount": 0.8
+        }
+      ]
+    },
+    {
+      "id": "leslie-mic-distance",
+      "label": "The lavender snout breathes with the microphone distance: drag across",
+      "object": "lavender-snout",
+      "param": "leslie.mic_distance",
+      "range": [
+        20,
+        150
+      ],
+      "curve": "linear",
+      "gesture": "drag-x",
+      "effects": [
+        {
+          "effect": "pulse",
+          "amount": 1
+        },
+        {
+          "effect": "hue",
+          "parts": "eye",
+          "amount": 0.4
+        }
+      ]
+    },
+    {
+      "id": "leslie-mic-angle",
+      "label": "The coral tongue sways with the microphone spread: drag across",
+      "object": "coral-tongue",
+      "param": "leslie.mic_angle",
+      "range": [
+        0,
+        180
+      ],
+      "curve": "linear",
+      "gesture": "drag-x",
+      "effects": [
+        {
+          "effect": "wobble",
+          "amount": 0.8
+        }
+      ]
+    },
+    {
+      "id": "tg-click",
+      "label": "The lying creature jitters with Key Click: drag across",
+      "object": "lying-creature",
+      "param": "tg.click",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "drag-x",
+      "effects": [
+        {
+          "effect": "boil",
+          "amount": 1.5
+        },
+        {
+          "effect": "glow",
+          "amount": 0.3
+        }
+      ]
+    },
+    {
+      "id": "tg-click-release",
+      "label": "The fan hand jitters with Release Click: drag across",
+      "object": "fan-hand",
+      "param": "tg.click_release",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "drag-x",
+      "effects": [
+        {
+          "effect": "boil",
+          "amount": 1.5
+        }
+      ]
+    },
+    {
+      "id": "tg-leakage",
+      "label": "The splash bush scribbles with tonewheel Leakage: drag across",
+      "object": "splash-bush",
+      "param": "tg.leakage",
+      "range": [
+        -90,
+        -30
+      ],
+      "curve": "linear",
+      "gesture": "drag-x",
+      "effects": [
+        {
+          "effect": "scribble",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "id": "tg-crosstalk",
+      "label": "The purple path scribbles with Crosstalk: drag across",
+      "object": "purple-path",
+      "param": "tg.crosstalk",
+      "range": [
+        -80,
+        -20
+      ],
+      "curve": "linear",
+      "gesture": "drag-x",
+      "effects": [
+        {
+          "effect": "scribble",
+          "count": 16
+        }
+      ]
+    },
+    {
+      "id": "tg-complex",
+      "label": "The acorn frog: tap for complex or pure tonewheels",
+      "object": "acorn-frog",
+      "param": "tg.complex",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 0.8
+        },
+        {
+          "effect": "blink"
+        }
+      ]
+    },
+    {
+      "id": "tg-tuning",
+      "label": "The striped shell: tap for gear or equal tuning",
+      "object": "striped-shell",
+      "param": "tg.tuning",
+      "range": [
+        0,
+        1
+      ],
+      "curve": "linear",
+      "gesture": "tap",
+      "effects": [
+        {
+          "effect": "hue",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "tg-master",
+      "label": "The left cliff drifts in colour with the master tuning (display only)",
+      "object": "left-cliff",
+      "param": "tg.master",
+      "range": [
+        430,
+        450
+      ],
+      "curve": "linear",
+      "effects": [
+        {
+          "effect": "hue",
+          "amount": 0.4
+        }
+      ]
+    },
+    {
+      "id": "out-level",
+      "label": "The sky brightens with the output Volume (display only)",
+      "object": "sky",
+      "param": "out.level",
+      "range": [
+        -30,
+        12
+      ],
+      "curve": "linear",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "voice-manuals",
+      "label": "The bunny slab shows the manual mode (display only: it changes which keys play which manual)",
+      "object": "bunny-slab",
+      "param": "voice.manuals",
+      "range": [
+        0,
+        2
+      ],
+      "curve": "linear",
+      "effects": [
+        {
+          "effect": "hue",
+          "amount": 0.5
+        }
+      ]
+    },
+    {
+      "id": "voice-split",
+      "label": "The purple ledge shows the split point (display only)",
+      "object": "purple-ledge",
+      "param": "voice.split",
+      "range": [
+        36,
+        72
+      ],
+      "curve": "linear",
+      "effects": [
+        {
+          "effect": "hue",
+          "amount": 0.4
+        }
+      ]
+    },
+    {
+      "id": "voice-pedal-split",
+      "label": "The grey ground shows the pedal split (display only)",
+      "object": "bottom-ground",
+      "param": "voice.pedal_split",
+      "range": [
+        0,
+        15
+      ],
+      "curve": "linear",
+      "effects": [
+        {
+          "effect": "hue",
+          "amount": 0.3
+        }
+      ]
+    },
+    {
+      "id": "note-21",
+      "label": "A0: hold to play",
+      "part": "f232",
+      "note": 21,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-22",
+      "label": "A#0: hold to play",
+      "part": "f142",
+      "note": 22,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-23",
+      "label": "B0: hold to play",
+      "part": "f279",
+      "note": 23,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-24",
+      "label": "C1: hold to play",
+      "part": "f306",
+      "note": 24,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-25",
+      "label": "C#1: hold to play",
+      "part": "f141",
+      "note": 25,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-26",
+      "label": "D1: hold to play",
+      "part": "f059",
+      "note": 26,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-27",
+      "label": "D#1: hold to play",
+      "part": "f064",
+      "note": 27,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-28",
+      "label": "E1: hold to play",
+      "part": "f208",
+      "note": 28,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-29",
+      "label": "F1: hold to play",
+      "part": "f249",
+      "note": 29,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-30",
+      "label": "F#1: hold to play",
+      "part": "f051",
+      "note": 30,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-31",
+      "label": "G1: hold to play",
+      "part": "f162",
+      "note": 31,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-32",
+      "label": "G#1: hold to play",
+      "part": "f309",
+      "note": 32,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-33",
+      "label": "A1: hold to play",
+      "part": "f177",
+      "note": 33,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-34",
+      "label": "A#1: hold to play",
+      "part": "f138",
+      "note": 34,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-35",
+      "label": "B1: hold to play",
+      "part": "f182",
+      "note": 35,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-36",
+      "label": "C2: hold to play",
+      "part": "f070",
+      "note": 36,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-37",
+      "label": "C#2: hold to play",
+      "part": "f166",
+      "note": 37,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-38",
+      "label": "D2: hold to play",
+      "part": "f264",
+      "note": 38,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-39",
+      "label": "D#2: hold to play",
+      "part": "f235",
+      "note": 39,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-40",
+      "label": "E2: hold to play",
+      "part": "f234",
+      "note": 40,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-41",
+      "label": "F2: hold to play",
+      "part": "f128",
+      "note": 41,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-42",
+      "label": "F#2: hold to play",
+      "part": "f248",
+      "note": 42,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-43",
+      "label": "G2: hold to play",
+      "part": "f175",
+      "note": 43,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-44",
+      "label": "G#2: hold to play",
+      "part": "f291",
+      "note": 44,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-45",
+      "label": "A2: hold to play",
+      "part": "f060",
+      "note": 45,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-46",
+      "label": "A#2: hold to play",
+      "part": "f185",
+      "note": 46,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-47",
+      "label": "B2: hold to play",
+      "part": "f079",
+      "note": 47,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-48",
+      "label": "C3: hold to play",
+      "part": "f113",
+      "note": 48,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-49",
+      "label": "C#3: hold to play",
+      "part": "f058",
+      "note": 49,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-50",
+      "label": "D3: hold to play",
+      "part": "f265",
+      "note": 50,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-51",
+      "label": "D#3: hold to play",
+      "part": "f005",
+      "note": 51,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-52",
+      "label": "E3: hold to play",
+      "part": "f108",
+      "note": 52,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-53",
+      "label": "F3: hold to play",
+      "part": "f227",
+      "note": 53,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-54",
+      "label": "F#3: hold to play",
+      "part": "f288",
+      "note": 54,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-55",
+      "label": "G3: hold to play",
+      "part": "f170",
+      "note": 55,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-56",
+      "label": "G#3: hold to play",
+      "part": "f066",
+      "note": 56,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-57",
+      "label": "A3: hold to play",
+      "part": "f213",
+      "note": 57,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-58",
+      "label": "A#3: hold to play",
+      "part": "f230",
+      "note": 58,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-59",
+      "label": "B3: hold to play",
+      "part": "f244",
+      "note": 59,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
       "id": "note-60",
       "label": "C4: hold to play",
-      "part": "f175",
+      "part": "f214",
       "note": 60,
       "gesture": "hold",
       "effects": [
@@ -199,7 +1745,7 @@
     {
       "id": "note-61",
       "label": "C#4: hold to play",
-      "part": "f291",
+      "part": "f133",
       "note": 61,
       "gesture": "hold",
       "effects": [
@@ -220,7 +1766,7 @@
     {
       "id": "note-62",
       "label": "D4: hold to play",
-      "part": "f252",
+      "part": "f233",
       "note": 62,
       "gesture": "hold",
       "effects": [
@@ -241,7 +1787,7 @@
     {
       "id": "note-63",
       "label": "D#4: hold to play",
-      "part": "f310",
+      "part": "f085",
       "note": 63,
       "gesture": "hold",
       "effects": [
@@ -262,7 +1808,7 @@
     {
       "id": "note-64",
       "label": "E4: hold to play",
-      "part": "f119",
+      "part": "f102",
       "note": 64,
       "gesture": "hold",
       "effects": [
@@ -283,7 +1829,7 @@
     {
       "id": "note-65",
       "label": "F4: hold to play",
-      "part": "f133",
+      "part": "f057",
       "note": 65,
       "gesture": "hold",
       "effects": [
@@ -304,7 +1850,7 @@
     {
       "id": "note-66",
       "label": "F#4: hold to play",
-      "part": "f102",
+      "part": "f013",
       "note": 66,
       "gesture": "hold",
       "effects": [
@@ -325,7 +1871,7 @@
     {
       "id": "note-67",
       "label": "G4: hold to play",
-      "part": "f056",
+      "part": "f168",
       "note": 67,
       "gesture": "hold",
       "effects": [
@@ -346,7 +1892,7 @@
     {
       "id": "note-68",
       "label": "G#4: hold to play",
-      "part": "f285",
+      "part": "f080",
       "note": 68,
       "gesture": "hold",
       "effects": [
@@ -367,7 +1913,7 @@
     {
       "id": "note-69",
       "label": "A4: hold to play",
-      "part": "f203",
+      "part": "f056",
       "note": 69,
       "gesture": "hold",
       "effects": [
@@ -388,7 +1934,7 @@
     {
       "id": "note-70",
       "label": "A#4: hold to play",
-      "part": "f199",
+      "part": "f267",
       "note": 70,
       "gesture": "hold",
       "effects": [
@@ -409,7 +1955,7 @@
     {
       "id": "note-71",
       "label": "B4: hold to play",
-      "part": "f215",
+      "part": "f283",
       "note": 71,
       "gesture": "hold",
       "effects": [
@@ -430,7 +1976,7 @@
     {
       "id": "note-72",
       "label": "C5: hold to play",
-      "part": "f091",
+      "part": "f285",
       "note": 72,
       "gesture": "hold",
       "effects": [
@@ -451,7 +1997,7 @@
     {
       "id": "note-73",
       "label": "C#5: hold to play",
-      "part": "f050",
+      "part": "f017",
       "note": 73,
       "gesture": "hold",
       "effects": [
@@ -472,7 +2018,7 @@
     {
       "id": "note-74",
       "label": "D5: hold to play",
-      "part": "f043",
+      "part": "f203",
       "note": 74,
       "gesture": "hold",
       "effects": [
@@ -493,7 +2039,7 @@
     {
       "id": "note-75",
       "label": "D#5: hold to play",
-      "part": "f023",
+      "part": "f205",
       "note": 75,
       "gesture": "hold",
       "effects": [
@@ -514,8 +2060,680 @@
     {
       "id": "note-76",
       "label": "E5: hold to play",
-      "part": "f008",
+      "part": "f016",
       "note": 76,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-77",
+      "label": "F5: hold to play",
+      "part": "f300",
+      "note": 77,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-78",
+      "label": "F#5: hold to play",
+      "part": "f188",
+      "note": 78,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-79",
+      "label": "G5: hold to play",
+      "part": "f151",
+      "note": 79,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-80",
+      "label": "G#5: hold to play",
+      "part": "f215",
+      "note": 80,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-81",
+      "label": "A5: hold to play",
+      "part": "f063",
+      "note": 81,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-82",
+      "label": "A#5: hold to play",
+      "part": "f078",
+      "note": 82,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-83",
+      "label": "B5: hold to play",
+      "part": "f293",
+      "note": 83,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-84",
+      "label": "C6: hold to play",
+      "part": "f120",
+      "note": 84,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-85",
+      "label": "C#6: hold to play",
+      "part": "f153",
+      "note": 85,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-86",
+      "label": "D6: hold to play",
+      "part": "f277",
+      "note": 86,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-87",
+      "label": "D#6: hold to play",
+      "part": "f245",
+      "note": 87,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-88",
+      "label": "E6: hold to play",
+      "part": "f033",
+      "note": 88,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-89",
+      "label": "F6: hold to play",
+      "part": "f294",
+      "note": 89,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-90",
+      "label": "F#6: hold to play",
+      "part": "f114",
+      "note": 90,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-91",
+      "label": "G6: hold to play",
+      "part": "f307",
+      "note": 91,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-92",
+      "label": "G#6: hold to play",
+      "part": "f008",
+      "note": 92,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-93",
+      "label": "A6: hold to play",
+      "part": "f018",
+      "note": 93,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-94",
+      "label": "A#6: hold to play",
+      "part": "f258",
+      "note": 94,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-95",
+      "label": "B6: hold to play",
+      "part": "f154",
+      "note": 95,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-96",
+      "label": "C7: hold to play",
+      "part": "f200",
+      "note": 96,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-97",
+      "label": "C#7: hold to play",
+      "part": "f046",
+      "note": 97,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-98",
+      "label": "D7: hold to play",
+      "part": "f041",
+      "note": 98,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-99",
+      "label": "D#7: hold to play",
+      "part": "f246",
+      "note": 99,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-100",
+      "label": "E7: hold to play",
+      "part": "f123",
+      "note": 100,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-101",
+      "label": "F7: hold to play",
+      "part": "f044",
+      "note": 101,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-102",
+      "label": "F#7: hold to play",
+      "part": "f160",
+      "note": 102,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-103",
+      "label": "G7: hold to play",
+      "part": "f021",
+      "note": 103,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-104",
+      "label": "G#7: hold to play",
+      "part": "f096",
+      "note": 104,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-105",
+      "label": "A7: hold to play",
+      "part": "f270",
+      "note": 105,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-106",
+      "label": "A#7: hold to play",
+      "part": "f273",
+      "note": 106,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-107",
+      "label": "B7: hold to play",
+      "part": "f095",
+      "note": 107,
+      "gesture": "hold",
+      "effects": [
+        {
+          "effect": "glow",
+          "amount": 1.3
+        },
+        {
+          "effect": "hue",
+          "amount": 0.25
+        },
+        {
+          "effect": "boil",
+          "amount": 0.6
+        }
+      ]
+    },
+    {
+      "id": "note-108",
+      "label": "C8: hold to play",
+      "part": "f278",
+      "note": 108,
       "gesture": "hold",
       "effects": [
         {

@@ -18,15 +18,22 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
   document.body.classList.add('debug');
   const [W, H] = mapping.size;
 
-  // Labels at each control's top-left corner.
-  for (const { control, box } of layer.controls) {
-    const t = document.createElementNS(SVG, 'text');
-    t.setAttribute('x', String(box.x + 12));
-    t.setAttribute('y', String(box.y + 44));
-    t.classList.add('region-label');
-    t.textContent = `${control.id} · ${control.gesture} · ${control.param}`;
-    layer.svg.append(t);
-  }
+  // Labels at each control's top-left corner, rebuilt when the bindings change (shuffle, editor).
+  let labels: SVGTextElement[] = [];
+  const drawLabels = (): void => {
+    for (const t of labels) t.remove();
+    labels = layer.controls.map(({ control, box }) => {
+      const t = document.createElementNS(SVG, 'text');
+      t.setAttribute('x', String(box.x + 12));
+      t.setAttribute('y', String(box.y + 44));
+      t.classList.add('region-label');
+      t.textContent = `${control.param}`;
+      layer.svg.append(t);
+      return t;
+    });
+  };
+  drawLabels();
+  layer.onRebind(() => { drawLabels(); refresh(); });
 
   // HUD
   const hud = document.createElement('div');
@@ -47,7 +54,13 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
   }
   const help = document.createElement('div');
   help.className = 'help';
-  help.innerHTML = 'click: log image px to console &middot; shift+click: add polygon point &middot; Enter: print entry &middot; Backspace/Esc: undo/clear &middot; <b>`</b>: parts mode';
+  help.innerHTML = 'click: log image px to console &middot; shift+click: add polygon point &middot; Enter: print entry &middot; Backspace/Esc: undo/clear &middot; <b>`</b>: parts mode &middot; ';
+  const bindBtn = document.createElement('button');
+  bindBtn.type = 'button';
+  bindBtn.className = 'bind-open';
+  bindBtn.textContent = 'Bind…';
+  bindBtn.title = 'Open the bind editor: pick shapes, make objects, bind parameters and notes';
+  help.append(bindBtn);
   const partLine = document.createElement('div');
   partLine.className = 'part';
   const liveLine = document.createElement('div');
@@ -72,8 +85,9 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
   };
   const refresh = (): void => {
     for (const [id, cell] of rows) cell.textContent = fmt(id, host.get(id));
-    for (const { control, el } of layer.controls) {
-      el.style.fillOpacity = String(0.08 + 0.35 * positionOf(control, host.get(control.param)));
+    for (const { control, els } of layer.controls) {
+      const o = String(0.08 + 0.35 * positionOf(control, host.get(control.param)));
+      for (const el of els) el.style.fillOpacity = o;
     }
   };
   refresh();
@@ -116,12 +130,24 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
     const [x, y, w, h] = part.bbox.map(Math.round);
     partLine.textContent = `${part.id}  ${part.fill}${part.opacity < 1 ? ` @${part.opacity.toFixed(2)}` : ''}  area ${part.area.toLocaleString()}  box ${x},${y} ${w}×${h}  ink ${part.ink.length}`;
   });
+  const partClicks: Array<(id: string, add: boolean) => void> = [];
   artEl.addEventListener('pointerdown', (ev) => {
     if (!partsMode) return;
     const part = partOf(ev.target);
-    if (part) console.log(`[thingsynth] part ${part.id}`, part);
+    if (!part) return;
+    console.log(`[thingsynth] part ${part.id}`, part);
+    for (const cb of partClicks) cb(part.id, (ev as PointerEvent).shiftKey);
   });
   if (new URLSearchParams(location.search).get('debug') === 'parts') setPartsMode(true);
+
+  // The bind editor (web/src/editor.ts), opened from the HUD; it stays open across the reloads its saves cause.
+  const openEditor = async (): Promise<void> => {
+    const { mountEditor } = await import('./editor');
+    mountEditor({ layer, mapping, host, effects, setPartsMode, onPartClick: (cb) => { partClicks.push(cb); } });
+    bindBtn.disabled = true;
+  };
+  bindBtn.addEventListener('click', () => { void openEditor(); });
+  try { if (sessionStorage.getItem('thingsynth.editor') === 'open') void openEditor(); } catch { /* storage off */ }
 
   // Editor state.
   const draft: Point[] = [];
