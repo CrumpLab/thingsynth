@@ -205,3 +205,83 @@ def main() -> None:
 
 if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- chosen: graffiti eyeballs ------------------------------------------------------------------------------------
+# One sprite list drives the mockup and the app. Timeline (tap: complex on, glided): the acorns fade (0..0.2), the
+# white eyeballs pop up where they sat (0.1..0.5), the drop shadows land behind them (0.15..0.55), irises and pupils
+# open (0.3..0.7), the shines catch (0.5..0.75), and the white paint drips run down last (0.55..0.95).
+def eyes_items() -> list[dict]:
+    items = []
+    R2 = lambda x, y: [round(x, 1), round(y, 1)]
+    for k, (x, y, r) in enumerate(ACORN_CENTRES):
+        o = 0.08 * k
+        R = r * 1.3
+        A = lambda d, f, e, at, s, t, grow='scale': items.append({'d': d, 'fill': f, 'edge': round(e, 1), 'at': at, 'start': round(s + o, 3), 'end': round(t + o, 3), 'grow': grow})
+        A(blob(x + 26, y + 26, R, 30 + k, 5, 0.05), ['#b44cff', '#ff5ced'][k], INK * 1.3, R2(x + 26, y + 26), 0.15, 0.55)
+        for j, (dx, L) in enumerate([(-0.45, 150), (0.05, 230), (0.5, 120)]):
+            top = (x + dx * R, y + R * 0.75)
+            A(drip(*top, 26 - 4 * j, L), '#ffffff', INK, R2(*top), 0.55 + 0.05 * j, 0.85 + 0.05 * j, 'y')
+        A(blob(x, y, R, 20 + k, 5, 0.05), '#ffffff', INK * 1.6, R2(x, y), 0.1, 0.5)
+        look = (-0.18 * R, 0.05 * R) if k == 0 else (-0.22 * R, -0.12 * R)
+        ix, iy = x + look[0], y + look[1]
+        A(circle(ix, iy, R * 0.52), ['#2DFFF4', '#ffe066'][k], INK * 1.2, R2(ix, iy), 0.3, 0.65)
+        A(circle(ix, iy, R * 0.26), '#000000', 0, R2(ix, iy), 0.35, 0.7)
+        A(ellipse(ix + R * 0.18, iy - R * 0.2, R * 0.13, R * 0.09, -30), '#ffffff', INK * 0.6, R2(ix + R * 0.18, iy - R * 0.2), 0.5, 0.75)
+    return items
+
+
+def eyes_frame(t: float) -> Image.Image:
+    if t <= 0:
+        return m.compose()
+    return draw(g.sprite_svg(eyes_items(), t), hide=t >= 0.1)
+
+
+def eyes_main() -> None:
+    out = OUT.parent / 'graffiti-eyes'
+    out.mkdir(parents=True, exist_ok=True)
+    frames = [0, 0.25, 0.5, 0.75, 1.0]
+    tiles = [eyes_frame(t) for t in frames]
+    tiles[-1].save(out / 'end-frame.png')
+    w, h = tiles[0].size
+    sc = 0.36
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * 5 + 60, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (tt, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {tt:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'eyes' in __import__('sys').argv[1:]:
+    eyes_main()
+
+if __name__ == '__main__' and 'export' in __import__('sys').argv[1:]:
+    import json as _j
+    op = ROOT / 'art/golden-pyramid-with-tunnel-celebration/objects.json'
+    O = _j.loads(op.read_text())
+    objs = O['objects'] if 'objects' in O else O
+    objs['acorn-frog']['label'] = 'The frog body under the acorns, with its two acorns'
+    objs['acorn-frog']['parts']['acorns'] = ACORNS
+    op.write_text(_j.dumps(O, indent=2) + '\n')
+    mp = ROOT / 'mapping.json'
+    M = _j.loads(mp.read_text())
+    for b in M['bindings']:
+        if b['id'] == 'tg-complex':
+            b['label'] = 'The acorn frog: tap for complex or pure tonewheels; complex turns its acorns into two graffiti eyeballs'
+            b['glide'] = 800
+            b['effects'] = [{'effect': 'vanish', 'parts': ['acorns'], 'span': [0.0, 0.2]},
+                            {'effect': 'sprites', 'place': 'over', 'items': eyes_items()}]
+        if b['id'] == 'note-57':
+            b['part'] = 'f216'
+        if b['id'] == 'note-60':
+            b['part'] = 'f217'
+    mp.write_text(_j.dumps(M, indent=2) + '\n')
+    print('exported', len(eyes_items()), 'shapes')

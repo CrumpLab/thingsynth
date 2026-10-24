@@ -536,10 +536,16 @@
       "ink": "auto"
     },
     "acorn-frog": {
-      "label": "The frog body under the acorns",
+      "label": "The frog body under the acorns, with its two acorns",
       "parts": {
         "body": [
           "f206"
+        ],
+        "acorns": [
+          "f212",
+          "f214",
+          "f211",
+          "f213"
         ]
       },
       "ink": "auto"

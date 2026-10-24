@@ -198,7 +198,9 @@ it, a candy rainbow sweeps out of it into the pool, and it rains (`scripts/strea
 (percussion), boing: the sleepy eye opens and springs out on a coil from a grey cup (`scripts/eye_endframes.py`); note
 103 moved off its iris to f087. **cloud** (wheel age), overgrown: spotted mushrooms and little flowers sprout one by one along
 the big cloud's top edge (`scripts/cloud_endframes.py`, `export` writes them into `mapping.json`). **horned-ghost** (lower drawbar 6), waving twins: two
-little copies of the ghost pop up beside it and it waves a big lime hand (`scripts/ghost_endframes.py`).
+little copies of the ghost pop up beside it and it waves a big lime hand (`scripts/ghost_endframes.py`). **acorn-frog** (complex
+tonewheels), graffiti eyeballs: its acorns turn into two big dripping spray-painted eyeballs (`scripts/frog_endframes.py`);
+notes 57 and 60 moved off the acorns to the petals f216 and f217.
 **stalk-drawbar-16 and stalk-drawbar-513**, sap rising: a green sap with a wavy surface climbs each stalk with the
 drawbar, turning a luminous light green (#9cf27c) towards the top; each bud on the stalk (roles `bud-1`..) swells
 24% and glows just as the sap reaches its height; and the stalk grows (`grow`): one new branch per drawbar step,
