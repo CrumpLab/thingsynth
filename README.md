@@ -26,6 +26,12 @@ Open the printed URL (http://localhost:5173). Click or press a key to start audi
   logs image coordinates on every click, and has a small polygon editor (shift+click points, Enter prints a
   `mapping.json` entry). In debug, the backquote key (or `?debug=parts`) switches to parts mode: the pointer
   picks the painting's own fill shapes, outlines the one under it and shows its id, colour, area and box.
+- **Wander** (the button in the bottom bar, or `?wander`): every Tonewheel parameter of the current preset takes
+  its own random walk around it, so the whole painting keeps moving while you play. The *speed* dial goes from a
+  slow drift to a flutter, the *amount* dial sets how far things stray (both remembered in this browser; also
+  `?wander-speed=` and `?wander-amount=`, 0 to 1). Drag a dial up and down, scroll it, or use the arrow keys;
+  double-click resets it. Choosing a preset re-centres the walks; setting a parameter yourself re-centres that
+  one; stopping returns to the preset.
 - `?flat` shows the published JPEG instead of the painting rebuilt from its layers. `?mute=1` keeps the engine
   running silently (for automated checks).
 
@@ -47,6 +53,8 @@ web/                    Vite app, plain TypeScript, no framework
   src/objects.ts        art/<slug>/objects.json resolved against the parts table
   src/effects.ts        the nine effects, note envelopes, the preset wave and idle, on the painting's own paths
   src/color.ts          OKLCH colour math with darken-first gamut mapping
+  src/wander.ts         preset wander: a random walk per parameter around the preset
+  src/dial.ts           the small rotary dial used for wander speed and amount
   src/debug.ts          ?debug overlay, HUD and region editor
   runtime/              copy of SynthLand's web runtime (do not edit here)
   public/wasm/          additive.wasm (Tonewheel's engine)

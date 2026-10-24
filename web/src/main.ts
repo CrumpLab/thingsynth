@@ -7,6 +7,8 @@ import { buildArt } from './art';
 import { mountEffects } from './effects';
 import { parseMapping } from './mapping';
 import { loadObjects, resolveObject } from './objects';
+import { createDial } from './dial';
+import { createWander } from './wander';
 import { mountPainting } from './painting';
 
 const base = import.meta.env.BASE_URL;
@@ -76,6 +78,29 @@ async function boot(): Promise<void> {
   });
   host.onPreset((i) => { if (i >= 0) presetSelect.value = String(i); });
 
+  // Wander: every visible parameter random-walks around the preset (web/src/wander.ts). The dials are remembered in
+  // this browser; ?wander starts it, ?wander-speed= and ?wander-amount= (0..1) set the dials.
+  const saved = ((): { speed?: number; amount?: number } => {
+    try { return JSON.parse(localStorage.getItem('thingsynth.wander') ?? '{}') as { speed?: number; amount?: number }; } catch { return {}; }
+  })();
+  const num = (k: string, d: number): number => { const v = Number(query.get(k)); return query.has(k) && Number.isFinite(v) ? v : d; };
+  const wander = createWander(host, { speed: num('wander-speed', saved.speed ?? 0.5), amount: num('wander-amount', saved.amount ?? 0.5) });
+  const save = (): void => {
+    try { localStorage.setItem('thingsynth.wander', JSON.stringify({ speed: wander.speed(), amount: wander.amount() })); } catch { /* private mode */ }
+  };
+  const wanderBtn = document.getElementById('wander') as HTMLButtonElement;
+  const speedDial = createDial({ label: 'speed', title: 'Wander speed: from a slow drift to a flutter', value: wander.speed(), reset: 0.5,
+    onInput: (v) => { wander.setSpeed(v); save(); } });
+  const amountDial = createDial({ label: 'amount', title: 'Wander amount: how far the parameters stray from the preset', value: wander.amount(), reset: 0.5,
+    onInput: (v) => { wander.setAmount(v); save(); } });
+  document.getElementById('wander-box')!.append(speedDial.el, amountDial.el);
+  wander.onChange((on) => {
+    wanderBtn.setAttribute('aria-pressed', String(on));
+    document.body.classList.toggle('wandering', on);
+  });
+  wanderBtn.addEventListener('click', () => { if (wander.running()) wander.stop(); else wander.start(); });
+  if (query.has('wander')) wander.start();
+
   // Audio state.
   host.audio.onState((running) => {
     startOverlay.classList.toggle('hidden', running);
@@ -91,6 +116,7 @@ async function boot(): Promise<void> {
     const { mountDebug } = await import('./debug');
     await layer.ready;
     mountDebug(layer, mapping, host, await effectsReady);
+    Object.assign((window as unknown as { thingsynth: object }).thingsynth, { wander });
   }
 }
 
