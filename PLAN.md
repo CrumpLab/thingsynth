@@ -18,8 +18,13 @@ authoring loop is "edit JSON, reload".
 ## 2. Architecture
 
 ```
-  art/<slug>/image.jpg ──► <img> full-bleed (object-fit: contain)
-                            <svg viewBox="0 0 2475 2475"> hit layer   web/src/painting.ts
+  PSD ── tools/extract_psd.py ──► art/<slug>/layers/  (wash, fills.svg, scribbles, ink.svg, caption)
+                                │
+                                ▼
+  <svg viewBox="0 0 4950 4950"> the painting rebuilt, static          web/src/art.ts
+      white paper, then clipped to the painted area: wash image, 312 fill paths,
+      scribble image, 1,630 ink paths; the caption strip below
+  <svg viewBox="0 0 2475 2475"> hit layer, same box, on top           web/src/painting.ts
                                 │  one <polygon> per region, pointer events,
                                 │  screen -> image px via getScreenCTM()
                                 ▼
@@ -203,7 +208,8 @@ the conversion to coordinates is step 3 and takes about a minute per region.
 `UPSTREAM.md` records the SynthLand commit the copies came from and `scripts/sync_upstream.sh` re-copies them.
 The additive engine's `.wasm` is committed here (upstream it is a build output), so the repo builds with only
 Node and pnpm. `pnpm build` typechecks the app, the runtime copy and the worklet copy, then builds `dist/`
-(a static site, about 1.5 MB with the painting). Nothing is deployed yet.
+(a static site, about 12 MB uncompressed, about 6.4 MB over the wire with gzip on the two SVGs; the scribble
+layer, 3 MB of WebP, is the largest piece). Nothing is deployed yet.
 
 ## 8. Open questions
 
@@ -225,6 +231,8 @@ Node and pnpm. `pnpm build` typechecks the app, the runtime copy and the worklet
 
 ## 9. Next: the animation layer
 
-[docs/animation-layer-plan.md](docs/animation-layer-plan.md) proposes cutting the painting into line-bounded
-cells, grouping them into objects, and animating the painting's own pixels per cell so the 47 parameters and
-88 notes each own something visible. Under review; not implemented.
+[docs/animation-layer-plan.md](docs/animation-layer-plan.md) (approved 2026-10-24) rebuilds the painting from
+the PSD's vector layers and animates its own fill shapes and ink strokes so the 47 parameters and 88 notes each
+own something visible. Milestone 1 is done: `tools/extract_psd.py` exports the layers into
+`art/<slug>/layers/`, the page draws the painting from them, and `?debug` has a parts mode for picking shapes.
+Nothing animates yet; that is milestone 2.

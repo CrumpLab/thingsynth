@@ -1,7 +1,7 @@
 # Animation layer: plan for review
 
-*Written 2026-10-24, revised the same day after reading the PSD. Not implemented. Review, then PLAN.md gets
-the approved version.*
+*Written 2026-10-24, revised the same day after reading the PSD, approved by Matt the same day.
+Status: milestone 1 done (see section 6).*
 
 ## 0. In one paragraph
 
@@ -49,15 +49,16 @@ Of the 312 fill shapes, 298 are bigger than 50 × 50 px and 244 bigger than 100 
 
 **Parts (automatic, exact).** `tools/extract_psd.py` (Python with psd-tools, Pillow and resvg, run with
 `uv run`; authoring time only) reads the PSD and writes into `art/<slug>/layers/`:
-- `wash.png` and `scribbles.png`, the two pixel layers at 2475² (half the PSD, matching the JPEG) as PNG, plus
-  an `@2x` set for later if wanted;
+- `wash.webp` and `scribbles.webp`, the two pixel layers at 2475² (half the PSD, matching the JPEG);
 - `fills.svg`: the 312 coloured paths from both vector layers, each with an id (`f001`..), its colour,
   opacity, bounding box, centroid and area, coordinates rounded to one decimal and translated into the canvas
   space, in paint order;
 - `ink.svg`: the 1,630 black shapes, each with an id and its bounding box, in paint order;
 - `parts.json`: the table of fills and ink strokes with their numbers, and for each fill the ink strokes that
   overlap its outline (so a creature's lines can boil with its body);
-- `frame.svg`: border, signature, title.
+- `caption.webp`: the title and signature strip, cropped from the published JPEG (the PSD's own title and
+  signature layers are an older lettering);
+- `layers.json` (canvas, painted area, stack) and `check.jpg` (the rebuild next to the JPEG).
 The PSD itself stays outside the repo (it is Matt's source and 217 MB); the exports are committed.
 
 **Objects (semi-automatic, then by hand).** An object is a named group of fill parts with a role for each
@@ -78,11 +79,11 @@ can still idle (section 3).
 The page becomes one `<svg viewBox="0 0 4950 4950">` that rebuilds the PSD stack:
 
 ```
-<image href="layers/wash.png">            soft colour wash, raster
+<image href="layers/wash.webp">           soft colour wash, raster
 <g id="fills"> 312 <path> </g>            every fill an element with its own id, colour, opacity
-<image href="layers/scribbles.png">       pencil scribbles, raster, mostly transparent
+<image href="layers/scribbles.webp">      pencil scribbles, raster, mostly transparent
 <g id="ink"> 1630 <path> </g>             the line drawing, on top
-<g id="frame"> border, title, signature </g>
+<image href="layers/caption.webp">        title and signature, below the painted area
 ```
 
 The composite is the painting (the picture in section 0 was rendered exactly this way). Animation is then
@@ -197,10 +198,25 @@ shuffle:
 
 ## 6. Milestones
 
-1. **Extract**: `tools/extract_psd.py`, the four layers plus `parts.json` and `frame.svg` in `art/<slug>/layers/`,
-   the page rebuilt from them instead of the JPEG, checked against the JPEG by eye and by pixel difference.
+1. **Extract** (done 2026-10-24): `tools/extract_psd.py`, the four layers plus `parts.json` in
+   `art/<slug>/layers/`, the page rebuilt from them instead of the JPEG (`?flat` keeps the JPEG), and the parts
+   debug mode (hover and click the painting's fill shapes). Findings while doing it:
+   - The rebuild lines up with the JPEG with zero offset. The remaining difference (mean 9/255 in the painted
+     area) is on ink edges only: anti-aliasing and JPEG compression. Ink coverage is 21.4% in the rebuild,
+     20.0% in the JPEG, 20.4% in the PSD's own flattened PNG.
+   - The painted area is the hole in the white "Rectangle 1" frame layer, 375..4575 px; everything is clipped
+     to it (some ink strokes run past the edge in the PSD).
+   - The PSD's title and signature layers are an older lettering than the published piece, so the caption strip
+     (title and signature) is cropped from the published JPEG instead. `frame.svg` was dropped: the frame is
+     just the clip plus white paper.
+   - Rasters are WebP at 2475 px (wash 1.3 MB, scribbles 3.1 MB); ink.svg is 4.6 MB (1.4 MB gzipped),
+     fills.svg 1.9 MB (0.6 MB gzipped). First load is about 6.4 MB over the wire. Fine on a desktop; for phones,
+     a lower WebP quality on the scribbles or one-decimal-less ink paths are the first levers.
+   - Readiness waits on the images' load events, not `decode()`, which never settles in a background tab.
 2. **Render**: `glow` and `hue` on fill paths, `boil` on ink strokes, `amp.drive` driving the pyramid end to
-   end through `mapping.json` v2, the parts debug mode. Checked in the browser with `?debug` and the meter.
+   end through `mapping.json` v2. Checked in the browser with `?debug` and the meter. Animated elements will
+   need to move into their own small SVG layer (or be promoted) so that a change does not make the browser
+   re-rasterise all 1,942 static paths every frame.
 3. **Vocabulary**: the rest of the effects, note parts, envelopes, transitions, idle.
 4. **Objects and bindings**: grouping, names, the proposal for all 47 + 88, the bind editor; Matt's review.
 5. **Polish**: line boil quality, scribble style tuned against the real scribbles, phone performance, a
@@ -208,11 +224,11 @@ shuffle:
 
 ## 7. Open questions for Matt
 
-- **The PSD** answered the biggest question: the drawing is vector. Two smaller ones remain: may the exported
-  layers (fills.svg, ink.svg, wash.png, scribbles.png) be committed to the public repo? They are the painting
-  taken apart, under the same all-rights-reserved note. And is the 2475² export enough, or keep the 4950²?
-- **The title and signature** are pixel layers. Leave them static, or let the hand-lettered title be the
-  "all notes off" flash?
+- **The PSD** answered the biggest question: the drawing is vector. Matt confirmed (2026-10-24) that the
+  exported layers may be committed to the public repo, under the same all-rights-reserved note as the image.
+  The 2475² raster export is used for now; the tool's `--scale 1` gives the full 4950² if needed.
+- **The title and signature** come from the published JPEG (one caption image). Leave them static, or let the
+  hand-lettered title be the "all notes off" flash?
 - **How much motion.** The plan keeps everything small and local. Is a stronger reading wanted anywhere, for
   example the stream actually flowing, or the sky's scribbles drifting with the Leslie?
 - **Note layout.** Bigger-cell-is-lower-note across the whole canvas, or a spatial keyboard (low notes left,

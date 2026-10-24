@@ -2,11 +2,22 @@
 // console helper that prints image pixels on every click, and a tiny polygon editor:
 //   shift+click   add a vertex          Backspace  remove the last vertex
 //   Enter         print (and copy) a mapping.json entry for the polygon      Escape  clear it
+// Parts mode (press ` (backquote), or open with ?debug=parts; p is a note on the computer keyboard): the pointer hits the painting's own fill shapes instead of
+// the mapping regions; the shape under the pointer is outlined and its id, colour, area and box are shown;
+// click logs the full parts.json record.
 import type { WebSynthlandHost } from '../runtime/types';
+import partsJson from '../../art/golden-pyramid-with-tunnel-celebration/layers/parts.json';
+import { layers } from './art';
 import { formatEntry, positionOf, type Mapping, type Point, type RegionEntry } from './mapping';
 import type { PaintingLayer } from './painting';
 
 const SVG = 'http://www.w3.org/2000/svg';
+
+interface FillPart {
+  id: string; layer: number; n: number; fill: string; opacity: number;
+  bbox: [number, number, number, number]; centroid: [number, number]; area: number; ink: string[];
+}
+const fillParts = new Map((partsJson as unknown as { fills: FillPart[] }).fills.map((f) => [f.id, f]));
 
 export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynthlandHost): void {
   document.body.classList.add('debug');
@@ -42,8 +53,10 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
   }
   const help = document.createElement('div');
   help.className = 'help';
-  help.innerHTML = 'click: log image px to console &middot; shift+click: add polygon point &middot; Enter: print entry &middot; Backspace/Esc: undo/clear';
-  hud.append(coords, table, help);
+  help.innerHTML = 'click: log image px to console &middot; shift+click: add polygon point &middot; Enter: print entry &middot; Backspace/Esc: undo/clear &middot; <b>`</b>: parts mode';
+  const partLine = document.createElement('div');
+  partLine.className = 'part';
+  hud.append(coords, partLine, table, help);
   document.body.append(hud);
 
   const fmt = (id: string, v: number): string => {
@@ -69,6 +82,42 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
     const inside = x >= 0 && y >= 0 && x <= W && y <= H;
     coords.textContent = inside ? `x ${x}  y ${y}   (image ${W}×${H})` : `outside image (${W}×${H})`;
   });
+
+  // Parts mode: hover and click the painting's own fill shapes.
+  const scale = W / layers.canvas[0];
+  const hilite = document.createElementNS(SVG, 'path');
+  hilite.classList.add('part-hilite');
+  hilite.setAttribute('transform', `scale(${scale})`);
+  layer.svg.append(hilite);
+  let partsMode = false;
+  const setPartsMode = (on: boolean): void => {
+    if (layer.art.flat) { console.warn('[thingsynth] parts mode needs the layered painting (drop ?flat)'); return; }
+    partsMode = on;
+    document.body.classList.toggle('parts-mode', on);
+    hilite.removeAttribute('d');
+    partLine.textContent = on ? 'parts mode: hover a shape' : '';
+    console.log(`[thingsynth] parts mode ${on ? 'on' : 'off'}`);
+  };
+  const partOf = (t: EventTarget | null): FillPart | undefined => {
+    const id = t instanceof SVGPathElement && t.id.startsWith('f') ? t.id : '';
+    return id ? fillParts.get(id) : undefined;
+  };
+  const artEl = layer.art.el;
+  artEl.addEventListener('pointermove', (ev) => {
+    if (!partsMode) return;
+    const part = partOf(ev.target);
+    const path = part ? layer.art.fills.get(part.id) : undefined;
+    if (!part || !path) { hilite.removeAttribute('d'); partLine.textContent = 'parts mode: hover a shape'; return; }
+    hilite.setAttribute('d', path.getAttribute('d') ?? '');
+    const [x, y, w, h] = part.bbox.map(Math.round);
+    partLine.textContent = `${part.id}  ${part.fill}${part.opacity < 1 ? ` @${part.opacity.toFixed(2)}` : ''}  area ${part.area.toLocaleString()}  box ${x},${y} ${w}×${h}  ink ${part.ink.length}`;
+  });
+  artEl.addEventListener('pointerdown', (ev) => {
+    if (!partsMode) return;
+    const part = partOf(ev.target);
+    if (part) console.log(`[thingsynth] part ${part.id}`, part);
+  });
+  if (new URLSearchParams(location.search).get('debug') === 'parts') setPartsMode(true);
 
   // Editor state.
   const draft: Point[] = [];
@@ -113,7 +162,8 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
   window.addEventListener('keydown', (ev) => {
     const tag = (document.activeElement as HTMLElement | null)?.tagName;
     if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
-    if (ev.key === 'Enter') printDraft();
+    if ((ev.code === 'Backquote' || ev.key === '`') && !ev.metaKey && !ev.ctrlKey && !ev.altKey) setPartsMode(!partsMode);
+    else if (ev.key === 'Enter') printDraft();
     else if (ev.key === 'Backspace') { draft.pop(); redraw(); }
     else if (ev.key === 'Escape') { draft.length = 0; redraw(); }
     else return;
@@ -128,7 +178,10 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
       get: (id: string) => host.get(id),
       params: () => host.params().filter((p) => !p.hidden).map((p) => `${p.id} [${p.min}..${p.max}] ${p.unit}`),
       entry: printDraft,
+      art: layer.art,
+      part: (id: string) => fillParts.get(id),
+      partsMode: setPartsMode,
     },
   });
-  console.log('[thingsynth] debug mode: window.thingsynth = { host, mapping, set, get, params, draft, entry }');
+  console.log('[thingsynth] debug mode: window.thingsynth = { host, mapping, set, get, params, draft, entry, art, part, partsMode }');
 }

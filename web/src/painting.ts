@@ -1,6 +1,9 @@
-// The painting layer: the image full-bleed (letterboxed, never cropped) with an SVG hit layer on top whose
-// coordinate system IS the image's pixel grid, so mapping.json regions are drawn and hit-tested unchanged.
+// The painting layer: the art (web/src/art.ts) full-bleed, letterboxed, never cropped, with an SVG hit layer on
+// top whose coordinate system is mapping.json's image-pixel grid, so regions are drawn and hit-tested unchanged.
+// The art and the hit layer are separate SVGs of the same aspect in the same box, so they line up exactly and
+// changes in the hit layer (debug outlines, highlights) never make the browser repaint the painting.
 import type { WebSynthlandHost } from '../runtime/types';
+import type { Art } from './art';
 import {
   axisPosition, boundingBox, shapePoints, tapNext, valueAt, type Mapping, type Point, type RegionEntry,
 } from './mapping';
@@ -9,7 +12,7 @@ const SVG = 'http://www.w3.org/2000/svg';
 
 export interface PaintingLayer {
   svg: SVGSVGElement;
-  img: HTMLImageElement;
+  art: Art;
   /** Screen (client) coordinates -> image pixels. */
   toImage(clientX: number, clientY: number): Point;
   /** One SVG element per region, in mapping order. */
@@ -18,19 +21,14 @@ export interface PaintingLayer {
   onChange(cb: (entry: RegionEntry, value: number) => void): void;
 }
 
-export function mountPainting(stage: HTMLElement, imageUrl: string, mapping: Mapping, host: WebSynthlandHost): PaintingLayer {
+export function mountPainting(stage: HTMLElement, art: Art, mapping: Mapping, host: WebSynthlandHost): PaintingLayer {
   const [W, H] = mapping.size;
-  const img = document.createElement('img');
-  img.src = imageUrl;
-  img.alt = 'Golden Pyramid With Tunnel Celebration';
-  img.draggable = false;
-  img.className = 'painting';
 
   const svg = document.createElementNS(SVG, 'svg');
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
   svg.classList.add('hits');
-  stage.append(img, svg);
+  stage.append(art.el, svg);
 
   const toImage = (clientX: number, clientY: number): Point => {
     const ctm = svg.getScreenCTM();
@@ -63,7 +61,7 @@ export function mountPainting(stage: HTMLElement, imageUrl: string, mapping: Map
     bindGesture(el, entry, toImage, send, () => desc(entry.param), host);
   }
 
-  return { svg, img, toImage, shapes, onChange: (cb) => { listeners.push(cb); } };
+  return { svg, art, toImage, shapes, onChange: (cb) => { listeners.push(cb); } };
 }
 
 function bindGesture(

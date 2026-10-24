@@ -19,16 +19,76 @@
     "exifDescription": "Digital Work"
   },
   "tags": {
-    "characters": ["horned creature", "antenna blob", "one eyed creature", "rabbit eared figure", "toothy monster"],
-    "subjects": ["landscape", "pyramid", "tunnel", "creatures", "waterfall", "river", "trees"],
-    "themes": ["imaginary worlds", "crowded life", "gathering", "faces in things"],
-    "style": ["cartoon", "doodle", "psychedelic", "seek and find density"],
-    "mood": ["playful", "celebratory", "busy"],
-    "setting": ["invented landscape", "valley"],
-    "composition": ["all over", "central feature", "dense", "border framed"],
-    "line": ["thick black outline", "pencil scribble underlayer", "flat fill", "soft shading"],
-    "color": ["candy", "rainbow", "saturated", "pastel sky"],
-    "elements": ["hand lettered title", "signature", "white border", "waterfall", "ring in sky", "eyes in things", "stalk trees"]
+    "characters": [
+      "horned creature",
+      "antenna blob",
+      "one eyed creature",
+      "rabbit eared figure",
+      "toothy monster"
+    ],
+    "subjects": [
+      "landscape",
+      "pyramid",
+      "tunnel",
+      "creatures",
+      "waterfall",
+      "river",
+      "trees"
+    ],
+    "themes": [
+      "imaginary worlds",
+      "crowded life",
+      "gathering",
+      "faces in things"
+    ],
+    "style": [
+      "cartoon",
+      "doodle",
+      "psychedelic",
+      "seek and find density"
+    ],
+    "mood": [
+      "playful",
+      "celebratory",
+      "busy"
+    ],
+    "setting": [
+      "invented landscape",
+      "valley"
+    ],
+    "composition": [
+      "all over",
+      "central feature",
+      "dense",
+      "border framed"
+    ],
+    "line": [
+      "thick black outline",
+      "pencil scribble underlayer",
+      "flat fill",
+      "soft shading"
+    ],
+    "color": [
+      "candy",
+      "rainbow",
+      "saturated",
+      "pastel sky"
+    ],
+    "elements": [
+      "hand lettered title",
+      "signature",
+      "white border",
+      "waterfall",
+      "ring in sky",
+      "eyes in things",
+      "stalk trees"
+    ]
   },
-  "rights": "All rights reserved, Matt Crump. Not covered by the repository's GPLv3 licence."
+  "rights": "All rights reserved, Matt Crump. Not covered by the repository's GPLv3 licence.",
+  "layers": {
+    "dir": "layers/",
+    "fromPsd": "Golden pyramid with tunnel celebration.psd (4950x4950, Adobe Fresco export; not in the repo)",
+    "extractedWith": "tools/extract_psd.py",
+    "contents": "wash.webp, fills.svg (312 vector fills), scribbles.webp, ink.svg (1630 vector ink strokes), caption.webp (from the JPEG), layers.json, parts.json"
+  }
 }

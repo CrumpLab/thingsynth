@@ -1,0 +1,100 @@
+{
+  "schema": "thingsynth.layers/1",
+  "source": {
+    "file": "Golden pyramid with tunnel celebration.psd",
+    "sha256": "5c5082d074a64fa2d3a7db3402e9ccb3e733223beba62b7df0f10e59c14a774f",
+    "width": 4950,
+    "height": 4950
+  },
+  "canvas": [
+    4950,
+    4950
+  ],
+  "painted": [
+    375,
+    375,
+    4200,
+    4200
+  ],
+  "rasterScale": 0.5,
+  "stack": [
+    {
+      "layer": 3,
+      "name": "Background",
+      "kind": "solidcolorfill"
+    },
+    {
+      "layer": 8,
+      "name": "Pixel layer",
+      "kind": "smartobject"
+    },
+    {
+      "layer": 9,
+      "name": "Vector layer",
+      "kind": "smartobject"
+    },
+    {
+      "layer": 6,
+      "name": "Pixel layer",
+      "kind": "pixel"
+    },
+    {
+      "layer": 7,
+      "name": "Vector layer",
+      "kind": "smartobject"
+    },
+    {
+      "layer": 17,
+      "name": "Rectangle 1",
+      "kind": "shape"
+    },
+    {
+      "layer": 18,
+      "name": "sig",
+      "kind": "pixel"
+    },
+    {
+      "layer": 26,
+      "name": "Layer 1",
+      "kind": "pixel"
+    }
+  ],
+  "order": [
+    "background",
+    "wash",
+    "fills",
+    "scribbles",
+    "ink",
+    "caption"
+  ],
+  "rasters": {
+    "wash": {
+      "layer": 8,
+      "name": "Pixel layer",
+      "file": "wash.webp"
+    },
+    "scribbles": {
+      "layer": 6,
+      "name": "Pixel layer",
+      "file": "scribbles.webp"
+    }
+  },
+  "caption": {
+    "file": "caption.webp",
+    "box": [
+      0,
+      4583,
+      4950,
+      367
+    ],
+    "source": "golden-pyramid-with-tunnel-celebration.jpg"
+  },
+  "files": {
+    "fills": "fills.svg",
+    "ink": "ink.svg"
+  },
+  "counts": {
+    "fills": 312,
+    "ink": 1630
+  }
+}

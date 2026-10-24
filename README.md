@@ -24,7 +24,10 @@ Open the printed URL (http://localhost:5173). Click or press a key to start audi
   `web/public/tonewheel/presets/`).
 - `?debug` draws the mapped regions, shows pointer coordinates in image pixels and the mapped parameter values,
   logs image coordinates on every click, and has a small polygon editor (shift+click points, Enter prints a
-  `mapping.json` entry). `?mute=1` keeps the engine running silently (for automated checks).
+  `mapping.json` entry). In debug, the backquote key (or `?debug=parts`) switches to parts mode: the pointer
+  picks the painting's own fill shapes, outlines the one under it and shows its id, colour, area and box.
+- `?flat` shows the published JPEG instead of the painting rebuilt from its layers. `?mute=1` keeps the engine
+  running silently (for automated checks).
 
 Other scripts: `pnpm build` (typecheck + production build into `dist/`), `pnpm preview`, `pnpm typecheck`,
 `pnpm presets` (rebuild the preset index), `pnpm sync` (re-copy from SynthLand, see [UPSTREAM.md](UPSTREAM.md)).
@@ -32,11 +35,14 @@ Other scripts: `pnpm build` (typecheck + production build into `dist/`), `pnpm p
 ## Layout
 
 ```
-art/<slug>/             the painting (full resolution) and meta.json
+art/<slug>/             the published JPEG and meta.json
+  layers/               the painting taken apart from the PSD (tools/extract_psd.py): wash.webp, fills.svg,
+                        scribbles.webp, ink.svg, caption.webp, layers.json, parts.json, check.jpg
 mapping.json            regions of the painting -> Tonewheel parameters (the thing Matt edits)
 web/                    Vite app, plain TypeScript, no framework
   src/main.ts           boots the runtime, presets, start overlay
-  src/painting.ts       image + SVG hit layer in image-pixel coordinates, gesture handling
+  src/art.ts            rebuilds the painting from art/<slug>/layers as one static SVG (or the JPEG with ?flat)
+  src/painting.ts       the art + an SVG hit layer in image-pixel coordinates, gesture handling
   src/mapping.ts        mapping.json schema, validation, value curves
   src/debug.ts          ?debug overlay, HUD and region editor
   runtime/              copy of SynthLand's web runtime (do not edit here)
@@ -44,7 +50,20 @@ web/                    Vite app, plain TypeScript, no framework
   public/tonewheel/     plugin.json and presets
 upstream/               reference copies of the Tonewheel manifest and engine params.json
 scripts/                sync_upstream.sh, build_preset_index.mjs, build_worklet.mjs
+tools/extract_psd.py    PSD -> art/<slug>/layers (run with uv, authoring time only; see below)
 ```
+
+## Re-extracting the painting from the PSD
+
+The PSD stays outside the repo (it is the source, 217 MB). With [uv](https://docs.astral.sh/uv/) installed:
+
+```bash
+uv run tools/extract_psd.py "/path/to/Golden pyramid with tunnel celebration.psd" art/golden-pyramid-with-tunnel-celebration --reference art/golden-pyramid-with-tunnel-celebration/golden-pyramid-with-tunnel-celebration.jpg
+```
+
+It rewrites `art/<slug>/layers/` and prints how closely the rebuilt stack matches the published JPEG
+(`check.jpg` shows them side by side). Fill and ink ids follow the PSD's paint order, so they only change if
+the PSD's drawing changes.
 
 ## Licence
 

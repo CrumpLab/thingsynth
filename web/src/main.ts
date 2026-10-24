@@ -3,13 +3,14 @@
 // AudioWorklet. Plain DOM, no framework; the runtime is a verbatim copy of SynthLand's web/packages/runtime/src.
 import { createSynthlandHost } from '../runtime/host';
 import rawMapping from '../../mapping.json';
-import paintingUrl from '../../art/golden-pyramid-with-tunnel-celebration/golden-pyramid-with-tunnel-celebration.jpg';
+import { buildArt } from './art';
 import { parseMapping } from './mapping';
 import { mountPainting } from './painting';
 
 const base = import.meta.env.BASE_URL;
 const query = new URLSearchParams(location.search);
 const debug = query.has('debug');
+const flat = query.has('flat');
 
 const stage = document.getElementById('stage')!;
 const startOverlay = document.getElementById('start')!;
@@ -19,6 +20,13 @@ const debugLink = document.getElementById('debug-link') as HTMLAnchorElement;
 
 async function boot(): Promise<void> {
   const mapping = parseMapping(rawMapping);
+  // Start building the painting first: its files load while the runtime fetches plugin.json and the presets.
+  const art = buildArt(flat);
+  stage.classList.add('loading');
+  void art.ready.then(() => stage.classList.remove('loading'), (err: unknown) => {
+    console.error('[thingsynth] painting failed to load', err);
+    status.textContent = `painting failed to load: ${err instanceof Error ? err.message : String(err)}`;
+  });
   const host = createSynthlandHost({
     pluginUrl: `${base}tonewheel/plugin.json`,
     presetsUrl: `${base}tonewheel/presets/index.json`,
@@ -38,7 +46,7 @@ async function boot(): Promise<void> {
     if (!ids.has(r.param)) console.warn(`[thingsynth] mapping region "${r.id}" uses unknown param "${r.param}"`);
   }
 
-  const layer = mountPainting(stage, paintingUrl, mapping, host);
+  const layer = mountPainting(stage, art, mapping, host);
   if (!debug) layer.onChange((entry, v) => { status.textContent = `${entry.param} = ${fmtValue(host, entry.param, v)}`; });
 
   // Presets: the select mirrors the runtime's list; ?preset=<slug> or mapping.defaultPreset picks the first one.
@@ -73,6 +81,7 @@ async function boot(): Promise<void> {
     debugLink.textContent = 'exit debug';
     debugLink.href = location.pathname;
     const { mountDebug } = await import('./debug');
+    await art.ready.catch(() => undefined);
     mountDebug(layer, mapping, host);
   }
 }
