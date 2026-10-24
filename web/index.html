@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>thingsynth</title>
+  <meta name="description" content="A painting by Matt Crump that plays Tonewheel, a tonewheel organ synth, in the browser." />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main id="stage" aria-label="Painting"></main>
+  <div id="start" role="button" tabindex="0">
+    <div class="card">
+      <h1>thingsynth</h1>
+      <p id="start-title"></p>
+      <p class="hint">Click or press a key to start the organ.<br />Keys A&ndash;; play notes, Z/X shift octave, Web MIDI is on.</p>
+    </div>
+  </div>
+  <footer id="bar">
+    <label>Preset <select id="preset"></select></label>
+    <span id="status">off</span>
+    <a id="debug-link" href="?debug">debug</a>
+  </footer>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

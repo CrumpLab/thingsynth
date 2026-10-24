@@ -1,0 +1,35 @@
+{
+  "schema": "thingsynth.mapping/1",
+  "image": "art/golden-pyramid-with-tunnel-celebration/golden-pyramid-with-tunnel-celebration.jpg",
+  "size": [2475, 2475],
+  "defaultPreset": "jazz-trio",
+  "regions": [
+    {
+      "id": "placeholder-drive",
+      "label": "Placeholder: drag left/right for Drive",
+      "region": { "rect": [160, 160, 900, 360] },
+      "gesture": "drag-x",
+      "param": "amp.drive",
+      "range": [0, 1],
+      "curve": "linear"
+    },
+    {
+      "id": "placeholder-drawbar",
+      "label": "Placeholder: drag up/down for the Upper 16' drawbar",
+      "region": { "polygon": [[1500, 1500], [2300, 1500], [2300, 2300], [1500, 2300]] },
+      "gesture": "drag-y",
+      "param": "upper.db1",
+      "range": [0, 8],
+      "curve": "linear"
+    },
+    {
+      "id": "placeholder-rotor",
+      "label": "Placeholder: tap to cycle rotor speed (Stop / Slow / Fast)",
+      "region": { "rect": [1500, 160, 800, 400] },
+      "gesture": "tap",
+      "param": "leslie.speed",
+      "range": [0, 2],
+      "curve": "linear"
+    }
+  ]
+}
