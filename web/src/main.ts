@@ -152,7 +152,7 @@ async function boot(): Promise<void> {
     const { mountDebug } = await import('./debug');
     await layer.ready;
     mountDebug(layer, mapping, host, await effectsReady);
-    Object.assign((window as unknown as { thingsynth: object }).thingsynth, { wander, shuffle: applyShuffle, layer, output });
+    Object.assign((window as unknown as { thingsynth: object }).thingsynth, { wander, shuffle: applyShuffle, layer, output, objects });
   }
 }
 

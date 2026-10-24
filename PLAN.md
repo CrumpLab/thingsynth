@@ -148,7 +148,7 @@ span (`web/src/effects.ts`):
 | --- | --- | --- | --- |
 | `glow` | fills | more vivid and more solid: OKLCH chroma +0.09; light colours deepen only as far as needed to hold it, mid and dark colours lift towards light; opacity 60% of the way to solid | |
 | `hue` | fills | the hue turned 60 degrees (negative turns the other way) | |
-| `fill` | fills | a vivid copy of the shape fully revealed from an edge, like a drawbar pulled out | `from`: bottom, top, left, right |
+| `fill` | fills | a vivid copy of the object fully revealed from an edge, one level across all its shapes, like a drawbar pulled out | `from`: bottom, top, left, right; `edge`: straight or wave (a hand-drawn surface that rolls as it moves); `turn` (degrees the colour turns as it advances) or `toward` (a hue, OKLCH degrees, every shape's colour moves to) |
 | `scribble` | fills | pencil loops in the painting's own scribble style, all drawn in, clipped to the shape | `count` (default 14) |
 | `boil` | ink | the outline redrawn, its lines bent up to 12 canvas px; a new drawing every 1/12 of the way, so dragging makes them writhe and holding keeps them still | |
 | `swell` | object | 8% larger about its centre (negative shrinks) | |
@@ -169,6 +169,13 @@ painting). With the system's reduced-motion setting, frames are reached without 
 
 In the bind editor each effect row has its span and easing, and the **Frame** slider scrubs the selected binding's
 animation from its first frame to its last without touching the organ, to see an animation while shaping it.
+`node scripts/object_frames.mjs <binding-id> [url] --tag <name>` renders one binding's animation (with the dev
+server running) into `docs/objects/<binding-id>/`: a strip of frames 0 to 1 and a loop from first frame to last and
+back, for reviewing objects one at a time.
+
+Objects reworked so far (`docs/objects/`): **pyramid-drive**, molten heat rising: an orange level with a wavy
+surface climbs from the pyramid's base to its apex as Drive goes 0 to 1, both faces converging on one orange as it
+rises; the faces above the level warm from 20%; the outline starts to boil past 55%, easing in.
 
 Fill ids (`f001`..) and ink ids (`i0001`..) come from the extractor and are stable as long as the PSD's drawing does
 not change; `?debug`'s parts mode (backquote) shows the id of the shape under the pointer. The parts table also

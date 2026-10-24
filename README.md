@@ -48,7 +48,8 @@ Open the printed URL (http://localhost:5173). Click or press a key to start audi
 
 Other scripts: `pnpm build` (typecheck + production build into `dist/`), `pnpm preview`, `pnpm typecheck`,
 `pnpm presets` (rebuild the preset index), `pnpm sync` (re-copy from SynthLand, see [UPSTREAM.md](UPSTREAM.md)),
-`pnpm demo [url]` (record the demo video: needs the dev server running, ffmpeg and Google Chrome; it drives a
+`node scripts/object_frames.mjs <binding-id> [url]` (render one object's animation, first frame to last, into
+`docs/objects/<binding-id>/`), `pnpm demo [url]` (record the demo video: needs the dev server running, ffmpeg and Google Chrome; it drives a
 headless Chrome with a throwaway profile and writes `docs/demo/`).
 
 On phones (small touch screens) the page uses half-size raster layers and a lite mode (redrawn at most 20 times

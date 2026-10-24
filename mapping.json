@@ -9,7 +9,7 @@
   "bindings": [
     {
       "id": "pyramid-drive",
-      "label": "The golden pyramid: drag across it for Drive; it heats towards red, deepens and its lines boil",
+      "label": "The golden pyramid fills with molten heat as Drive rises: drag across it; past halfway its lines start to boil",
       "object": "golden-pyramid",
       "param": "amp.drive",
       "range": [
@@ -20,16 +20,28 @@
       "gesture": "drag-x",
       "effects": [
         {
-          "effect": "hue",
-          "amount": -0.3
+          "effect": "fill",
+          "amount": 0.6,
+          "from": "bottom",
+          "edge": "wave",
+          "toward": 65
         },
         {
           "effect": "glow",
-          "amount": 1
+          "amount": 0.5,
+          "span": [
+            0.2,
+            1
+          ]
         },
         {
           "effect": "boil",
-          "amount": 1
+          "amount": 1.3,
+          "span": [
+            0.55,
+            1
+          ],
+          "ease": "in"
         }
       ],
       "locked": true

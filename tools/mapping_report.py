@@ -25,7 +25,7 @@ def main() -> None:
     def fx(b: dict) -> str:
         out = []
         for e in b["effects"]:
-            extra = "".join(f" {k} {e[k]}" for k in ("parts", "from", "count", "hz") if k in e)
+            extra = "".join(f" {k} {e[k]}" for k in ("parts", "from", "edge", "turn", "toward", "count", "span", "ease") if k in e)
             out.append(f"{e['effect']} {e.get('amount', 1):g}{extra}")
         return ", ".join(out)
 

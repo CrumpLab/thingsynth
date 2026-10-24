@@ -7,7 +7,7 @@ the object shows the value but touching it does nothing (routing, tuning and lev
 
 | parameter | name | object | gesture | effects | lock |
 | --- | --- | --- | --- | --- | --- |
-| `amp.drive` | Drive | golden-pyramid | drag-x | hue -0.3, glow 1, boil 1 | locked |
+| `amp.drive` | Drive | golden-pyramid | drag-x | fill 0.6 from bottom edge wave toward 65, glow 0.5 span [0.2, 1], boil 1.3 span [0.55, 1] ease in | locked |
 | `upper.db1` | Upper 16' | stalk-left | drag-y | fill 1 from bottom |  |
 | `upper.db2` | Upper 5 1/3' | stalk-right | drag-y | fill 1 from bottom |  |
 | `leslie.speed` | Rotor Speed | spiral-curl | tap | spin 1 |  |

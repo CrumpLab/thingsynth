@@ -51,6 +51,13 @@ export interface EffectSpec {
   ease?: Ease;
   /** fill: the edge the colour rises from (default bottom). */
   from?: FillFrom;
+  /** fill: the leading edge, straight (default) or a gentle hand-drawn wave that rolls as it moves. */
+  edge?: 'straight' | 'wave';
+  /** fill: degrees the revealed colour's hue has turned by the last frame (it turns as the fill advances). */
+  turn?: number;
+  /** fill: a hue (OKLCH degrees, e.g. 50 = orange) the revealed colour moves to as the fill advances, the short way
+   * round; every shape of the object converges on it (instead of `turn`, which turns each by the same amount). */
+  toward?: number;
   /** scribble: how many pencil strokes at full value (default 14). */
   count?: number;
 }
@@ -178,6 +185,18 @@ function parseBinding(raw: unknown, i: number): Binding {
     if (o.from !== undefined) {
       if (!['bottom', 'top', 'left', 'right'].includes(o.from as string)) fail(w, 'from must be bottom, top, left or right');
       spec.from = o.from as FillFrom;
+    }
+    if (o.edge !== undefined) {
+      if (o.edge !== 'straight' && o.edge !== 'wave') fail(w, 'edge must be straight or wave');
+      spec.edge = o.edge;
+    }
+    if (o.turn !== undefined) {
+      if (typeof o.turn !== 'number' || Math.abs(o.turn) > 360) fail(w, 'turn must be degrees, -360..360');
+      spec.turn = o.turn;
+    }
+    if (o.toward !== undefined) {
+      if (typeof o.toward !== 'number' || o.toward < 0 || o.toward > 360) fail(w, 'toward must be a hue, 0..360');
+      spec.toward = o.toward;
     }
     if (o.count !== undefined) {
       if (typeof o.count !== 'number' || o.count < 1 || o.count > 64) fail(w, 'count must be 1..64');

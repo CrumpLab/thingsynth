@@ -12,7 +12,10 @@
 //   glow      colour more vivid and more solid: OKLCH chroma up; light colours deepen only as far as needed to hold
 //             it, mid and dark colours lift towards light
 //   hue       the colour turns round the wheel, 60 degrees at amount 1 (negative turns the other way)
-//   fill      a vivid copy of the shape revealed from an edge (`from`: bottom, top, left, right), like a drawbar
+//   fill      a vivid copy of the object revealed from an edge (`from`: bottom, top, left, right), one level across
+//             all its shapes, like a drawbar; `edge: "wave"` gives the level a hand-drawn wave that rolls as it moves,
+//             `turn` turns the revealed colour's hue (degrees by the last frame) as it advances, `toward` moves every
+//             shape's revealed colour to one hue instead
 //   scribble  pencil loops drawn in, clipped to the shape, in the painting's own scribble style (`count` strokes)
 //   boil      the outline redrawn: the lines bend further from their own shape as u grows, a new drawing every
 //             1/12 of the way, so dragging makes them writhe and holding keeps them still; the original at 0
@@ -67,7 +70,10 @@ const LITE = ((): boolean => {
 const PAINT_EVERY_MS = 1000 / (LITE ? 20 : PAINT_HZ);
 
 type Fill = { el: SVGPathElement; hex: string; base: Oklch; opacity: number; hue: number; glow: number; written: string };
-type Reveal = { copy: SVGPathElement; rect: SVGRectElement; box: [number, number, number, number]; from: string; written: string };
+type Reveal = {
+  copy: SVGPathElement; clip: SVGPathElement; base: Oklch; glow: number; turn: number;
+  box: [number, number, number, number]; from: string; wave: boolean; written: string; colour: string;
+};
 type Scribble = { strokes: SVGPathElement[]; count: number; written: string };
 
 /** One effect of an animation, with what it acts on. */
@@ -225,21 +231,25 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
             const clip = document.createElementNS(SVG, 'clipPath');
             clip.id = clipId;
             clip.setAttribute('clipPathUnits', 'userSpaceOnUse');
-            const rect = document.createElementNS(SVG, 'rect');
-            for (const a of ['x', 'y', 'width', 'height']) rect.setAttribute(a, '0');
-            clip.append(rect);
+            const shape = document.createElementNS(SVG, 'path');
+            shape.setAttribute('d', 'M0 0Z');
+            clip.append(shape);
             stack.defs.append(clip);
             L.added.push(clip);
             const copy = orig.cloneNode(false) as SVGPathElement;
             copy.removeAttribute('id');
             copy.dataset.revealOf = id;
-            copy.setAttribute('fill', glowColour(hexToOklch(part.fill), 0, FILL_GLOW * Math.abs(spec.amount)));
             copy.removeAttribute('fill-opacity');
             copy.setAttribute('clip-path', `url(#${clipId})`);
             copy.style.pointerEvents = 'none';
             orig.after(copy);
             L.added.push(copy);
-            tr.reveals.push({ copy, rect, box: part.bbox, from: spec.from ?? 'bottom', written: '' });
+            // One level for the whole object: every shape's reveal uses the object's box.
+            tr.reveals.push({
+              copy, clip: shape, base: hexToOklch(part.fill), glow: FILL_GLOW * Math.abs(spec.amount),
+              turn: spec.toward !== undefined ? hueDelta(hexToOklch(part.fill).h, spec.toward) : spec.turn ?? 0,
+              box: obj.bbox, from: spec.from ?? 'bottom', wave: spec.edge === 'wave', written: '', colour: '',
+            });
           }
           break;
         case 'scribble': {
@@ -351,17 +361,10 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       if (!tr.reveals.length && !tr.scribble) continue;
       const u = local(tr, L.shown);
       for (const r of tr.reveals) {
-        const [x, y, w, h] = r.box;
-        let rx = x, ry = y, rw = w, rh = h;
-        if (r.from === 'bottom') { ry = y + h * (1 - u); rh = h * u; }
-        else if (r.from === 'top') rh = h * u;
-        else if (r.from === 'left') rw = w * u;
-        else { rx = x + w * (1 - u); rw = w * u; }
-        const key = `${rx.toFixed(1)} ${ry.toFixed(1)} ${rw.toFixed(1)} ${rh.toFixed(1)}`;
-        if (key === r.written) continue;
-        r.written = key;
-        r.rect.setAttribute('x', rx.toFixed(1)); r.rect.setAttribute('y', ry.toFixed(1));
-        r.rect.setAttribute('width', rw.toFixed(1)); r.rect.setAttribute('height', rh.toFixed(1));
+        const d = revealPath(r.box, r.from, u, r.wave);
+        if (d !== r.written) { r.written = d; r.clip.setAttribute('d', d); }
+        const colour = glowColour(r.base, r.turn * u, r.glow);
+        if (colour !== r.colour) { r.colour = colour; r.copy.setAttribute('fill', colour); }
       }
       const s = tr.scribble;
       if (s) {
@@ -575,6 +578,44 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       if (raf) cancelAnimationFrame(raf);
     },
   };
+}
+
+/** The shorter turn (degrees, -180..180) from hue a to hue b. */
+function hueDelta(a: number, b: number): number {
+  return ((((b - a) % 360) + 540) % 360) - 180;
+}
+
+/**
+ * The clip for a fill at u (0..1): the part of the box covered from the `from` edge, with a straight leading edge or
+ * a gentle wave (about 2% of the box, three crests across) whose phase rolls with u, so the surface undulates as the
+ * level moves and holds still when it holds.
+ */
+function revealPath(box: [number, number, number, number], from: string, u: number, wave: boolean): string {
+  const [x, y, w, h] = box;
+  if (u <= 0) return 'M0 0Z';
+  const vertical = from === 'bottom' || from === 'top';
+  const span = vertical ? w : h, depth = vertical ? h : w;
+  const amp = wave && u < 1 ? Math.min(depth * 0.02, depth * u * 0.5, depth * (1 - u) * 0.5) : 0;
+  const n = amp > 0 ? 48 : 1;
+  const pts: string[] = [];
+  for (let i = 0; i <= n; i++) {
+    const s = i / n;
+    const off = amp * Math.sin(s * Math.PI * 6 + u * Math.PI * 4);
+    const along = (vertical ? x : y) + s * span;
+    let p: number;
+    if (from === 'bottom') p = y + h * (1 - u) + off;
+    else if (from === 'top') p = y + h * u + off;
+    else if (from === 'left') p = x + w * u + off;
+    else p = x + w * (1 - u) + off;
+    pts.push(vertical ? `${along.toFixed(1)} ${p.toFixed(1)}` : `${p.toFixed(1)} ${along.toFixed(1)}`);
+  }
+  // close along the `from` edge, a little beyond the box so outlines never show a seam
+  const e = 4;
+  if (from === 'bottom') pts.push(`${x + w + e} ${y + h + e}`, `${x - e} ${y + h + e}`);
+  else if (from === 'top') pts.push(`${x + w + e} ${y - e}`, `${x - e} ${y - e}`);
+  else if (from === 'left') pts.push(`${x - e} ${y + h + e}`, `${x - e} ${y - e}`);
+  else pts.push(`${x + w + e} ${y + h + e}`, `${x + w + e} ${y - e}`);
+  return `M${pts.join('L')}Z`;
 }
 
 /**
