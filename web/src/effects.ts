@@ -15,7 +15,7 @@
 //   fill      a vivid copy of the object revealed from an edge (`from`: bottom, top, left, right), one level across
 //             all its shapes, like a drawbar; `edge: "wave"` gives the level a hand-drawn wave that rolls as it moves,
 //             `turn` turns the revealed colour's hue (degrees by the last frame) as it advances, `toward` moves every
-//             shape's revealed colour to one hue instead
+//             shape's revealed colour to one hue instead, `color` moves it to one exact colour
 //   scribble  pencil loops drawn in, clipped to the shape, in the painting's own scribble style (`count` strokes)
 //   boil      the outline redrawn: the lines bend further from their own shape as u grows, a new drawing every
 //             1/12 of the way, so dragging makes them writhe and holding keeps them still; the original at 0
@@ -28,9 +28,9 @@
 // stay. With the system's reduced-motion setting, frames are reached without gliding.
 import type { WebSynthlandHost } from '../runtime/types';
 import { layers, type Art } from './art';
-import { glowColour, hexToOklch, type Oklch } from './color';
+import { glowColour, hexToOklch, mixOklch, oklchToHex, type Oklch } from './color';
 import { positionOf, type Binding, type Ease, type EffectSpec } from './mapping';
-import { fillParts, resolveObject, type ArtObject } from './objects';
+import { fillParts, inkParts, resolveObject, type ArtObject } from './objects';
 
 const SVG = 'http://www.w3.org/2000/svg';
 const HUE_DEG = 60;
@@ -71,7 +71,7 @@ const PAINT_EVERY_MS = 1000 / (LITE ? 20 : PAINT_HZ);
 
 type Fill = { el: SVGPathElement; hex: string; base: Oklch; opacity: number; hue: number; glow: number; written: string };
 type Reveal = {
-  copy: SVGPathElement; clip: SVGPathElement; base: Oklch; glow: number; turn: number;
+  copy: SVGPathElement; clip: SVGPathElement; base: Oklch; glow: number; turn: number; to: Oklch | null;
   box: [number, number, number, number]; from: string; wave: boolean; written: string; colour: string;
 };
 type Scribble = { strokes: SVGPathElement[]; count: number; written: string };
@@ -248,6 +248,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
             tr.reveals.push({
               copy, clip: shape, base: hexToOklch(part.fill), glow: FILL_GLOW * Math.abs(spec.amount),
               turn: spec.toward !== undefined ? hueDelta(hexToOklch(part.fill).h, spec.toward) : spec.turn ?? 0,
+              to: spec.color ? hexToOklch(spec.color) : null,
               box: obj.bbox, from: spec.from ?? 'bottom', wave: spec.edge === 'wave', written: '', colour: '',
             });
           }
@@ -283,10 +284,32 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
         case 'swell':
         case 'lean':
         case 'spin':
-        case 'blink':
+        case 'blink': {
           for (const id of ids) { const el = art.fills.get(id); if (el) tr.targets.push(el); }
-          for (const s of obj.ownInk) { const el = art.ink.get(s); if (el) tr.targets.push(el); }
+          // Restricted to roles (`parts`): those shapes' own centre, base and enclosed ink, not the whole object's.
+          let ink = obj.ownInk;
+          if (spec.parts) {
+            let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, ax = 0, ay = 0, at = 0;
+            for (const id of ids) {
+              const p = fillParts.get(id);
+              if (!p) continue;
+              const [x, y, w, h] = p.bbox;
+              x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x + w); y1 = Math.max(y1, y + h);
+              ax += p.centroid[0] * p.area; ay += p.centroid[1] * p.area; at += p.area;
+            }
+            if (at > 0) {
+              const mw = (x1 - x0) * 0.15, mh = (y1 - y0) * 0.15;
+              tr.centre = [ax / at, ay / at];
+              tr.base = [(x0 + x1) / 2, y1];
+              ink = Array.from(new Set(ids.flatMap((id) => fillParts.get(id)?.ink ?? []))).filter((s) => {
+                const b = inkParts.get(s)?.bbox;
+                return !!b && b[0] >= x0 - mw && b[1] >= y0 - mh && b[0] + b[2] <= x1 + mw && b[1] + b[3] <= y1 + mh;
+              });
+            }
+          }
+          for (const s of ink) { const el = art.ink.get(s); if (el) tr.targets.push(el); }
           break;
+        }
       }
       L.tracks.push(tr);
     }
@@ -363,7 +386,9 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       for (const r of tr.reveals) {
         const d = revealPath(r.box, r.from, u, r.wave);
         if (d !== r.written) { r.written = d; r.clip.setAttribute('d', d); }
-        const colour = glowColour(r.base, r.turn * u, r.glow);
+        const colour = r.to
+          ? oklchToHex(mixOklch(hexToOklch(glowColour(r.base, 0, r.glow)), r.to, u))
+          : glowColour(r.base, r.turn * u, r.glow);
         if (colour !== r.colour) { r.colour = colour; r.copy.setAttribute('fill', colour); }
       }
       const s = tr.scribble;

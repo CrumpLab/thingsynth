@@ -58,6 +58,9 @@ export interface EffectSpec {
   /** fill: a hue (OKLCH degrees, e.g. 50 = orange) the revealed colour moves to as the fill advances, the short way
    * round; every shape of the object converges on it (instead of `turn`, which turns each by the same amount). */
   toward?: number;
+  /** fill: the revealed colour at the last frame (hex); it moves there from the shape's glowing colour as the fill
+   * advances. Overrides `turn` and `toward`. */
+  color?: string;
   /** scribble: how many pencil strokes at full value (default 14). */
   count?: number;
 }
@@ -193,6 +196,10 @@ function parseBinding(raw: unknown, i: number): Binding {
     if (o.turn !== undefined) {
       if (typeof o.turn !== 'number' || Math.abs(o.turn) > 360) fail(w, 'turn must be degrees, -360..360');
       spec.turn = o.turn;
+    }
+    if (o.color !== undefined) {
+      if (typeof o.color !== 'string' || !/^#[0-9a-f]{6}$/i.test(o.color)) fail(w, 'color must be a hex colour like "#9cf27c"');
+      spec.color = o.color;
     }
     if (o.toward !== undefined) {
       if (typeof o.toward !== 'number' || o.toward < 0 || o.toward > 360) fail(w, 'toward must be a hue, 0..360');

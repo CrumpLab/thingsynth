@@ -63,6 +63,12 @@ export function oklchToHex(col: Oklch, maxDarken = 0): string {
   return '#' + rgb.map((v) => v.toString(16).padStart(2, '0')).join('');
 }
 
+/** Mix two colours in OKLCH at u (0..1), the hue the short way round. */
+export function mixOklch(a: Oklch, b: Oklch, u: number): Oklch {
+  const dh = ((((b.h - a.h) % 360) + 540) % 360) - 180;
+  return { l: a.l + (b.l - a.l) * u, c: a.c + (b.c - a.c) * u, h: (a.h + dh * u + 360) % 360 };
+}
+
 const GLOW_CHROMA = 0.09, GLOW_DARKEN = 0.18, GLOW_LIFT = 0.15;
 
 /**

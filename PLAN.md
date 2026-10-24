@@ -148,7 +148,7 @@ span (`web/src/effects.ts`):
 | --- | --- | --- | --- |
 | `glow` | fills | more vivid and more solid: OKLCH chroma +0.09; light colours deepen only as far as needed to hold it, mid and dark colours lift towards light; opacity 60% of the way to solid | |
 | `hue` | fills | the hue turned 60 degrees (negative turns the other way) | |
-| `fill` | fills | a vivid copy of the object fully revealed from an edge, one level across all its shapes, like a drawbar pulled out | `from`: bottom, top, left, right; `edge`: straight or wave (a hand-drawn surface that rolls as it moves); `turn` (degrees the colour turns as it advances) or `toward` (a hue, OKLCH degrees, every shape's colour moves to) |
+| `fill` | fills | a vivid copy of the object fully revealed from an edge, one level across all its shapes, like a drawbar pulled out | `from`: bottom, top, left, right; `edge`: straight or wave (a hand-drawn surface that rolls as it moves); `turn` (degrees the colour turns as it advances), `toward` (a hue, OKLCH degrees, every shape's colour moves to) or `color` (an exact colour it moves to) |
 | `scribble` | fills | pencil loops in the painting's own scribble style, all drawn in, clipped to the shape | `count` (default 14) |
 | `boil` | ink | the outline redrawn, its lines bent up to 12 canvas px; a new drawing every 1/12 of the way, so dragging makes them writhe and holding keeps them still | |
 | `swell` | object | 8% larger about its centre (negative shrinks) | |
@@ -157,7 +157,8 @@ span (`web/src/effects.ts`):
 | `blink` | object | squashed shut towards its centre line, like an eye closing | |
 
 "Object" effects move the object's fills together with the ink strokes enclosed by it (`ownInk`), leaving the
-borders it shares with neighbours in place. (`pulse` and `wobble` in older mappings are read as `swell` and
+borders it shares with neighbours in place; restricted to roles (`parts`), they move those shapes about their own
+centre or base with only the ink those shapes enclose (a bud swelling on a stalk). (`pulse` and `wobble` in older mappings are read as `swell` and
 `lean`.)
 
 Changes glide: 150 ms for a parameter (or the binding's `glide`), about 150 ms for a note to reach its last frame,
@@ -176,6 +177,9 @@ back, for reviewing objects one at a time.
 Objects reworked so far (`docs/objects/`): **pyramid-drive**, molten heat rising: an orange level with a wavy
 surface climbs from the pyramid's base to its apex as Drive goes 0 to 1, both faces converging on one orange as it
 rises; the faces above the level warm from 20%; the outline starts to boil past 55%, easing in.
+**stalk-drawbar-16 and stalk-drawbar-513**, sap rising: a green sap with a wavy surface climbs each stalk with the
+drawbar, turning a luminous light green (#9cf27c) towards the top; each bud on the stalk (roles `bud-1`..) swells
+24% and glows just as the sap reaches its height.
 
 Fill ids (`f001`..) and ink ids (`i0001`..) come from the extractor and are stable as long as the PSD's drawing does
 not change; `?debug`'s parts mode (backquote) shows the id of the shape under the pointer. The parts table also

@@ -48,7 +48,7 @@
     },
     {
       "id": "stalk-drawbar-16",
-      "label": "The left stalk: drag up and down for the Upper 16' drawbar; it fills like a drawbar pulled out",
+      "label": "The left stalk: drag up and down for the Upper 16' drawbar; sap rises and the buds open as it passes",
       "object": "stalk-left",
       "param": "upper.db1",
       "range": [
@@ -60,13 +60,55 @@
       "effects": [
         {
           "effect": "fill",
-          "from": "bottom"
+          "amount": 0.5,
+          "parts": "body",
+          "from": "bottom",
+          "edge": "wave",
+          "color": "#9cf27c"
+        },
+        {
+          "effect": "swell",
+          "amount": 3,
+          "parts": "bud-1",
+          "span": [
+            0.21,
+            0.33
+          ],
+          "ease": "out"
+        },
+        {
+          "effect": "glow",
+          "amount": 0.8,
+          "parts": "bud-1",
+          "span": [
+            0.21,
+            0.33
+          ]
+        },
+        {
+          "effect": "swell",
+          "amount": 3,
+          "parts": "bud-2",
+          "span": [
+            0.55,
+            0.67
+          ],
+          "ease": "out"
+        },
+        {
+          "effect": "glow",
+          "amount": 0.8,
+          "parts": "bud-2",
+          "span": [
+            0.55,
+            0.67
+          ]
         }
       ]
     },
     {
       "id": "stalk-drawbar-513",
-      "label": "The right stalk: drag up and down for the Upper 5 1/3' drawbar",
+      "label": "The right stalk: drag up and down for the Upper 5 1/3' drawbar; sap rises and the buds open as it passes",
       "object": "stalk-right",
       "param": "upper.db2",
       "range": [
@@ -78,7 +120,68 @@
       "effects": [
         {
           "effect": "fill",
-          "from": "bottom"
+          "amount": 0.5,
+          "parts": "body",
+          "from": "bottom",
+          "edge": "wave",
+          "color": "#9cf27c"
+        },
+        {
+          "effect": "swell",
+          "amount": 3,
+          "parts": "bud-1",
+          "span": [
+            0.34,
+            0.46
+          ],
+          "ease": "out"
+        },
+        {
+          "effect": "glow",
+          "amount": 0.8,
+          "parts": "bud-1",
+          "span": [
+            0.34,
+            0.46
+          ]
+        },
+        {
+          "effect": "swell",
+          "amount": 3,
+          "parts": "bud-2",
+          "span": [
+            0.37,
+            0.49
+          ],
+          "ease": "out"
+        },
+        {
+          "effect": "glow",
+          "amount": 0.8,
+          "parts": "bud-2",
+          "span": [
+            0.37,
+            0.49
+          ]
+        },
+        {
+          "effect": "swell",
+          "amount": 3,
+          "parts": "bud-3",
+          "span": [
+            0.61,
+            0.73
+          ],
+          "ease": "out"
+        },
+        {
+          "effect": "glow",
+          "amount": 0.8,
+          "parts": "bud-3",
+          "span": [
+            0.61,
+            0.73
+          ]
         }
       ]
     },
