@@ -132,33 +132,43 @@ A binding names either an `object` from objects.json or a single fill as `"part"
   "effects": [ { "effect": "glow", "amount": 1.3 }, { "effect": "hue", "amount": 0.25 }, { "effect": "boil", "amount": 0.6 } ] }
 ```
 
-The value drawn is a parameter's position in `range` through `curve` (0..1), so a drag, a preset or MIDI all
-move the picture; for a note it is an envelope, velocity/127 with a 10 ms attack and back to 0 over `release`.
-Effects (`web/src/effects.ts`), at amount 1 and value 1; every effect takes optional `parts` (a role or list of
-roles) and `amount`:
+**Each binding is one animation of its object, from a first frame to a last frame, and the frame shown is a
+function of the binding's value and nothing else.** A continuous parameter shows the frame at its position in
+`range` through `curve` (0..1). A note, or an on/off parameter, plays from the first frame to the last when it
+turns on and back when it turns off. Nothing moves on its own: between changes every object holds its frame, and
+the only motion is the glide from one frame to the next when a value changes.
 
-| effect | on | what it does | options |
+An animation is the binding's list of effects, all evaluated at the same frame t. Every effect takes `amount`
+(its strength at the last frame), optional `parts` (a role or list of roles), and optionally `span`, the part of
+the timeline it plays over (`[from, to]`, default `[0, 1]`), and `ease` (`linear`, `in`, `out`, `in-out`), so an
+object can, say, fill over the first half of its timeline and glow over the second. At amount 1 and the end of its
+span (`web/src/effects.ts`):
+
+| effect | on | last frame | options |
 | --- | --- | --- | --- |
 | `glow` | fills | more vivid and more solid: OKLCH chroma +0.09; light colours deepen only as far as needed to hold it, mid and dark colours lift towards light; opacity 60% of the way to solid | |
-| `hue` | fills | turns the hue by 60 degrees (negative turns the other way) | |
-| `fill` | fills | a vivid copy of the shape rises from an edge, like a drawbar pulled out | `from`: bottom, top, left, right |
-| `scribble` | fills | pencil loops in a deeper shade of the shape's colour draw themselves in, clipped to it | `count` (default 14) |
-| `boil` | ink | every outline stroke jitters by up to 10 canvas px and 0.6 degrees, re-drawn 8 times a second; still at 0 | |
-| `pulse` | object | breathes: scale about its centre by up to 5% | `hz` (default 0.6) |
-| `wobble` | object | heat-shimmer sway (10 px) and skew (2 degrees) | `hz` (default 1.6) |
-| `spin` | object | turns about its centre at up to 0.75 rev/s; it stops where it is | |
-| `blink` | object | squashes to 12% height and back in 160 ms, on note-on or when the value rises past half | |
+| `hue` | fills | the hue turned 60 degrees (negative turns the other way) | |
+| `fill` | fills | a vivid copy of the shape fully revealed from an edge, like a drawbar pulled out | `from`: bottom, top, left, right |
+| `scribble` | fills | pencil loops in the painting's own scribble style, all drawn in, clipped to the shape | `count` (default 14) |
+| `boil` | ink | the outline redrawn, its lines bent up to 12 canvas px; a new drawing every 1/12 of the way, so dragging makes them writhe and holding keeps them still | |
+| `swell` | object | 8% larger about its centre (negative shrinks) | |
+| `lean` | object | leaning 10 degrees from its base (negative leans left) | |
+| `spin` | object | turned 180 degrees about its centre | |
+| `blink` | object | squashed shut towards its centre line, like an eye closing | |
 
 "Object" effects move the object's fills together with the ink strokes enclosed by it (`ownInk`), leaving the
-borders it shares with neighbours in place. The painting is redrawn at most 30 times a second: every change inside
-the art SVG re-rasterises the whole painting, and at the display's 120 Hz that backed up into long frames.
+borders it shares with neighbours in place. (`pulse` and `wobble` in older mappings are read as `swell` and
+`lean`.)
 
-Values glide (150 ms, or the binding's `glide`). A preset load travels across the painting as a wave from its
+Changes glide: 150 ms for a parameter (or the binding's `glide`), about 150 ms for a note to reach its last frame,
+the binding's `release` (default 300 ms) to go back. A preset load reaches objects as a wave from the painting's
 centre (up to 450 ms of delay at the corners) with 400 ms glides. Several bindings may touch the same fill or
-stroke: hue turns and glows add up, boils take the largest, motions compose. For a minute after anything is
-played or touched, unbound scenery idles: 40 mid-sized shapes drift in hue by up to 7 degrees, the pencil-scribble
-layer breathes by 6 px, and blinking objects blink now and then; then it fades out over 2 s. With the system's
-reduced-motion setting on, boil, pulse, wobble, spin, blink and idle are off; colours and reveals still follow.
+stroke: hue turns and glows add up, boils take the largest depth, moves compose. The painting is redrawn only while
+something is changing, at most 30 times a second (every change inside the art SVG re-rasterises the whole
+painting). With the system's reduced-motion setting, frames are reached without gliding.
+
+In the bind editor each effect row has its span and easing, and the **Frame** slider scrubs the selected binding's
+animation from its first frame to its last without touching the organ, to see an animation while shaping it.
 
 Fill ids (`f001`..) and ink ids (`i0001`..) come from the extractor and are stable as long as the PSD's drawing does
 not change; `?debug`'s parts mode (backquote) shows the id of the shape under the pointer. The parts table also

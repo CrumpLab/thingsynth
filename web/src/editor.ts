@@ -9,7 +9,7 @@ import rawObjectsJson from '../../art/golden-pyramid-with-tunnel-celebration/obj
 import type { ParamDesc, WebSynthlandHost } from '../runtime/types';
 import { layers } from './art';
 import type { Effects } from './effects';
-import { EFFECTS, parseMapping, type Binding, type EffectKind, type Gesture, type Mapping } from './mapping';
+import { EASES, EFFECTS, parseMapping, type Binding, type EffectKind, type Gesture, type Mapping } from './mapping';
 import { fillParts, loadObjects } from './objects';
 import type { PaintingLayer } from './painting';
 import { noteName } from './shuffle';
@@ -74,18 +74,26 @@ export function mountEditor(d: EditorDeps): void {
   const glide = el('input', { type: 'number', min: '0', step: '50', placeholder: '150', 'aria-label': 'Glide ms' });
   const label = el('input', { type: 'text', placeholder: 'Label (tooltip)', 'aria-label': 'Label' });
   const locked = el('input', { type: 'checkbox', 'aria-label': 'Locked against shuffle' });
-  const fx = new Map<EffectKind, { on: HTMLInputElement; amount: HTMLInputElement; extra?: HTMLInputElement | HTMLSelectElement }>();
+  interface FxRow { on: HTMLInputElement; amount: HTMLInputElement; extra?: HTMLInputElement | HTMLSelectElement; from: HTMLInputElement; to: HTMLInputElement; ease: HTMLSelectElement }
+  const fx = new Map<EffectKind, FxRow>();
   const fxBox = el('div', { class: 'fx' });
   for (const k of EFFECTS) {
     const on = el('input', { type: 'checkbox', id: `fx-${k}` });
-    const amount = el('input', { type: 'number', step: '0.1', value: '1', 'aria-label': `${k} amount` });
+    const amount = el('input', { type: 'number', step: '0.1', value: '1', 'aria-label': `${k} amount`, title: 'amount at the last frame' });
     let extra: HTMLInputElement | HTMLSelectElement | undefined;
     if (k === 'fill') { extra = el('select', { 'aria-label': 'fill from' }); for (const f of ['bottom', 'top', 'left', 'right']) extra.append(el('option', { value: f, text: f })); }
     if (k === 'scribble') extra = el('input', { type: 'number', min: '1', max: '64', value: '14', 'aria-label': 'scribble count' });
-    if (k === 'pulse' || k === 'wobble') extra = el('input', { type: 'number', min: '0.05', step: '0.1', placeholder: k === 'pulse' ? '0.6' : '1.6', 'aria-label': `${k} hz` });
-    fx.set(k, extra ? { on, amount, extra } : { on, amount });
-    fxBox.append(el('label', { for: `fx-${k}` }, on, ` ${k}`), amount, extra ?? el('span'));
+    const from = el('input', { type: 'number', min: '0', max: '1', step: '0.05', value: '0', 'aria-label': `${k} starts at`, title: 'starts at this point of the timeline' });
+    const to = el('input', { type: 'number', min: '0', max: '1', step: '0.05', value: '1', 'aria-label': `${k} ends at`, title: 'ends at this point of the timeline' });
+    const ease = el('select', { 'aria-label': `${k} easing` });
+    for (const e of EASES) ease.append(el('option', { value: e, text: e }));
+    fx.set(k, extra ? { on, amount, extra, from, to, ease } : { on, amount, from, to, ease });
+    fxBox.append(el('label', { for: `fx-${k}` }, on, ` ${k}`), amount, extra ?? el('span'),
+      el('div', { class: 'span' }, el('span', { text: 'span' }), from, to, ease));
   }
+  const frameSlider = el('input', { type: 'range', min: '0', max: '1', step: '0.01', value: '0', 'aria-label': 'Preview frame' });
+  const frameOut = el('span', { class: 'frame-out', text: 'live' });
+  const frameRelease = el('button', { type: 'button', text: 'live', title: 'Back to following the parameter or note' });
   const status = el('div', { class: 'status', role: 'status' });
   const preview = el('button', { type: 'button', text: 'Preview' });
   const save = el('button', { type: 'button', class: 'primary', text: 'Save' });
@@ -98,6 +106,8 @@ export function mountEditor(d: EditorDeps): void {
     row('Object', objSelect), newBox,
     row('Bind to', target, noteNum), row('Gesture', gesture), row('Range', rMin, rMax, curve), row('Glide ms', glide),
     row('Label', label), row('Locked', locked), el('h3', { text: 'Effects' }), fxBox,
+    el('h3', { text: 'Frame' }), el('p', { class: 'hint', text: 'Scrub the saved animation from its first frame to its last; the organ is not touched.' }),
+    row('Frame', frameSlider, frameOut, frameRelease),
     el('div', { class: 'buttons' }, preview, save, remove, copy), status,
   );
   document.body.append(panel);
@@ -153,7 +163,10 @@ export function mountEditor(d: EditorDeps): void {
       const spec = b.effects.find((e) => e.effect === k);
       f.on.checked = !!spec;
       f.amount.value = String(spec?.amount ?? 1);
-      if (f.extra) f.extra.value = String((k === 'fill' ? spec?.from : k === 'scribble' ? spec?.count : spec?.hz) ?? (k === 'fill' ? 'bottom' : k === 'scribble' ? '14' : ''));
+      if (f.extra) f.extra.value = String((k === 'fill' ? spec?.from : spec?.count) ?? (k === 'fill' ? 'bottom' : '14'));
+      f.from.value = String(spec?.span?.[0] ?? 0);
+      f.to.value = String(spec?.span?.[1] ?? 1);
+      f.ease.value = spec?.ease ?? 'linear';
     }
   };
   const onTarget = (): void => {
@@ -220,7 +233,9 @@ export function mountEditor(d: EditorDeps): void {
       const e: Raw = { effect: k, amount: Number(f.amount.value) || 1 };
       if (k === 'fill' && f.extra) e.from = f.extra.value;
       if (k === 'scribble' && f.extra && f.extra.value) e.count = Number(f.extra.value);
-      if ((k === 'pulse' || k === 'wobble') && f.extra && f.extra.value) e.hz = Number(f.extra.value);
+      const a = Number(f.from.value), b = Number(f.to.value);
+      if (!(a === 0 && b === 1)) e.span = [a, b];
+      if (f.ease.value !== 'linear') e.ease = f.ease.value;
       return e;
     });
     const b: Raw = isNote
@@ -292,7 +307,29 @@ export function mountEditor(d: EditorDeps): void {
     void navigator.clipboard?.writeText(text).then(() => say('Copied the binding JSON.'), () => say('Could not copy; see the console.', true));
     console.log('[thingsynth] binding JSON:\n' + text);
   });
+  // Frame: hold the binding being edited at a frame of its animation (as saved, or as previewed).
+  let pinnedId: string | null = null;
+  const currentId = (): string | null => {
+    const t = target.value === 'note' ? `note:${noteNum.value}` : target.value;
+    return bindingFor(t)?.id ?? null;
+  };
+  const unpin = (): void => {
+    if (pinnedId) d.effects?.pin(pinnedId, null);
+    pinnedId = null;
+    frameOut.textContent = 'live';
+  };
+  frameSlider.addEventListener('input', () => {
+    const id = currentId();
+    if (!id) { say('Nothing bound to that yet: save or preview it first.', true); return; }
+    if (pinnedId && pinnedId !== id) d.effects?.pin(pinnedId, null);
+    pinnedId = id;
+    d.effects?.pin(id, Number(frameSlider.value));
+    frameOut.textContent = Number(frameSlider.value).toFixed(2);
+  });
+  frameRelease.addEventListener('click', unpin);
+  target.addEventListener('change', unpin);
   close.addEventListener('click', () => {
+    unpin();
     panel.remove(); hl.remove();
     document.body.classList.remove('editing');
     try { sessionStorage.removeItem(STATE_KEY); } catch { /* storage off */ }

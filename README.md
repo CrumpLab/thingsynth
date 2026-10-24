@@ -67,7 +67,7 @@ web/                    Vite app, plain TypeScript, no framework
   src/painting.ts       the art + an SVG hit layer in image-pixel coordinates, gesture handling
   src/mapping.ts        mapping.json schema (v1 regions, v2 bindings), validation, value curves
   src/objects.ts        art/<slug>/objects.json resolved against the parts table
-  src/effects.ts        the nine effects, note envelopes, the preset wave and idle, on the painting's own paths
+  src/effects.ts        each binding as one animation, first to last frame, set by its value: the nine effects
   src/color.ts          OKLCH colour math with darken-first gamut mapping
   src/wander.ts         preset wander: a random walk per parameter around the preset
   src/dial.ts           the small rotary dial used for wander speed and amount

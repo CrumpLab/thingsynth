@@ -71,7 +71,7 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
     const noteName = (n: number): string => `${names[n % 12]}${Math.floor(n / 12) - 1}`;
     window.setInterval(() => {
       const held = effects.notes();
-      liveLine.textContent = `notes: ${held.length ? held.map(noteName).join(' ') : '-'} · idle ${effects.idle() ? 'on' : 'off'}`;
+      liveLine.textContent = `notes: ${held.length ? held.map(noteName).join(' ') : '-'} · ${effects.moving() ? 'moving' : 'still'}`;
     }, 150);
   }
   document.body.append(hud);

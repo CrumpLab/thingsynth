@@ -11,8 +11,8 @@ the object shows the value but touching it does nothing (routing, tuning and lev
 | `upper.db1` | Upper 16' | stalk-left | drag-y | fill 1 from bottom |  |
 | `upper.db2` | Upper 5 1/3' | stalk-right | drag-y | fill 1 from bottom |  |
 | `leslie.speed` | Rotor Speed | spiral-curl | tap | spin 1 |  |
-| `amp.expression` | Expression | pyramid-worm | drag-y | pulse 1, glow 0.4 |  |
-| `vib.upper` | Vibrato Upper | stream | tap | wobble 1, hue 0.3 parts water |  |
+| `amp.expression` | Expression | pyramid-worm | drag-y | swell 1, glow 0.4 |  |
+| `vib.upper` | Vibrato Upper | stream | tap | lean 1, hue 0.3 parts water |  |
 | `tg.age` | Wheel Age | cloud | drag-x | scribble 1 count 18 |  |
 | `perc.on` | Percussion | bottom-eye | tap | blink 1, glow 1 parts lid |  |
 | `upper.db3` | Upper 8' | mushroom-stem | drag-y | fill 1 from bottom |  |
@@ -33,16 +33,16 @@ the object shows the value but touching it does nothing (routing, tuning and lev
 | `lower.db9` | Lower 1' | horned-collar | drag-y | fill 1 from bottom |  |
 | `pedal.db16` | Pedal 16' | sand-ground | drag-y | fill 1 from bottom |  |
 | `pedal.db8` | Pedal 8' | left-cushion | drag-y | fill 1 from bottom |  |
-| `pedal.sustain` | Pedal Sustain | orange-sprite | drag-y | glow 1, pulse 0.5 |  |
+| `pedal.sustain` | Pedal Sustain | orange-sprite | drag-y | glow 1, swell 0.5 |  |
 | `perc.harmonic` | Perc Harmonic | big-eye | tap | hue 0.6 parts body, blink 1 |  |
 | `perc.decay` | Perc Decay | pink-cap | tap | hue 0.5 |  |
 | `perc.volume` | Perc Volume | straw-saucer | tap | glow -0.8 |  |
 | `vib.mode` | Vibrato | tunnel | tap | hue 1, glow 0.5 |  |
-| `vib.lower` | Vibrato Lower | river-bank | tap | wobble 0.8, glow 0.4 |  |
+| `vib.lower` | Vibrato Lower | river-bank | tap | lean 0.8, glow 0.4 |  |
 | `leslie.on` | Leslie | tunnel-rim | tap | glow 1 |  |
 | `leslie.balance` | Horn/Drum | pink-cloud | drag-x | hue 0.8 |  |
-| `leslie.mic_distance` | Mic Distance | lavender-snout | drag-x | pulse 1, hue 0.4 parts eye |  |
-| `leslie.mic_angle` | Mic Spread | coral-tongue | drag-x | wobble 0.8 |  |
+| `leslie.mic_distance` | Mic Distance | lavender-snout | drag-x | swell 1, hue 0.4 parts eye |  |
+| `leslie.mic_angle` | Mic Spread | coral-tongue | drag-x | lean 0.8 |  |
 | `tg.click` | Key Click | lying-creature | drag-x | boil 1.5, glow 0.3 |  |
 | `tg.click_release` | Release Click | fan-hand | drag-x | boil 1.5 |  |
 | `tg.leakage` | Leakage | splash-bush | drag-x | scribble 1 count 12 |  |

@@ -1,7 +1,9 @@
 # Animation layer: plan for review
 
 *Written 2026-10-24, revised the same day after reading the PSD, approved by Matt the same day.
-Status: milestones 1 to 5 done (see section 6).*
+Status: milestones 1 to 5 done (see section 6). Revised after Matt's review on 2026-10-24: every binding is now
+one animation from a first to a last frame, the frame set by the value alone; nothing moves on its own (see
+PLAN.md section 3.1). The free-running motion, idle drift and boil cycling described below are gone.*
 
 ## 0. In one paragraph
 

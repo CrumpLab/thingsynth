@@ -103,6 +103,11 @@ body.debug .region.obj.note-pad { stroke: #50dcff; stroke-dasharray: 2 3; }
 #editor .row input[type="number"] { width: 64px; }
 #editor .new { display: grid; gap: 4px; margin: 4px 0 4px 70px; }
 #editor .fx { display: grid; grid-template-columns: 1fr 56px 74px; gap: 3px 6px; align-items: center; }
+#editor .fx .span { grid-column: 1 / -1; display: flex; gap: 4px; align-items: center; margin: 0 0 4px 20px; color: var(--muted); }
+#editor .fx .span input { width: 50px !important; }
+#editor .fx .span select { flex: 1; }
+#editor input[type="range"] { flex: 1; accent-color: var(--accent); }
+#editor .frame-out { width: 32px; font: 11px ui-monospace, Menlo, monospace; color: var(--muted); }
 #editor .fx input[type="number"], #editor .fx select { width: 100%; }
 #editor .buttons { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 #editor button { background: #2a1a12; color: var(--fg); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; padding: 3px 9px; font: inherit; cursor: pointer; }

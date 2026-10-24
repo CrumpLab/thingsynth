@@ -1,42 +1,44 @@
-// Effects: draw each binding's value on its object by changing the painting's own paths.
+// Effects: each binding drives one animation of its object, from a first frame (t = 0) to a last frame (t = 1).
+// The frame shown is a function of the binding's value and nothing else: a continuous parameter shows the frame at
+// its position in its range; a note or an on/off parameter plays from the first frame to the last when it turns on
+// and back when it turns off. Nothing moves on its own: between changes every object holds its frame. The only
+// motion is the glide from one frame to the next when a value changes (and a preset load reaching objects as a wave
+// from the painting's centre).
 //
-//   colour   glow      more vivid and more solid: OKLCH chroma up; light colours deepen only as far as needed
-//                      to hold that chroma, mid and dark colours lift towards light (so glow never dims a shape)
-//            hue       turns round the colour wheel, 60 degrees at amount 1
-//   reveal   fill      a vivid copy of the shape rises from an edge (bottom by default), like a drawbar
-//            scribble  pencil loops draw themselves in, clipped to the shape, matched to the painting's own scribble
-//                      layer: its pastel palette, ~10 px grainy pencil at ~55% opacity, long loose loops
-//   motion   boil      the outline strokes are redrawn: three wobbled drawings of each line, cycled 8 times a
-//                      second (the hand-drawn line boil); depth follows the value, the original line at 0
-//            pulse     the object breathes: scale about its centre, depth follows the value
-//            wobble    a heat-shimmer sway and skew, depth follows the value
-//            spin      the object turns about its centre, speed follows the value; it stops where it is
-//            blink     a quick squash and back, on note-on or when the value rises past half
+// An animation is the binding's list of effects, all evaluated at the same t. Each effect may play over part of the
+// timeline (`span`: [from, to], default [0, 1]) with an easing (`ease`: linear, in, out, in-out), so an object can,
+// say, fill during the first half and then glow. At its own local u (0..1), with strength `amount`:
 //
-// A parameter binding's value is the parameter's position in its range (0..1 through the curve), so a drag, a
-// preset or MIDI all move the picture; it glides (150 ms, or the binding's `glide`). A note binding's value is an
-// envelope: velocity/127 with a 10 ms attack, back to 0 over the binding's `release` after note-off. A preset load
-// travels across the painting as a wave from its centre. While anything has happened in the last minute, unbound
-// scenery idles: a slow colour drift, the pencil-scribble layer breathing, an occasional blink. With the system's
-// reduced-motion setting on, the motion effects and idle are off and colours and reveals still follow.
+//   glow      colour more vivid and more solid: OKLCH chroma up; light colours deepen only as far as needed to hold
+//             it, mid and dark colours lift towards light
+//   hue       the colour turns round the wheel, 60 degrees at amount 1 (negative turns the other way)
+//   fill      a vivid copy of the shape revealed from an edge (`from`: bottom, top, left, right), like a drawbar
+//   scribble  pencil loops drawn in, clipped to the shape, in the painting's own scribble style (`count` strokes)
+//   boil      the outline redrawn: the lines bend further from their own shape as u grows, a new drawing every
+//             1/12 of the way, so dragging makes them writhe and holding keeps them still; the original at 0
+//   swell     the object grows about its centre, 8% at amount 1 (negative shrinks)
+//   lean      the object leans from its base, 10 degrees at amount 1 (negative leans left)
+//   spin      the object turns about its centre, 180 degrees at amount 1
+//   blink     the object squashes shut towards its centre line (an eye closing)
+//
+// swell, lean, spin and blink move the object's fills and the ink it encloses; the borders it shares with neighbours
+// stay. With the system's reduced-motion setting, frames are reached without gliding.
 import type { WebSynthlandHost } from '../runtime/types';
 import { layers, type Art } from './art';
-import { glowColour, hexToOklch, oklchToHex, type Oklch } from './color';
-import { positionOf, type Binding, type EffectSpec } from './mapping';
-import { fillParts, inkParts, resolveObject, type ArtObject } from './objects';
+import { glowColour, hexToOklch, type Oklch } from './color';
+import { positionOf, type Binding, type Ease, type EffectSpec } from './mapping';
+import { fillParts, resolveObject, type ArtObject } from './objects';
 
 const SVG = 'http://www.w3.org/2000/svg';
 const HUE_DEG = 60;
 const GLOW_OPACITY = 0.6;
-/** fill: the rising copy is the shape's own colour glowing this much (vivid, lighter for mid and dark colours). */
+/** fill: the revealed copy is the shape's own colour glowing this much (vivid, lighter for mid and dark colours). */
 const FILL_GLOW = 1.4;
-const BOIL_PX = 12, BOIL_HZ = 8, BOIL_DRAWINGS = 3;
-/** Wavelengths of the wobble field in canvas px: long enough that both edges of a stroke move together. */
+/** boil: how far lines bend at u = 1 (canvas px), and how many distinct drawings there are from 0 to 1. */
+const BOIL_PX = 12, BOIL_FRAMES = 12;
+/** Wavelengths of the bending field in canvas px: long enough that both edges of a stroke move together. */
 const BOIL_WAVE: readonly [number, number] = [170, 260];
-const PULSE_DEPTH = 0.05, PULSE_HZ = 0.6;
-const WOBBLE_PX = 10, WOBBLE_DEG = 2, WOBBLE_HZ = 1.6;
-const SPIN_RPS = 0.75;
-const BLINK_MS = 160;
+const SWELL = 0.08, LEAN_DEG = 10, SPIN_DEG = 180, BLINK_SHUT = 0.88;
 const SCRIBBLE_COUNT = 14, SCRIBBLE_WIDTH = 10, SCRIBBLE_OPACITY = 0.55;
 /**
  * The real scribble layer's colours, measured from scribbles.webp (hue share of its pencil pixels): lavender 30%,
@@ -45,63 +47,92 @@ const SCRIBBLE_COUNT = 14, SCRIBBLE_WIDTH = 10, SCRIBBLE_OPACITY = 0.55;
 const SCRIBBLE_PALETTE: ReadonlyArray<[string, number]> = [
   ['#c4a3f0', 30], ['#efe38a', 15], ['#f2a6c6', 13], ['#b38be8', 9], ['#9fbcec', 7], ['#f0d27a', 5], ['#b4e0a2', 5],
 ];
-const GLIDE_MS = 150, PRESET_GLIDE_MS = 400, WAVE_MS = 450;
-const ATTACK_MS = 10;
 /**
- * The painting is redrawn at most this often. Any change inside the art SVG makes the browser re-rasterise the
- * whole painting (one layer of ~1,900 paths), so writing at the display's 120 Hz backs the raster threads up into
- * long frames; 30 Hz ("on twos") keeps motion smooth and matches hand-drawn animation.
+ * Glides, as time constants (ms): a parameter change (or the binding's own `glide`), a preset load, a note playing
+ * its animation to the last frame. A note's way back is its binding's `release` (ms to settle, so release / 3).
+ */
+const GLIDE_MS = 150, PRESET_GLIDE_MS = 400, WAVE_MS = 450, NOTE_ON_MS = 50;
+/**
+ * The painting is redrawn at most this often while something is changing. Any change inside the art SVG makes the
+ * browser re-rasterise the whole painting (one layer of ~1,900 paths), so writing at the display's 120 Hz backs the
+ * raster threads up into long frames.
  */
 const PAINT_HZ = 30;
-/**
- * Lite: small touch screens (phones), or ?lite; ?lite=0 turns it off. The painting is redrawn at most 20 times a
- * second and half as many shapes idle; everything else is the same.
- */
+/** Lite: small touch screens (phones), or ?lite; ?lite=0 turns it off. Redrawn at most 20 times a second. */
 const LITE = ((): boolean => {
   const q = new URLSearchParams(location.search);
   if (q.has('lite')) return q.get('lite') !== '0';
   return matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 800;
 })();
 const PAINT_EVERY_MS = 1000 / (LITE ? 20 : PAINT_HZ);
-const IDLE_AFTER_MS = 60_000, IDLE_FILLS = LITE ? 20 : 40, IDLE_HUE_DEG = 7, IDLE_FADE_MS = 2000, IDLE_HZ = 10, SCRIBBLE_DRIFT_PX = 6;
 
 type Fill = { el: SVGPathElement; hex: string; base: Oklch; opacity: number; hue: number; glow: number; written: string };
-type Move = { spec: EffectSpec; targets: SVGPathElement[]; cx: number; cy: number; phase: number };
 type Reveal = { copy: SVGPathElement; rect: SVGRectElement; box: [number, number, number, number]; from: string; written: string };
 type Scribble = { strokes: SVGPathElement[]; count: number; written: string };
+
+/** One effect of an animation, with what it acts on. */
+interface Track {
+  spec: EffectSpec;
+  span: [number, number];
+  ease: (u: number) => number;
+  /** glow, hue */
+  fills: string[];
+  /** boil */
+  ink: string[];
+  /** fill */
+  reveals: Reveal[];
+  /** scribble */
+  scribble?: Scribble;
+  /** swell, lean, spin, blink: the elements moved, and the centre and base point they move about */
+  targets: SVGPathElement[];
+  centre: [number, number];
+  base: [number, number];
+}
 
 interface Live {
   binding: Binding;
   obj: ArtObject;
+  /** the frame the binding is heading for, and the one shown (0..1) */
   target: number;
   shown: number;
   tau: number;
   startAt: number;
-  hueGlow: Map<string, [number, number]>;
-  boil: Map<string, number>;
-  moves: Move[];
-  reveals: Reveal[];
-  scribbles: Scribble[];
-  spinRate: number;
-  angle: number;
-  blinks: boolean;
-  blinkAt: number;
-  /** Being replaced: fading to 0, then its added elements are removed. */
+  tracks: Track[];
+  /** Being replaced: going back to frame 0, then its added elements are removed. */
   retiring: boolean;
   added: Element[];
+  /** Held at a frame by the editor's Frame slider (the value is ignored meanwhile), or null. */
+  pinned: number | null;
 }
 
 export interface Effects {
-  /** Replace the bindings: unchanged ones stay, new ones fade in and old ones fade out over `handoverMs`. */
+  /** Replace the bindings: unchanged ones stay, new ones play in and old ones play out over `handoverMs`. */
   setBindings(bindings: Binding[], handoverMs?: number): void;
-  /** The value each binding currently shows (0..1), for the debug HUD and tests. */
+  /** The frame each binding currently shows (0..1), for the debug HUD and tests. */
   shown(): Array<{ id: string; value: number }>;
-  /** Notes currently sounding (held or releasing). */
+  /** Notes currently sounding. */
   notes(): number[];
-  idle(): boolean;
+  /** True while frames are gliding; false means every object is holding still. */
+  moving(): boolean;
+  /** Hold a binding at a frame (0..1) regardless of its value, or release it with null (the editor's Frame slider). */
+  pin(bindingId: string, frame: number | null): void;
   /** Lite mode (small touch screens, or ?lite). */
   lite: boolean;
   dispose(): void;
+}
+
+const EASES: Record<Ease, (u: number) => number> = {
+  linear: (u) => u,
+  in: (u) => u * u,
+  out: (u) => 1 - (1 - u) * (1 - u),
+  'in-out': (u) => (u < 0.5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u)),
+};
+
+/** A track's own position (0..1) at the binding's frame t. */
+function local(tr: Track, t: number): number {
+  const [a, b] = tr.span;
+  const u = b > a ? (t - a) / (b - a) : t >= b ? 1 : 0;
+  return tr.ease(Math.max(0, Math.min(1, u)));
 }
 
 function rng(seedText: string): () => number {
@@ -118,13 +149,11 @@ function rng(seedText: string): () => number {
 export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<string, ArtObject>, bindings: Binding[]): Effects {
   const stack = art.stack;
   if (!stack) throw new Error('effects need the layered painting');
-  const motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const instant = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fills = new Map<string, Fill>();
-  // Boil drawings: per stroke, its original outline and wobbled redraws per depth level (cached, made lazily).
   const inkOriginal = new Map<string, string>();
-  const boilCache = new Map<string, string[]>();
+  const boilCache = new Map<string, string>();
   const boilShown = new Map<string, string>();
-  let boilFrame = 0;
   const transformed = new Set<SVGPathElement>();
   let live: Live[] = [];
   const byNote = new Map<number, Live[]>();
@@ -139,8 +168,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     fills.set(id, f);
     return f;
   };
-  // The pencil grain for scribbles: fractal noise as a speckled mask, shared by every scribble group. Static, so it
-  // costs nothing per frame beyond re-rasterising the strokes it masks.
+  // The pencil grain for scribbles: fractal noise as a speckled mask, shared by every scribble group.
   let pencilId = '';
   const pencilFilter = (): string => {
     if (pencilId) return pencilId;
@@ -168,30 +196,26 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     })
     : obj.fills;
 
-  // ---- build: one binding's state and the elements it adds to the painting ------------------------------------------
+  // ---- build: one binding's animation and the elements it adds to the painting --------------------------------------
   const build = (binding: Binding): Live | null => {
     const obj = resolveObject(objects, binding.object);
     if (!obj) return null; // main.ts warns
     const rand = rng(binding.id);
-    const L: Live = {
-      binding, obj, target: 0, shown: 0, tau: binding.glide ?? GLIDE_MS, startAt: 0,
-      hueGlow: new Map(), boil: new Map(), moves: [], reveals: [], scribbles: [],
-      spinRate: 0, angle: 0, blinks: false, blinkAt: -Infinity, retiring: false, added: [],
-    };
+    const L: Live = { binding, obj, target: 0, shown: 0, tau: binding.glide ?? GLIDE_MS, startAt: 0, tracks: [], retiring: false, added: [], pinned: null };
+    const [bx, by, bw, bh] = obj.bbox;
     for (const spec of binding.effects) {
       const ids = partsOf(obj, spec, binding.id);
+      const tr: Track = {
+        spec, span: spec.span ?? [0, 1], ease: EASES[spec.ease ?? 'linear'],
+        fills: [], ink: [], reveals: [], targets: [], centre: obj.centroid, base: [bx + bw / 2, by + bh],
+      };
       switch (spec.effect) {
         case 'glow':
         case 'hue':
-          for (const id of ids) {
-            if (!fillState(id)) continue;
-            const cur = L.hueGlow.get(id) ?? [0, 0];
-            if (spec.effect === 'hue') cur[0] += spec.amount * HUE_DEG; else cur[1] += spec.amount;
-            L.hueGlow.set(id, cur);
-          }
+          tr.fills = ids.filter((id) => fillState(id));
           break;
         case 'boil':
-          for (const s of obj.ink) L.boil.set(s, Math.max(L.boil.get(s) ?? 0, Math.abs(spec.amount)));
+          tr.ink = obj.ink.filter((s) => art.ink.has(s));
           break;
         case 'fill':
           for (const id of ids) {
@@ -209,14 +233,13 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
             const copy = orig.cloneNode(false) as SVGPathElement;
             copy.removeAttribute('id');
             copy.dataset.revealOf = id;
-            const b = hexToOklch(part.fill);
-            copy.setAttribute('fill', glowColour(b, 0, FILL_GLOW * Math.abs(spec.amount)));
+            copy.setAttribute('fill', glowColour(hexToOklch(part.fill), 0, FILL_GLOW * Math.abs(spec.amount)));
             copy.removeAttribute('fill-opacity');
             copy.setAttribute('clip-path', `url(#${clipId})`);
             copy.style.pointerEvents = 'none';
             orig.after(copy);
             L.added.push(copy);
-            L.reveals.push({ copy, rect, box: part.bbox, from: spec.from ?? 'bottom', written: '' });
+            tr.reveals.push({ copy, rect, box: part.bbox, from: spec.from ?? 'bottom', written: '' });
           }
           break;
         case 'scribble': {
@@ -240,34 +263,29 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
           g.setAttribute('stroke-width', String(SCRIBBLE_WIDTH));
           g.setAttribute('filter', `url(#${pencilFilter()})`);
           const count = spec.count ?? SCRIBBLE_COUNT;
-          const [bx, by, bw, bh] = obj.bbox;
           const strokes: SVGPathElement[] = [];
           for (let k = 0; k < count; k++) strokes.push(scribbleStroke(g, rand, bx, by, bw, bh));
           stack.ink.before(g);
           L.added.push(g);
-          L.scribbles.push({ strokes, count, written: '' });
+          tr.scribble = { strokes, count, written: '' };
           break;
         }
-        case 'pulse':
-        case 'wobble':
+        case 'swell':
+        case 'lean':
         case 'spin':
-        case 'blink': {
-          if (!motionOK) break;
-          const targets: SVGPathElement[] = [];
-          for (const id of ids) {
-            const el = art.fills.get(id);
-            if (el) targets.push(el);
-          }
-          for (const s of obj.ownInk) { const el = art.ink.get(s); if (el) targets.push(el); }
-          const m: Move = { spec, targets, cx: obj.centroid[0], cy: obj.centroid[1], phase: rand() * Math.PI * 2 };
-          L.moves.push(m);
-          if (spec.effect === 'blink') L.blinks = true;
+        case 'blink':
+          for (const id of ids) { const el = art.fills.get(id); if (el) tr.targets.push(el); }
+          for (const s of obj.ownInk) { const el = art.ink.get(s); if (el) tr.targets.push(el); }
           break;
-        }
       }
+      L.tracks.push(tr);
     }
     // Reveal copies move with their originals.
-    for (const m of L.moves) for (const r of L.reveals) if (m.targets.some((t) => t.id === r.copy.dataset.revealOf)) m.targets.push(r.copy);
+    const copies = L.tracks.flatMap((t) => t.reveals);
+    for (const t of L.tracks) {
+      if (!t.targets.length) continue;
+      for (const r of copies) if (t.targets.some((el) => el.id === r.copy.dataset.revealOf)) t.targets.push(r.copy);
+    }
     return L;
   };
   const retire = (L: Live): void => {
@@ -289,47 +307,32 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
   }
   indexNotes();
 
-  // ---- idle scenery: unbound mid-sized fills, a deterministic sample (re-chosen when the bindings change) ----------
-  let idleFills: Array<{ id: string; period: number; phase: number }> = [];
-  const chooseIdle = (): void => {
-    const bound = new Set(live.filter((L) => !L.retiring).flatMap((L) => L.obj.fills));
-    const idleRand = rng('idle');
-    idleFills = Array.from(fillParts.values())
-      .filter((f) => !bound.has(f.id) && f.area > 15_000 && f.area < 200_000)
-      .map((f) => ({ f, k: idleRand() }))
-      .sort((a, b) => a.k - b.k)
-      .slice(0, IDLE_FILLS)
-      .map(({ f }) => ({ id: f.id, period: 7000 + idleRand() * 6000, phase: idleRand() * Math.PI * 2 }))
-      .filter((x) => fillState(x.id));
-  };
-  chooseIdle();
-
   // ---- values -------------------------------------------------------------------------------------------------------
   const read = (L: Live): number => (L.binding.kind === 'param' ? positionOf(L.binding, host.get(L.binding.param)) : L.target);
   for (const L of live) if (L.binding.kind === 'param') L.target = L.shown = read(L);
+  const glideOf = (ms: number): number => (instant ? 0 : ms);
 
   const [px, py, pw, ph] = layers.painted;
   const origin: [number, number] = [px + pw / 2, py + ph / 2];
   const maxDist = Math.hypot(pw / 2, ph / 2);
 
-  let raf = 0, last = 0, lastBoil = 0, lastIdle = 0, nextIdleBlink = 0, lastPaint = 0, motionDt = 0;
-  let lastActivity = -Infinity;
-  let idleLevel = 0;
-  /** Set when values moved since the last colour paint (a glide may settle between two paints). */
-  let colourDirty = false;
+  let raf = 0, last = 0, lastPaint = 0;
+  let dirty = true;
+  let moving = false;
   let disposed = false;
-  const activity = (): void => { lastActivity = performance.now(); };
 
-  // ---- painting -----------------------------------------------------------------------------------------------------
-  const paintColours = (now: number): void => {
+  // ---- painting: every frame is computed from the bindings' frames alone ----------------------------------------------
+  const paint = (): void => {
+    // Colours
     for (const f of fills.values()) { f.hue = 0; f.glow = 0; }
-    for (const L of live) for (const [id, [hue, glow]] of L.hueGlow) {
-      const f = fills.get(id);
-      if (f) { f.hue += hue * L.shown; f.glow += glow * L.shown; }
-    }
-    if (idleLevel > 0) for (const x of idleFills) {
-      const f = fills.get(x.id);
-      if (f) f.hue += IDLE_HUE_DEG * idleLevel * Math.sin((2 * Math.PI * now) / x.period + x.phase);
+    for (const L of live) for (const tr of L.tracks) {
+      if (!tr.fills.length) continue;
+      const u = local(tr, L.shown);
+      for (const id of tr.fills) {
+        const f = fills.get(id);
+        if (!f) continue;
+        if (tr.spec.effect === 'hue') f.hue += tr.spec.amount * HUE_DEG * u; else f.glow += tr.spec.amount * u;
+      }
     }
     for (const f of fills.values()) {
       const g = Math.max(-1, Math.min(1.5, f.glow));
@@ -342,106 +345,55 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       f.el.setAttribute('fill', col);
       if (op < 1) f.el.setAttribute('fill-opacity', op.toFixed(3)); else f.el.removeAttribute('fill-opacity');
     }
-  };
 
-  const paintReveals = (): void => {
-    for (const L of live) {
-      const v = Math.max(0, Math.min(1, L.shown));
-      for (const r of L.reveals) {
+    // Reveals and scribbles
+    for (const L of live) for (const tr of L.tracks) {
+      if (!tr.reveals.length && !tr.scribble) continue;
+      const u = local(tr, L.shown);
+      for (const r of tr.reveals) {
         const [x, y, w, h] = r.box;
         let rx = x, ry = y, rw = w, rh = h;
-        if (r.from === 'bottom') { ry = y + h * (1 - v); rh = h * v; }
-        else if (r.from === 'top') rh = h * v;
-        else if (r.from === 'left') rw = w * v;
-        else { rx = x + w * (1 - v); rw = w * v; }
+        if (r.from === 'bottom') { ry = y + h * (1 - u); rh = h * u; }
+        else if (r.from === 'top') rh = h * u;
+        else if (r.from === 'left') rw = w * u;
+        else { rx = x + w * (1 - u); rw = w * u; }
         const key = `${rx.toFixed(1)} ${ry.toFixed(1)} ${rw.toFixed(1)} ${rh.toFixed(1)}`;
         if (key === r.written) continue;
         r.written = key;
         r.rect.setAttribute('x', rx.toFixed(1)); r.rect.setAttribute('y', ry.toFixed(1));
         r.rect.setAttribute('width', rw.toFixed(1)); r.rect.setAttribute('height', rh.toFixed(1));
       }
-      for (const s of L.scribbles) {
-        const drawn = v * s.count;
+      const s = tr.scribble;
+      if (s) {
+        const drawn = u * s.count;
         const key = drawn.toFixed(3);
-        if (key === s.written) continue;
-        s.written = key;
-        s.strokes.forEach((p, i) => p.setAttribute('stroke-dashoffset', (1 - Math.max(0, Math.min(1, drawn - i))).toFixed(3)));
+        if (key !== s.written) {
+          s.written = key;
+          s.strokes.forEach((p, i) => p.setAttribute('stroke-dashoffset', (1 - Math.max(0, Math.min(1, drawn - i))).toFixed(3)));
+        }
       }
     }
-  };
 
-  /** Motion: transforms per element, composed from every binding that moves it, plus the boil. */
-  const paintMotion = (now: number, dt: number, reroll: boolean): boolean => {
-    let busy = false;
+    // Moves: one transform per element, composed from every track that moves it.
     const parts = new Map<SVGPathElement, string[]>();
     const add = (el: SVGPathElement, t: string): void => { const l = parts.get(el); if (l) l.push(t); else parts.set(el, [t]); };
-    const t = now / 1000;
-    for (const L of live) {
-      const v = L.shown;
-      for (const m of L.moves) {
-        const { cx, cy } = m;
-        let tr = '';
-        if (m.spec.effect === 'pulse' && v > 1e-3) {
-          const s = 1 + m.spec.amount * PULSE_DEPTH * v * Math.sin(2 * Math.PI * (m.spec.hz ?? PULSE_HZ) * t + m.phase);
-          tr = `translate(${cx.toFixed(1)} ${cy.toFixed(1)}) scale(${s.toFixed(4)}) translate(${(-cx).toFixed(1)} ${(-cy).toFixed(1)})`;
-          busy = true;
-        } else if (m.spec.effect === 'wobble' && v > 1e-3) {
-          const hz = m.spec.hz ?? WOBBLE_HZ;
-          const dx = m.spec.amount * WOBBLE_PX * v * Math.sin(2 * Math.PI * hz * t + m.phase);
-          const k = m.spec.amount * WOBBLE_DEG * v * Math.sin(2 * Math.PI * hz * 1.3 * t + m.phase * 1.7);
-          tr = `translate(${(cx + dx).toFixed(1)} ${cy.toFixed(1)}) skewX(${k.toFixed(3)}) translate(${(-cx).toFixed(1)} ${(-cy).toFixed(1)})`;
-          busy = true;
-        } else if (m.spec.effect === 'spin') {
-          const rate = m.spec.amount * SPIN_RPS * v;
-          if (Math.abs(rate) > 1e-4) { L.angle = (L.angle + 360 * rate * (dt / 1000)) % 360; busy = true; }
-          if (Math.abs(L.angle) > 0.01) tr = `rotate(${L.angle.toFixed(2)} ${cx.toFixed(1)} ${cy.toFixed(1)})`;
-        } else if (m.spec.effect === 'blink') {
-          const p = (now - L.blinkAt) / BLINK_MS;
-          if (p >= 0 && p < 1) {
-            const s = 1 - 0.88 * Math.abs(m.spec.amount) * Math.sin(Math.PI * p);
-            tr = `translate(${cx.toFixed(1)} ${cy.toFixed(1)}) scale(1 ${s.toFixed(3)}) translate(${(-cx).toFixed(1)} ${(-cy).toFixed(1)})`;
-            busy = true;
-          }
-        }
-        if (tr) for (const el of m.targets) add(el, tr);
-      }
-    }
-    // Boil: depth per stroke = the largest from any binding, in quarter steps; the next drawing every 1/BOIL_HZ s.
-    const amp = new Map<string, number>();
-    if (motionOK) for (const L of live) for (const [id, a] of L.boil) amp.set(id, Math.max(amp.get(id) ?? 0, a * L.shown));
-    if (reroll) boilFrame = (boilFrame + 1) % BOIL_DRAWINGS;
-    for (const [id, a] of amp) {
-      const el = art.ink.get(id);
-      if (!el) continue;
-      const level = Math.min(8, Math.round(a * 4)); // 0, 0.25 .. 2 (amounts above 1 boil harder)
-      if (!inkOriginal.has(id)) inkOriginal.set(id, el.getAttribute('d') ?? '');
-      const orig = inkOriginal.get(id)!;
-      let d = orig;
-      if (level > 0) {
-        busy = true;
-        const key = `${id}@${level}`;
-        let drawings = boilCache.get(key);
-        if (!drawings) {
-          drawings = Array.from({ length: BOIL_DRAWINGS }, (_, k) => wobblePath(orig, (BOIL_PX * level) / 4, rng(`${id}#${k}`)));
-          boilCache.set(key, drawings);
-        }
-        // Strokes start at different drawings so neighbours do not all flip on the same beat.
-        d = drawings[(boilFrame + id.charCodeAt(id.length - 1)) % BOIL_DRAWINGS]!;
-      }
-      if ((boilShown.get(id) ?? orig) === d) continue;
-      boilShown.set(id, d);
-      el.setAttribute('d', d);
-    }
-    // Strokes no binding boils any more go back to their own line.
-    for (const [id, d] of boilShown) {
-      if (amp.has(id)) continue;
-      const orig = inkOriginal.get(id);
-      if (orig !== undefined && d !== orig) art.ink.get(id)?.setAttribute('d', orig);
-      boilShown.delete(id);
+    const about = ([x, y]: [number, number], inner: string): string =>
+      `translate(${x.toFixed(1)} ${y.toFixed(1)}) ${inner} translate(${(-x).toFixed(1)} ${(-y).toFixed(1)})`;
+    for (const L of live) for (const tr of L.tracks) {
+      if (!tr.targets.length) continue;
+      const u = local(tr, L.shown);
+      if (u < 1e-4) continue;
+      const a = tr.spec.amount;
+      let t = '';
+      if (tr.spec.effect === 'swell') t = about(tr.centre, `scale(${(1 + a * SWELL * u).toFixed(4)})`);
+      else if (tr.spec.effect === 'lean') t = about(tr.base, `skewX(${(-a * LEAN_DEG * u).toFixed(3)})`);
+      else if (tr.spec.effect === 'spin') t = `rotate(${(a * SPIN_DEG * u).toFixed(2)} ${tr.centre[0].toFixed(1)} ${tr.centre[1].toFixed(1)})`;
+      else if (tr.spec.effect === 'blink') t = about(tr.centre, `scale(1 ${(1 - BLINK_SHUT * Math.min(1, Math.abs(a)) * u).toFixed(4)})`);
+      if (t) for (const el of tr.targets) add(el, t);
     }
     for (const [el, list] of parts) {
-      const s = list.join(' ');
-      if (el.getAttribute('transform') !== s) el.setAttribute('transform', s);
+      const t = list.join(' ');
+      if (el.getAttribute('transform') !== t) el.setAttribute('transform', t);
       transformed.add(el);
     }
     for (const el of Array.from(transformed)) {
@@ -449,138 +401,132 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       el.removeAttribute('transform');
       transformed.delete(el);
     }
-    return busy;
+
+    // Boil: per stroke, the depth is the largest any track asks for; the drawing is the one for that depth.
+    const depth = new Map<string, number>();
+    for (const L of live) for (const tr of L.tracks) {
+      if (!tr.ink.length) continue;
+      const v = Math.abs(tr.spec.amount) * local(tr, L.shown);
+      for (const id of tr.ink) depth.set(id, Math.max(depth.get(id) ?? 0, v));
+    }
+    for (const [id, v] of depth) {
+      const el = art.ink.get(id);
+      if (!el) continue;
+      if (!inkOriginal.has(id)) inkOriginal.set(id, el.getAttribute('d') ?? '');
+      const orig = inkOriginal.get(id)!;
+      const k = Math.min(BOIL_FRAMES * 2, Math.round(v * BOIL_FRAMES));
+      let d = orig;
+      if (k > 0) {
+        const key = `${id}@${k}`;
+        let drawn = boilCache.get(key);
+        if (drawn === undefined) {
+          drawn = wobblePath(orig, (BOIL_PX * k) / BOIL_FRAMES, rng(id), k * 0.9);
+          boilCache.set(key, drawn);
+        }
+        d = drawn;
+      }
+      if ((boilShown.get(id) ?? orig) === d) continue;
+      boilShown.set(id, d);
+      el.setAttribute('d', d);
+    }
+    for (const [id, d] of boilShown) {
+      if (depth.has(id)) continue;
+      const orig = inkOriginal.get(id);
+      if (orig !== undefined && d !== orig) art.ink.get(id)?.setAttribute('d', orig);
+      boilShown.delete(id);
+    }
   };
 
-  // ---- the loop -----------------------------------------------------------------------------------------------------
+  // ---- the loop runs only while some frame is gliding -------------------------------------------------------------
   const frame = (now: number): void => {
     raf = 0;
     if (disposed) return;
     const dt = last ? Math.max(0, now - last) : 16;
     last = now;
-    let moving = false;
+    moving = false;
     if (live.some((L) => L.retiring && L.shown === 0)) {
       for (const L of live) if (L.retiring && L.shown === 0) retire(L);
       live = live.filter((L) => !(L.retiring && L.shown === 0));
-      colourDirty = true;
+      dirty = true;
     }
     for (const L of live) {
       if (now < L.startAt) { moving = true; continue; }
       const d = L.target - L.shown;
       if (d === 0) continue;
-      colourDirty = true;
+      dirty = true;
       if (Math.abs(d) < 1e-3) L.shown = L.target;
       else { L.shown += d * (L.tau > 0 ? 1 - Math.exp(-dt / L.tau) : 1); moving = true; }
     }
-    // Idle fades in while there has been activity in the last minute, and out after.
-    const idleWanted = motionOK && now - lastActivity < IDLE_AFTER_MS ? 1 : 0;
-    if (idleLevel !== idleWanted) {
-      const step = dt / IDLE_FADE_MS;
-      idleLevel = idleWanted > idleLevel ? Math.min(1, idleLevel + step) : Math.max(0, idleLevel - step);
-    }
-    const idleTick = idleLevel > 0 && now - lastIdle >= 1000 / IDLE_HZ;
-    if (idleTick) {
-      lastIdle = now;
-      const dx = SCRIBBLE_DRIFT_PX * idleLevel * Math.sin(now / 2300), dy = SCRIBBLE_DRIFT_PX * idleLevel * Math.cos(now / 3100);
-      stack.scribbles.setAttribute('transform', `translate(${dx.toFixed(1)} ${dy.toFixed(1)})`);
-      if (idleLevel === 1 && now >= nextIdleBlink) {
-        const blinkers = live.filter((L) => L.blinks);
-        const pick = blinkers[Math.floor(Math.random() * blinkers.length)];
-        if (pick && nextIdleBlink > 0) pick.blinkAt = now;
-        nextIdleBlink = now + 4000 + Math.random() * 5000;
-      }
-    } else if (idleLevel === 0 && stack.scribbles.hasAttribute('transform')) stack.scribbles.removeAttribute('transform');
-    // Values advance every frame; the DOM is written at most PAINT_HZ times a second (spin integrates the time
-    // between writes so its speed is exact).
-    motionDt += dt;
-    let busy = true;
-    if (now - lastPaint >= PAINT_EVERY_MS - 1) {
+    if (dirty && now - lastPaint >= PAINT_EVERY_MS - 1) {
       lastPaint = now;
-      if (colourDirty || idleTick || idleLevel !== idleWanted) { paintColours(now); colourDirty = false; }
-      paintReveals();
-      const reroll = now - lastBoil >= 1000 / BOIL_HZ;
-      if (reroll) lastBoil = now;
-      busy = paintMotion(now, motionDt, reroll);
-      motionDt = 0;
+      dirty = false;
+      paint();
     }
-    if (moving || busy || idleLevel > 0 || idleWanted > 0) raf = requestAnimationFrame(frame);
-    else { last = 0; motionDt = 0; }
+    if (moving || dirty) raf = requestAnimationFrame(frame);
+    else last = 0;
   };
   const kick = (): void => {
     if (disposed) return;
     if (document.hidden) {
       // No frames in a background tab: jump to the targets so the picture is right when it is shown again.
       for (const L of live) { L.shown = L.target; L.startAt = 0; }
-      paintColours(performance.now());
-      paintReveals();
+      paint();
+      dirty = false;
       return;
     }
     if (!raf) raf = requestAnimationFrame(frame);
   };
 
-  // ---- inputs -------------------------------------------------------------------------------------------------------
+  // ---- inputs: parameters, presets, notes -------------------------------------------------------------------------
   const offParam = host.onParam((id) => {
     let hit = false;
     for (const L of live) {
-      if (L.retiring || L.binding.kind !== 'param' || L.binding.param !== id) continue;
-      const before = L.target;
+      if (L.retiring || L.pinned !== null || L.binding.kind !== 'param' || L.binding.param !== id) continue;
       L.target = read(L);
-      L.tau = L.binding.glide ?? GLIDE_MS;
+      L.tau = glideOf(L.binding.glide ?? GLIDE_MS);
       L.startAt = 0;
-      if (L.blinks && before < 0.5 && L.target >= 0.5) L.blinkAt = performance.now();
       hit = true;
     }
-    // Only once audio runs: the boot-time preset load is not anybody playing.
-    if (host.audio.running()) activity();
-    if (hit || (idleLevel === 0 && host.audio.running())) kick();
+    if (hit) kick();
   });
   const offPreset = host.onPreset((index) => {
     if (index < 0) return; // an edit, not a load
     const now = performance.now();
     for (const L of live) {
-      if (L.retiring || L.binding.kind !== 'param') continue;
+      if (L.retiring || L.pinned !== null || L.binding.kind !== 'param') continue;
       L.target = read(L);
-      L.tau = L.binding.glide ?? PRESET_GLIDE_MS;
+      L.tau = glideOf(L.binding.glide ?? PRESET_GLIDE_MS);
       const [cx, cy] = L.obj.centroid;
-      L.startAt = now + (WAVE_MS * Math.hypot(cx - origin[0], cy - origin[1])) / maxDist;
+      L.startAt = instant ? 0 : now + (WAVE_MS * Math.hypot(cx - origin[0], cy - origin[1])) / maxDist;
     }
     kick();
   });
 
-  // Notes: wrap the host's note functions, which the computer keyboard, Web MIDI and touch all go through.
+  // Notes: wrap the host's note functions, which the computer keyboard, Web MIDI and touch all go through. Note-on
+  // plays the animation to its last frame; note-off plays it back over the binding's release.
   const origOn = host.noteOn.bind(host), origOff = host.noteOff.bind(host);
   const sounding = new Set<number>();
   host.noteOn = (note, velocity) => {
     origOn(note, velocity);
     sounding.add(note);
-    activity();
-    const now = performance.now();
-    for (const L of byNote.get(note) ?? []) {
-      L.target = Math.max(0, Math.min(1, velocity / 127));
-      L.tau = ATTACK_MS;
-      L.startAt = 0;
-      if (L.blinks) L.blinkAt = now;
-    }
+    for (const L of byNote.get(note) ?? []) { if (L.pinned !== null) continue; L.target = 1; L.tau = glideOf(NOTE_ON_MS); L.startAt = 0; }
     kick();
   };
   host.noteOff = (note) => {
     origOff(note);
     sounding.delete(note);
-    activity();
     for (const L of byNote.get(note) ?? []) {
+      if (L.pinned !== null) continue;
       L.target = 0;
-      L.tau = L.binding.kind === 'note' ? L.binding.release / 3 : GLIDE_MS;
+      L.tau = glideOf(L.binding.kind === 'note' ? L.binding.release / 3 : GLIDE_MS);
     }
     kick();
   };
-  const onPointer = (): void => { activity(); kick(); };
-  window.addEventListener('pointerdown', onPointer, { passive: true });
   const onVis = (): void => { if (!document.hidden) kick(); };
   document.addEventListener('visibilitychange', onVis);
 
-  paintColours(performance.now());
-  paintReveals();
-  kick();
+  paint();
+  dirty = false;
 
   const setBindings = (next: Binding[], handoverMs = 1200): void => {
     const key = (b: Binding): string => JSON.stringify(b);
@@ -594,15 +540,14 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       if (!L) continue;
       L.shown = 0;
       L.target = L.binding.kind === 'param' ? read(L) : 0;
-      L.tau = handoverMs / 3;
+      L.tau = glideOf(handoverMs / 3);
       fresh.push(L);
     }
     const leaving = Array.from(old.values());
-    for (const L of leaving) { L.retiring = true; L.target = 0; L.tau = handoverMs / 3; L.startAt = 0; }
+    for (const L of leaving) { L.retiring = true; L.target = 0; L.tau = glideOf(handoverMs / 3); L.startAt = 0; }
     live = [...fresh, ...leaving, ...live.filter((L) => L.retiring)];
     indexNotes();
-    chooseIdle();
-    colourDirty = true;
+    dirty = true;
     kick();
   };
 
@@ -610,13 +555,22 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     setBindings,
     shown: () => live.filter((L) => !L.retiring).map((L) => ({ id: L.binding.id, value: L.shown })),
     notes: () => Array.from(sounding).sort((a, b) => a - b),
-    idle: () => idleLevel > 0,
+    moving: () => raf !== 0 || moving,
+    pin: (bindingId, frame) => {
+      for (const L of live) {
+        if (L.retiring || L.binding.id !== bindingId) continue;
+        L.pinned = frame === null ? null : Math.max(0, Math.min(1, frame));
+        L.target = L.pinned ?? (L.binding.kind === 'param' ? read(L) : sounding.has(L.binding.note) ? 1 : 0);
+        L.tau = glideOf(60);
+        L.startAt = 0;
+      }
+      kick();
+    },
     lite: LITE,
     dispose: () => {
       disposed = true;
       offParam(); offPreset();
       host.noteOn = origOn; host.noteOff = origOff;
-      window.removeEventListener('pointerdown', onPointer);
       document.removeEventListener('visibilitychange', onVis);
       if (raf) cancelAnimationFrame(raf);
     },
@@ -657,12 +611,12 @@ function scribbleStroke(into: SVGGElement, rand: () => number, bx: number, by: n
 }
 
 /**
- * One redrawn version of an outline: every point of the path is pushed by a smooth wobble field (two crossed sine
- * waves per axis with random phases), so both edges of a stroke move together and the line bends along its length
- * instead of breaking up. The path is Fresco's absolute M/C/Z; numbers come in x y pairs.
+ * One redrawn version of an outline: every point of the path is pushed by a smooth field (two crossed sine waves per
+ * axis with phases from the stroke's id, moved on by `shift`), so both edges of a stroke move together and the line
+ * bends along its length instead of breaking up. The path is Fresco's absolute M/C/Z; numbers come in x y pairs.
  */
-function wobblePath(d: string, px: number, rand: () => number): string {
-  const [p0, p1, p2, p3] = [rand(), rand(), rand(), rand()].map((v) => v * Math.PI * 2) as [number, number, number, number];
+function wobblePath(d: string, px: number, rand: () => number, shift = 0): string {
+  const [p0, p1, p2, p3] = [rand(), rand(), rand(), rand()].map((v) => v * Math.PI * 2 + shift) as [number, number, number, number];
   const [l1, l2] = BOIL_WAVE;
   const tokens = d.match(/[MCZmcz]|-?\d+\.?\d*(?:e[-+]?\d+)?/gi) ?? [];
   let out = '';

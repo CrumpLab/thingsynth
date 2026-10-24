@@ -91,7 +91,7 @@
     },
     {
       "id": "worm-expression",
-      "label": "The worm breathes with Expression: drag up and down",
+      "label": "The worm swells with Expression: drag up and down",
       "object": "pyramid-worm",
       "param": "amp.expression",
       "range": [
@@ -102,7 +102,7 @@
       "gesture": "drag-y",
       "effects": [
         {
-          "effect": "pulse",
+          "effect": "swell",
           "amount": 1
         },
         {
@@ -113,7 +113,7 @@
     },
     {
       "id": "stream-vibrato",
-      "label": "The stream shimmers while vibrato is on for the upper manual: tap to switch",
+      "label": "The stream leans while vibrato is on for the upper manual: tap to switch",
       "object": "stream",
       "param": "vib.upper",
       "range": [
@@ -125,7 +125,7 @@
       "glide": 300,
       "effects": [
         {
-          "effect": "wobble",
+          "effect": "lean",
           "amount": 1
         },
         {
@@ -517,7 +517,7 @@
           "amount": 1
         },
         {
-          "effect": "pulse",
+          "effect": "swell",
           "amount": 0.5
         }
       ]
@@ -604,7 +604,7 @@
     },
     {
       "id": "vib-lower",
-      "label": "The river bank shimmers while vibrato is on for the lower manual: tap",
+      "label": "The river bank leans while vibrato is on for the lower manual: tap",
       "object": "river-bank",
       "param": "vib.lower",
       "range": [
@@ -616,7 +616,7 @@
       "glide": 300,
       "effects": [
         {
-          "effect": "wobble",
+          "effect": "lean",
           "amount": 0.8
         },
         {
@@ -663,7 +663,7 @@
     },
     {
       "id": "leslie-mic-distance",
-      "label": "The lavender snout breathes with the microphone distance: drag across",
+      "label": "The lavender snout swells with the microphone distance: drag across",
       "object": "lavender-snout",
       "param": "leslie.mic_distance",
       "range": [
@@ -674,7 +674,7 @@
       "gesture": "drag-x",
       "effects": [
         {
-          "effect": "pulse",
+          "effect": "swell",
           "amount": 1
         },
         {
@@ -686,7 +686,7 @@
     },
     {
       "id": "leslie-mic-angle",
-      "label": "The coral tongue sways with the microphone spread: drag across",
+      "label": "The coral tongue leans with the microphone spread: drag across",
       "object": "coral-tongue",
       "param": "leslie.mic_angle",
       "range": [
@@ -697,14 +697,14 @@
       "gesture": "drag-x",
       "effects": [
         {
-          "effect": "wobble",
+          "effect": "lean",
           "amount": 0.8
         }
       ]
     },
     {
       "id": "tg-click",
-      "label": "The lying creature jitters with Key Click: drag across",
+      "label": "The lying creature boils with Key Click: drag across",
       "object": "lying-creature",
       "param": "tg.click",
       "range": [
@@ -726,7 +726,7 @@
     },
     {
       "id": "tg-click-release",
-      "label": "The fan hand jitters with Release Click: drag across",
+      "label": "The fan hand boils with Release Click: drag across",
       "object": "fan-hand",
       "param": "tg.click_release",
       "range": [

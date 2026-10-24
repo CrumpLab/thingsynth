@@ -31,18 +31,24 @@ export interface RegionEntry extends Control {
   region: RegionShape;
 }
 
-export type EffectKind = 'glow' | 'hue' | 'boil' | 'fill' | 'pulse' | 'wobble' | 'scribble' | 'spin' | 'blink';
-export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'boil', 'fill', 'pulse', 'wobble', 'scribble', 'spin', 'blink'];
+export type EffectKind = 'glow' | 'hue' | 'fill' | 'scribble' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
+export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'fill', 'scribble', 'boil', 'swell', 'lean', 'spin', 'blink'];
+/** Older names still read: pulse and wobble were free-running; as frames of the timeline they are swell and lean. */
+const EFFECT_ALIASES: Record<string, EffectKind> = { pulse: 'swell', wobble: 'lean' };
 export type FillFrom = 'bottom' | 'top' | 'left' | 'right';
+export type Ease = 'linear' | 'in' | 'out' | 'in-out';
+export const EASES: readonly Ease[] = ['linear', 'in', 'out', 'in-out'];
 
 export interface EffectSpec {
   effect: EffectKind;
   /** Roles from the object's `parts` to apply to; omitted = every fill of the object. */
   parts?: string[];
-  /** Strength, 1 = the effect's full designed range; negative reverses hue and spin direction. */
+  /** Strength at the last frame, 1 = the effect's designed range; negative reverses direction. */
   amount: number;
-  /** pulse, wobble: cycles per second (defaults 0.6 and 1.6). */
-  hz?: number;
+  /** The part of the binding's timeline (0..1) this effect plays over, default [0, 1]. */
+  span?: [number, number];
+  /** How it moves through its span: linear (default), in (slow start), out (slow end), in-out. */
+  ease?: Ease;
   /** fill: the edge the colour rises from (default bottom). */
   from?: FillFrom;
   /** scribble: how many pencil strokes at full value (default 14). */
@@ -154,11 +160,20 @@ function parseBinding(raw: unknown, i: number): Binding {
     const w = `${where}.effects[${k}]`;
     if (!e || typeof e !== 'object') fail(w, 'not an object');
     const o = e as Record<string, unknown>;
-    if (!EFFECTS.includes(o.effect as EffectKind)) fail(w, `effect must be one of ${EFFECTS.join(', ')}`);
-    const spec: EffectSpec = { effect: o.effect as EffectKind, amount: typeof o.amount === 'number' ? o.amount : 1 };
-    if (o.hz !== undefined) {
-      if (typeof o.hz !== 'number' || o.hz <= 0) fail(w, 'hz must be a positive number');
-      spec.hz = o.hz;
+    const kind = (typeof o.effect === 'string' && EFFECT_ALIASES[o.effect]) || o.effect;
+    if (!EFFECTS.includes(kind as EffectKind)) fail(w, `effect must be one of ${EFFECTS.join(', ')}`);
+    const spec: EffectSpec = { effect: kind as EffectKind, amount: typeof o.amount === 'number' ? o.amount : 1 };
+    if (o.hz !== undefined) fail(w, 'hz is gone: effects no longer run on their own clock, every frame follows the value');
+    if (o.span !== undefined) {
+      const sp = o.span;
+      if (!Array.isArray(sp) || sp.length !== 2 || !sp.every((v) => typeof v === 'number' && v >= 0 && v <= 1) || sp[0] >= sp[1]) {
+        fail(w, 'span must be [from, to] with 0 <= from < to <= 1');
+      }
+      spec.span = [sp[0], sp[1]];
+    }
+    if (o.ease !== undefined) {
+      if (!EASES.includes(o.ease as Ease)) fail(w, `ease must be one of ${EASES.join(', ')}`);
+      spec.ease = o.ease as Ease;
     }
     if (o.from !== undefined) {
       if (!['bottom', 'top', 'left', 'right'].includes(o.from as string)) fail(w, 'from must be bottom, top, left or right');
