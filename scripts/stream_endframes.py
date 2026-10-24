@@ -174,3 +174,152 @@ def main() -> None:
 
 if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- round two: the froth gets bubbly and becomes a little cloud ---------------------------------------------------
+FROTH_C = (2097.0, 2505.0)
+CLOUD_WHITE = '#ffffff'
+CLOUD_SHADE = '#e9e2ff'
+
+
+SCRIB_MASK = ['']  # the insides of the clouds drawn so far, where the painting's scribbles are laid back over
+
+
+def puffs(circles, fill=CLOUD_WHITE, edge=INK) -> str:
+    SCRIB_MASK[0] += ''.join(f'<path d="{circle(x, y, max(1, r - edge * 1.2))}" fill="#fff"/>' for x, y, r in circles)
+    """A cloud as the union of circles: every circle outlined first, then every circle filled on top, so only the
+    outer edge keeps its ink, the way the painting draws its clouds."""
+    ink = ''.join(f'<path d="{circle(x, y, r)}" fill="#000" stroke="#000" stroke-width="{edge * 2}"/>' for x, y, r in circles)
+    body = ''.join(f'<path d="{circle(x, y, r)}" fill="{fill}"/>' for x, y, r in circles)
+    return ink + body
+
+
+def bubble(x, y, r, fill='#e3fbff') -> str:
+    return outlined(circle(x, y, r), fill, INK * 0.8) + f'<path d="{circle(x + r * 0.35, y - r * 0.35, r * 0.22)}" fill="#fff"/>'
+
+
+def no_froth():
+    return {'fill_over': {SPLASH: 'M0 0Z'}, 'ink_over': {i: 'M0 0Z' for i in m.own_ink(SPLASH)}}
+
+
+def cloud_circles(cx, cy, s=1.0, seed=4):
+    """A lumpy cloud: a ring of uneven bumps round a body, flatter at the bottom, like the painting's own clouds."""
+    rnd = random.Random(seed)
+    out = [(cx, cy + 10 * s, 120 * s)]
+    n = 11
+    for k in range(n):
+        a = math.pi * (0.9 + 1.2 * k / (n - 1))  # over the top, from left round to right
+        rx, ry = 190 * s, 105 * s
+        r = (45 + rnd.random() * 45) * s
+        out.append((cx + math.cos(a) * rx, cy + math.sin(a) * ry, r))
+    for k in range(4):  # the flatter underside
+        out.append((cx - 150 * s + k * 100 * s, cy + 70 * s, (45 + rnd.random() * 15) * s))
+    return out
+
+
+def b1_bubbly() -> Image.Image:
+    """Bubbly froth: the splash boils up into a heap of round outlined bubbles, big at the base, small at the top."""
+    rnd = random.Random(1)
+    out = ''
+    x0, y0 = FROTH_C
+    for k in range(26):
+        t = k / 25
+        r = 60 - 40 * t + rnd.random() * 12
+        x = x0 + (rnd.random() - 0.5) * 300 * (1 - 0.5 * t)
+        y = y0 + 110 - 330 * t + (rnd.random() - 0.5) * 30
+        out += bubble(x, y, r, ['#e3fbff', '#ffffff', '#f3e9ff'][k % 3])
+    return m.compose(front=out, rescrib=SCRIB_MASK[0], **no_froth())
+
+
+def b2_cloud_rising() -> Image.Image:
+    """Froth to cloud: the splash puffs up into a little cumulus cloud floating above the pool, a column of bubbles
+    still rising from the water into it."""
+    cx, cy = FROTH_C[0] + 20, FROTH_C[1] - 330
+    out = ''
+    for k, (x, y, r) in enumerate([(2090, 2470, 40), (2110, 2390, 32), (2080, 2320, 26), (2105, 2255, 20)]):
+        out += bubble(x, y, r)
+    out += puffs(cloud_circles(cx, cy, 0.95))
+    return m.compose(front=out, rescrib=SCRIB_MASK[0], **no_froth())
+
+
+def b3_cloud_face() -> Image.Image:
+    """Happy cloud: the froth becomes a round puffy cloud with a sleepy, smiling face, sitting on the water."""
+    cx, cy = FROTH_C[0] + 10, FROTH_C[1] - 120
+    out = puffs(cloud_circles(cx, cy, 1.05))
+    for ex in (cx - 70, cx + 70):
+        out += f'<path d="M{p(ex - 30, cy - 20)}C{p(ex - 15, cy + 5)} {p(ex + 15, cy + 5)} {p(ex + 30, cy - 20)}" fill="none" stroke="#000" stroke-width="{INK}" stroke-linecap="round"/>'
+    out += outlined(f'M{p(cx - 45, cy + 40)}C{p(cx - 30, cy + 95)} {p(cx + 30, cy + 95)} {p(cx + 45, cy + 40)}Z', '#f64c76', INK * 0.9)
+    out += ''.join(f'<path d="{circle(x, cy + 30, 22)}" fill="#ffb3c8"/>' for x in (cx - 120, cx + 120))
+    return m.compose(front=out, rescrib=SCRIB_MASK[0], **no_froth())
+
+
+def b4_rainbow() -> Image.Image:
+    """Cloud and rainbow: the froth lifts into a cloud and a little candy rainbow arcs from it back down into the
+    pool."""
+    cx, cy = FROTH_C[0] + 40, FROTH_C[1] - 300
+    out = ''
+    cols = ['#ff7a8a', '#ffb36b', '#ffe066', '#9cf27c', '#7fd8f5', '#c4a3f0']
+    ax, ay, R = cx + 330, cy + 300, 300
+    for k, col in enumerate(cols):
+        r_out, r_in = R - k * 26, R - (k + 1) * 26
+        d = (f'M{p(ax - r_out, ay)}A{r_out} {r_out} 0 0 1 {p(ax + r_out, ay)}L{p(ax + r_in, ay)}'
+             f'A{r_in} {r_in} 0 0 0 {p(ax - r_in, ay)}Z')
+        out += outlined(d, col, INK * 0.7)
+    out += puffs(cloud_circles(cx, cy, 0.8))
+    out += puffs([(ax + R - 40, ay - 10, 55), (ax + R + 20, ay + 20, 45)], CLOUD_WHITE, INK)
+    return m.compose(front=out, rescrib=SCRIB_MASK[0], **no_froth())
+
+
+def b5_raincloud() -> Image.Image:
+    """Bubble cloud: the froth rises as a cloud made of bubbles (each puff an outlined bubble with a shine), dropping
+    a few fat outlined droplets back into the pool."""
+    cx, cy = FROTH_C[0] + 20, FROTH_C[1] - 300
+    circles = cloud_circles(cx, cy, 0.9)
+    out = puffs(circles, '#eafcff')
+    out += ''.join(f'<path d="{circle(x + r * 0.35, y - r * 0.4, r * 0.18)}" fill="#fff"/>'
+                   f'<path d="M{p(x - r * 0.55, y + r * 0.1)}A{r * 0.6:.1f} {r * 0.6:.1f} 0 0 0 {p(x + r * 0.1, y + r * 0.6)}" fill="none" stroke="#bfefff" stroke-width="10" stroke-linecap="round"/>'
+                   for x, y, r in circles[:5])
+    for x, y, s in [(cx - 90, cy + 190, 26), (cx + 10, cy + 230, 22), (cx + 110, cy + 200, 26), (cx - 30, cy + 300, 20)]:
+        drop = f'M{p(x, y - s * 1.6)}C{p(x + s, y - s * 0.4)} {p(x + s, y + s)} {p(x, y + s)}C{p(x - s, y + s)} {p(x - s, y - s * 0.4)} {p(x, y - s * 1.6)}Z'
+        out += outlined(drop, '#bff6ff', INK * 0.7)
+    out += ''.join(outlined(ellipse(x, 2560, 50, 14), '#ffffff', INK * 0.6) for x in (cx - 90, cx + 110))
+    return m.compose(front=out, rescrib=SCRIB_MASK[0], **no_froth())
+
+
+ROUND2 = [
+    ('1-bubbly-froth', 'Bubbly froth', b1_bubbly),
+    ('2-froth-to-cloud', 'Froth to cloud', b2_cloud_rising),
+    ('3-happy-cloud', 'Happy cloud', b3_cloud_face),
+    ('4-cloud-and-rainbow', 'Cloud and rainbow', b4_rainbow),
+    ('5-bubble-cloud', 'Bubble cloud', b5_raincloud),
+]
+
+
+def round2() -> None:
+    out = OUT.parent / 'froth'
+    out.mkdir(parents=True, exist_ok=True)
+    tiles = [('0  As painted (vibrato off)', m.compose())]
+    for slug, title, fn in ROUND2:
+        SCRIB_MASK[0] = ''
+        im = fn()
+        im.save(out / f'{slug}.png')
+        tiles.append((f'{slug[0]}  {title}', im))
+    w, h = tiles[0][1].size
+    s = 0.5
+    tw, th = int(w * s), int(h * s)
+    sheet = Image.new('RGB', (tw * 3 + 40, (th + 60) * 2 + 10), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(sheet)
+    for i, (label, im) in enumerate(tiles):
+        x, y = 10 + (i % 3) * (tw + 10), 10 + (i // 3) * (th + 60)
+        d.text((x, y), label, fill='black', font=font)
+        sheet.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, y + 36))
+    sheet.save(out / 'sheet.png')
+    print('wrote', out / 'sheet.png')
+
+
+if __name__ == '__main__' and 'froth' in __import__('sys').argv[1:]:
+    round2()

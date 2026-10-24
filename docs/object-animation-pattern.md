@@ -79,6 +79,11 @@ What the decisions have shown, to apply to later objects:
   bands. Picked three together: bell, crest, and ripples with bands. He likes layered, celebratory change (the
   painting is called a celebration): several of the object's features transforming at once is welcome when each
   arrives in its own part of the timeline.
+- **Stream review, upper vibrato (2026-10-24):** the first five (waves, fountain, leaping fish, wavy water,
+  whirlpool) "all suck". He pointed at the froth: make it bubbly and turn it into a little cloud. Lesson: find the
+  object's most characterful small part and transform that, rather than effects spread over the whole object; and
+  generic water motifs (waves, fish) read as clip-art. New shapes should carry the painting's pencil scribbles and
+  lumpy, irregular outlines, not clean vector shapes.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
