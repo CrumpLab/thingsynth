@@ -109,15 +109,15 @@ boil); ink on top, always.
 
 | effect | what it does | good for |
 | --- | --- | --- |
-| `glow` | lightness up, slight saturation up, within the cell | note cells (velocity → amount), bools |
-| `hue` | rotate the cell's hue by up to ±60° (the piece is rainbow, so a shifted cell still belongs) | continuous params: drive, leakage, mic distance |
+| `glow` | lightness up, slight saturation up, within the part | note parts (velocity → amount), bools |
+| `hue` | rotate the part's hue by up to ±60° (the piece is rainbow, so a shifted part still belongs) | continuous params: drive, leakage, mic distance |
 | `fill` | the shape fills from bottom to top with its brightened colour (a clip on a lighter copy of the path), like a drawbar pulled out | the 20 drawbars (0..8 → 0..1) |
-| `pulse` | scale the cell's pixels about its centroid by ±3 %, breathing at a rate | expression, pedal sustain, Leslie speed (stop / slow / fast = still / slow breath / fast breath) |
-| `wobble` | small sinusoidal displacement of the cell's pixels, like heat shimmer | vibrato / chorus mode and depth |
+| `pulse` | scale the part about its centroid by ±3 %, breathing at a rate | expression, pedal sustain, Leslie speed (stop / slow / fast = still / slow breath / fast breath) |
+| `wobble` | small sinusoidal displacement of the part, like heat shimmer | vibrato / chorus mode and depth |
 | `boil` | the object's ink strokes jitter by 1 to 2 px each, re-rolled at 8 fps (the classic hand-drawn line boil); real strokes, so it reads as redrawing | any part while its note is on; percussion on |
 | `scribble` | procedural pencil scribble strokes in the part's colour, clipped to its path, in the manner of the real scribble layer, density = v | wheel age, key click, crosstalk |
-| `spin` | rotate the cell's pixels about its centroid (only for round things) | the ring in the sky for the Leslie rotor (speed from telemetry if the engine publishes rotor angle) |
-| `blink` | hide the eye's highlight fill and squash its ink for a frame or two | eyes on tap / note cells of the crowd |
+| `spin` | rotate the part about its centroid (only for round things) | the ring in the sky for the Leslie rotor (speed from telemetry if the engine publishes rotor angle) |
+| `blink` | hide the eye's highlight fill and squash its ink for a frame or two | eyes on tap / note parts of the crowd |
 
 Composite objects combine them by role: a creature glows in the body, blinks in the eye, boils its horns.
 
@@ -126,7 +126,7 @@ nothing is playing for a minute.
 
 **Transitions.** Parameter values are smoothed on the way into the state texture (about 150 ms, 400 ms for
 preset loads), so a preset change reads as a wave moving through the painting rather than a cut. Notes use an
-envelope: 10 ms attack, 300 ms release, longer for the pedal cells.
+envelope: 10 ms attack, 300 ms release, longer for the pedal parts.
 
 ## 4. Binding objects to Tonewheel
 
@@ -139,10 +139,10 @@ envelope: 10 ms attack, 300 ms release, longer for the pedal cells.
   "bindings": [
     { "object": "golden-pyramid", "param": "amp.drive", "range": [0, 1], "curve": "linear",
       "gesture": "drag-x",                     // input, as today
-      "effects": [ { "cells": "body", "effect": "hue", "amount": 0.5 },
-                   { "cells": "highlight", "effect": "glow" } ] },
+      "effects": [ { "parts": "body", "effect": "hue", "amount": 0.5 },
+                   { "parts": "highlight", "effect": "glow" } ] },
     { "object": "tower-right", "param": "upper.db3", "range": [0, 8], "gesture": "drag-y",
-      "effects": [ { "cells": "body", "effect": "fill" } ] },
+      "effects": [ { "parts": "body", "effect": "fill" } ] },
     { "part": "f217", "note": 60, "effects": [ { "effect": "glow" }, { "effect": "boil" } ] },
     { "object": "ring-in-sky", "telemetry": "leslie.rotor", "effects": [ { "effect": "spin" } ] }
   ]
@@ -201,7 +201,7 @@ shuffle:
    the page rebuilt from them instead of the JPEG, checked against the JPEG by eye and by pixel difference.
 2. **Render**: `glow` and `hue` on fill paths, `boil` on ink strokes, `amp.drive` driving the pyramid end to
    end through `mapping.json` v2, the parts debug mode. Checked in the browser with `?debug` and the meter.
-3. **Vocabulary**: the rest of the effects, note cells, envelopes, transitions, idle.
+3. **Vocabulary**: the rest of the effects, note parts, envelopes, transitions, idle.
 4. **Objects and bindings**: grouping, names, the proposal for all 47 + 88, the bind editor; Matt's review.
 5. **Polish**: line boil quality, scribble style tuned against the real scribbles, phone performance, a
    recorded demo.
