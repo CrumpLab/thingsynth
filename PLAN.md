@@ -203,7 +203,8 @@ tonewheels), graffiti eyeballs: its acorns turn into two big dripping spray-pain
 notes 57 and 60 moved off the acorns to the petals f216 and f217. **tunnel** (vibrato mode), rainbow rings and eyes:
 each mode brings rings up out of the tunnel's depth, then two eyes open in the dark (`scripts/tunnel_endframes.py`).
 **big-eye** (percussion harmonic), disco peacock: a peacock fan opens behind its head and its eye turns into a disco
-ball (`scripts/bigeye_endframes.py`).
+ball (`scripts/bigeye_endframes.py`). **orange-sprite** (pedal sustain), three morphs: starfish, then butterfly, then
+jellyfish (`scripts/sprite_endframes.py`).
 **stalk-drawbar-16 and stalk-drawbar-513**, sap rising: a green sap with a wavy surface climbs each stalk with the
 drawbar, turning a luminous light green (#9cf27c) towards the top; each bud on the stalk (roles `bud-1`..) swells
 24% and glows just as the sap reaches its height; and the stalk grows (`grow`): one new branch per drawbar step,

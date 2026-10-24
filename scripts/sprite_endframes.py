@@ -161,3 +161,130 @@ def main() -> None:
 
 if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- chosen: starfish, then butterfly wings, then jellyfish (4 -> 3 -> 2) -----------------------------------------
+# Sustain from short to long morphs it three times: starfish arms grow out of its body (0..0.25) and draw back in
+# (0.38..0.5) as butterfly wings open (0.35..0.58); the wings fold away (0.68..0.8) while the sprite itself fades
+# (0.66..0.8) and a jellyfish bell swells out of its head (0.68..0.88), its sleepy eye opens on the bell and the
+# tentacles drop down over the bush (0.75..1).
+def it(d, fill, edge, at, s, e, grow='scale', out=None) -> dict:
+    x = {'d': d, 'fill': fill, 'edge': round(edge, 1), 'at': [round(at[0], 1), round(at[1], 1)], 'start': round(s, 3), 'end': round(e, 3), 'grow': grow}
+    if out:
+        x['outStart'], x['outEnd'] = round(out[0], 3), round(out[1], 3)
+    return x
+
+
+def lidded_eye(x, y, r, at, s, e) -> list[dict]:
+    """The sleepy eye as sprites (no clip): cyan ball, a teal lid filling it below a curve, the black ring."""
+    lid = (f'M{p(x - r * 0.995, y - r * 0.1)}A{r:.1f} {r:.1f} 0 1 0 {p(x + r * 0.995, y - r * 0.1)}'
+           f'C{p(x + r * 0.4, y - r * 0.35)} {p(x - r * 0.4, y - r * 0.35)} {p(x - r * 0.995, y - r * 0.1)}Z')
+    return [it(circle(x, y, r), CYAN, INK, at, s, e), it(lid, TEAL, INK, at, s, e), it(circle(x, y, r), 'none', INK, at, s, e)]
+
+
+def around_items() -> list[dict]:
+    """Starfish arms and butterfly wings: behind the sprite, above the bush."""
+    bx, by = BODY
+    items = []
+    for k, ang in enumerate((-90, -15, 55, 125, 195)):
+        a = math.radians(ang)
+        P = [(bx + math.cos(a) * L, by + math.sin(a) * L) for L in range(0, 341, 20)]
+        s = 0.02 + 0.03 * k
+        items.append(it(tube(P, 95, 40), ORANGE, INK, BODY, s, s + 0.18, out=(0.38, 0.5)))
+        for L in range(140, 321, 55):
+            c = (bx + math.cos(a) * L, by + math.sin(a) * L)
+            items.append(it(circle(*c, 22 - L * 0.03), '#ffd0a6', INK * 0.6, BODY, s + 0.08, s + 0.2, out=(0.38, 0.5)))
+    wx, wy = BODY[0], BODY[1] - 60
+    for side in (-1, 1):
+        up = (f'M{p(wx, wy)}C{p(wx + side * 120, wy - 330)} {p(wx + side * 420, wy - 330)} {p(wx + side * 380, wy - 80)}'
+              f'C{p(wx + side * 350, wy + 20)} {p(wx + side * 150, wy + 30)} {p(wx, wy)}Z')
+        lo = (f'M{p(wx, wy + 20)}C{p(wx + side * 260, wy + 30)} {p(wx + side * 330, wy + 140)} {p(wx + side * 260, wy + 250)}'
+              f'C{p(wx + side * 180, wy + 330)} {p(wx + side * 60, wy + 180)} {p(wx, wy + 20)}Z')
+        o = (0.68, 0.8)
+        items += [it(lo, '#ffe066', INK, (wx, wy), 0.35, 0.55, out=o), it(up, '#c4a3f0' if side < 0 else '#ff9fc4', INK, (wx, wy), 0.37, 0.58, out=o),
+                  it(circle(wx + side * 270, wy - 160, 62), '#f64c76', INK, (wx, wy), 0.37, 0.58, out=o),
+                  it(circle(wx + side * 270, wy - 160, 30), '#2DFFF4', INK * 0.8, (wx, wy), 0.37, 0.58, out=o),
+                  it(circle(wx + side * 200, wy + 150, 40), '#ff9f43', INK * 0.8, (wx, wy), 0.35, 0.55, out=o)]
+    return items
+
+
+def jelly_items() -> list[dict]:
+    """The jellyfish: above everything."""
+    x, y = HEAD[0], HEAD[1] + 60
+    items = []
+    for k in range(7):
+        x0 = x - 190 + k * 63
+        pts = [(x0 + 30 * math.sin(i / 5 + k), y + 60 + i * 26) for i in range(18)]
+        s = 0.75 + 0.025 * ((k * 3) % 7)
+        items.append(it(tube(pts, 26, 14), ['#ff9f43', '#f64c76', '#ffb3d1'][k % 3], INK * 0.9, (x0, y + 60), s, min(1.0, s + 0.18), 'y'))
+    bell = (f'M{p(x - 250, y + 70)}C{p(x - 260, y - 260)} {p(x + 260, y - 260)} {p(x + 250, y + 70)}'
+            + ''.join(f'C{p(x + 250 - 62.5 * i - 15, y + 120)} {p(x + 250 - 62.5 * (i + 1) + 15, y + 120)} {p(x + 250 - 62.5 * (i + 1), y + 70)}' for i in range(8)) + 'Z')
+    items.append(it(bell, '#ffb07a', INK * 1.1, HEAD, 0.68, 0.88))
+    items.append(it(ellipse(x - 120, y - 120, 50, 26, -30), '#ffffff', INK * 0.6, HEAD, 0.74, 0.9))
+    items += lidded_eye(x - 20, y - 40, 62, (x - 20, y - 40), 0.75, 0.9)
+    return items
+
+
+def morph_frame(t: float) -> Image.Image:
+    if t <= 0:
+        return m.compose()
+    gone = t >= 0.73  # the sprite's fade (0.66..0.8), shown as gone past its middle
+    kw = {}
+    if gone:
+        kw = {'fill_over': {f: 'M0 0Z' for f in SPRITE}, 'ink_over': {i: 'M0 0Z' for f in SPRITE for i in m.own_ink(f)}}
+    m.FRONT = [] if gone else SPRITE
+    m.FRONT_INK = sorted({s for f in m.FRONT for s in m.own_ink(f)})
+    try:
+        im = m.compose(front=g.sprite_svg(around_items(), t) or '<g/>', **kw)
+    finally:
+        m.FRONT, m.FRONT_INK = [], []
+    jel = g.sprite_svg(jelly_items(), t)
+    if jel:
+        im.alpha_composite(m.svg(jel))
+    return im
+
+
+def morph_main() -> None:
+    out = OUT.parent / 'starfish-wings-jellyfish'
+    out.mkdir(parents=True, exist_ok=True)
+    frames = [0, 0.2, 0.4, 0.55, 0.7, 0.85, 1.0]
+    tiles = [morph_frame(t) for t in frames]
+    tiles[-1].save(out / 'end-frame.png')
+    w, h = tiles[0].size
+    sc = 0.26
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * len(frames) + 80, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=22)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (tt, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {tt:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'morph' in __import__('sys').argv[1:]:
+    morph_main()
+
+if __name__ == '__main__' and 'export' in __import__('sys').argv[1:]:
+    import json as _j
+    op = ROOT / 'art/golden-pyramid-with-tunnel-celebration/objects.json'
+    O = _j.loads(op.read_text())
+    objs = O['objects'] if 'objects' in O else O
+    objs['orange-sprite']['label'] = 'The orange sprite on the bush, with its yellow head and sleepy eye'
+    objs['orange-sprite']['parts'] = {'body': ['f221'], 'head': ['f222'], 'eye': ['f223', 'f224']}
+    op.write_text(_j.dumps(O, indent=2) + '\n')
+    mp = ROOT / 'mapping.json'
+    M = _j.loads(mp.read_text())
+    for b in M['bindings']:
+        if b['id'] == 'pedal-sustain':
+            b['label'] = 'The orange sprite: drag for Pedal Sustain; it morphs into a starfish, then a butterfly, then a jellyfish'
+            b['effects'] = [{'effect': 'sprites', 'place': 'around', 'front': ['f222', 'f223', 'f224'], 'items': around_items()},
+                            {'effect': 'vanish', 'span': [0.66, 0.8]},
+                            {'effect': 'sprites', 'place': 'over', 'items': jelly_items()}]
+    mp.write_text(_j.dumps(M, indent=2) + '\n')
+    print('exported', len(around_items()) + len(jelly_items()), 'shapes')

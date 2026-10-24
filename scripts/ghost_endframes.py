@@ -323,6 +323,9 @@ def sprite_svg(items, t) -> str:
     out = ''
     for it in items:
         v = 1 - (1 - max(0.0, min(1.0, (t - it['start']) / (it['end'] - it['start'])))) ** 3
+        if 'outStart' in it:
+            u = max(0.0, min(1.0, (t - it['outStart']) / (it['outEnd'] - it['outStart'])))
+            v *= 1 - (1 - (1 - u) ** 3)
         if v <= 0.01:
             continue
         x, y = it['at']

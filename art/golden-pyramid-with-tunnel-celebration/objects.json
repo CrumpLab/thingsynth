@@ -478,10 +478,17 @@
       "ink": "auto"
     },
     "orange-sprite": {
-      "label": "The orange sprite on the bush",
+      "label": "The orange sprite on the bush, with its yellow head and sleepy eye",
       "parts": {
         "body": [
           "f221"
+        ],
+        "head": [
+          "f222"
+        ],
+        "eye": [
+          "f223",
+          "f224"
         ]
       },
       "ink": "auto"

@@ -117,6 +117,10 @@ What the decisions have shown, to apply to later objects:
 - **Big eye review, percussion harmonic (2026-10-24, object picked by Claude):** offered hypno eye, ringed planet,
   three eyes, disco ball, peacock fan. Picked disco ball and peacock fan together: again a layered celebratory
   display, the eye morphing into something new while a big fan opens behind.
+- **Orange sprite review, pedal sustain (2026-10-24, object picked by Claude):** offered taffy arms, jellyfish,
+  butterfly wings, starfish, hot-air balloon. Asked for a chain of morphs: starfish, then butterfly, then jellyfish.
+  A continuous parameter can carry several end frames in sequence, each replacing the last, not only one change
+  growing.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
@@ -138,5 +142,6 @@ its thing in the painting's style.
 | acorn-frog (tg-complex) | `tg.complex` | the pale yellow frog body with a little blue head and two acorns on its back | built: on complex the acorns fade and two big spray-painted eyeballs pop up in their place, drop shadows land behind them, irises and pupils open, white paint drips run down; 0.8 s glide; notes A3 and C4 moved from the acorns to the pink petals f216 and f217; `docs/objects/tg-complex/mockup-vs-app.png` |
 | tunnel (vib-mode) | `vib.mode` | the dark teal arch in the golden pyramid, its mouth mostly hidden by the acorn frog and bush | built: each of the six modes brings rainbow rings up out of the tunnel's depth (outer first, the innermost night-dark), then two glowing yellow eyes open in dark sockets, peeking out; drawn on the tunnel, under the frog and ink; 0.6 s glide; `docs/objects/vib-mode/mockup-vs-app.png` |
 | big-eye (perc-harmonic) | `perc.harmonic` | the round orange-magenta eye of the lavender, triangle-headed creature at the right edge | built: on Third six peacock feathers fan open behind its head one after another, the eye turns into a disco ball (base, then rings of mirror tiles) and sparkles pop last; 0.8 s glide; `docs/objects/perc-harmonic/mockup-vs-app.png` |
+| orange-sprite (pedal-sustain) | `pedal.sustain` | the orange star-shaped creature with a yellow head and a sleepy cyan eye, on the green bush | built: three morphs in turn: starfish arms grow out of it (0-0.25) and draw back as butterfly wings open (0.35-0.58), the wings fold away as the sprite fades (0.66-0.8) and a jellyfish bell swells out of its head, its eye opening and tentacles dropping over the bush (0.68-1); `docs/objects/pedal-sustain/mockup-vs-app.png` |
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
