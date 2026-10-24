@@ -88,6 +88,10 @@ What the decisions have shown, to apply to later objects:
 - **Eye review, percussion (2026-10-24, object picked by Claude):** offered wide awake, boing, ding sparkle, more
   eyes, starstruck. Picked boing: the playful, physical option (the eye springing out on a coil) over the merely
   decorative ones.
+- **Cloud review, wheel age (2026-10-24, object picked by Claude):** offered old man cloud, billowing, stormy,
+  overgrown, tonewheels. Picked overgrown (mushrooms and little flowers sprouting along its top, like moss on
+  something left out a long time) straight away: age read as something living taking hold, not as decay or
+  machinery.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
@@ -104,5 +108,6 @@ its thing in the painting's style.
 | pyramid-worm (worm-expression) | `amp.expression` | the pale pink worm rising from the tunnel's rim on the pyramid, droopy hooked head, frilly tuft | built: ripples spread from its hole, candy bands climb its body, its tuft blooms into a crest, its head flares into a trumpet bell with sound waves; `docs/objects/worm-expression/mockup-vs-app.png` |
 | stream (stream-vibrato) | `vib.upper` | the pale blue pool fed by a thin waterfall, with a white froth splash | built: the froth bubbles up, a column of bubbles rises into a cloud of bubbles and the bubbles shrink away into it, a candy rainbow sweeps from it into the pool, droplets fall onto clear water; 0.9 s glide so the switch plays it through; `docs/objects/stream-vibrato/mockup-vs-app.png` |
 | bottom-eye (eye-percussion) | `perc.on` | the sleepy half-lidded round eye at the end of the grey lying creature | built: it opens in place, then springs out on a coil from a grey cup with an overshoot, motion lines last; 0.7 s glide; `docs/objects/eye-percussion/mockup-vs-app.png` |
+| cloud (cloud-age) | `tg.age` | the big pale scalloped cloud behind the pyramid's apex, under the horned ghost | built: spotted mushrooms and little flowers come up one by one in a scattered order along its top edge; stems rise, caps swell and spot, petals pop open last; `docs/objects/cloud-age/mockup-vs-app.png` |
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |

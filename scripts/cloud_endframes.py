@@ -311,3 +311,65 @@ def overgrown_main() -> None:
 
 if __name__ == '__main__' and 'overgrown' in __import__('sys').argv[1:]:
     overgrown_main()
+
+
+# ---- export: the approved overgrowth as the app's sprites ---------------------------------------------------------
+def stem_shape(x, y, top, w) -> str:
+    """The flower's curling stem as a thin outlined shape (no bare lines): the mockup's curve, offset either side."""
+    pts = []
+    for i in range(21):
+        u = i / 20
+        # the cubic from (x, y+5) via (x-10, y-40), (x+10, y-60) to (x, top+10)
+        P = [(x, y + 5), (x - 10, y - 40), (x + 10, y - 60), (x, top + 10)]
+        bx = sum(c * q[0] for c, q in zip([(1 - u) ** 3, 3 * u * (1 - u) ** 2, 3 * u * u * (1 - u), u ** 3], P))
+        by = sum(c * q[1] for c, q in zip([(1 - u) ** 3, 3 * u * (1 - u) ** 2, 3 * u * u * (1 - u), u ** 3], P))
+        pts.append((bx, by))
+    half = lambda i: w * (1 - 0.35 * i / 20)
+    left = [(px - half(i), py) for i, (px, py) in enumerate(pts)]
+    right = [(px + half(i), py) for i, (px, py) in enumerate(pts)][::-1]
+    return 'M' + 'L'.join(p(*q) for q in left + right) + 'Z'
+
+
+def export_effects() -> list[dict]:
+    items = []
+    R2 = lambda v: [round(q, 1) for q in v]
+    E = round(INK * 0.8, 1)
+    for s in sprouts():
+        x, y, h, t0 = s['x'], s['y'], s['h'], s['start']
+        span = 0.46
+        w = lambda a, b: (round(t0 + span * a, 3), round(t0 + span * b, 3))
+        if s['kind'] == 'mush':
+            a, b = w(0, 0.55)
+            items.append({'d': f'M{p(x - 14, y + 10)}L{p(x - 10, y - h)}L{p(x + 10, y - h)}L{p(x + 14, y + 10)}Z', 'fill': '#fff3e6', 'edge': E,
+                          'at': R2((x, y + 10)), 'start': a, 'end': b, 'grow': 'y'})
+            a, b = w(0.3, 1)
+            items.append({'d': f'M{p(x - 55, y - h + 5)}C{p(x - 50, y - h - 70)} {p(x + 50, y - h - 70)} {p(x + 55, y - h + 5)}Z', 'fill': CAPS[s['k'] % 3],
+                          'edge': E, 'at': R2((x, y - h)), 'start': a, 'end': b, 'grow': 'scale'})
+            a, b = w(0.75, 1)
+            for dx, dy in [(-22, 4), (8, -14), (26, 6)]:
+                items.append({'d': circle(x + dx, y - h - 28 + dy, 8), 'fill': '#ffffff', 'edge': 0, 'at': R2((x + dx, y - h - 28 + dy)),
+                              'start': a, 'end': b, 'grow': 'scale'})
+        else:
+            top = y - 95
+            a, b = w(0, 0.6)
+            items.append({'d': stem_shape(x, y, top, 7), 'fill': '#7fd36b', 'edge': round(INK * 0.6, 1), 'at': R2((x, y + 5)), 'start': a, 'end': b, 'grow': 'y'})
+            a, b = w(0.55, 1)
+            for j in range(5):
+                an = math.radians(j * 72 - 90)
+                items.append({'d': circle(x + math.cos(an) * 22, top + math.sin(an) * 22, 16), 'fill': '#ffe066', 'edge': round(INK * 0.6, 1),
+                              'at': R2((x, top)), 'start': a, 'end': b, 'grow': 'scale'})
+            a, b = w(0.25, 0.6)
+            items.append({'d': circle(x, top, 12), 'fill': '#f64c76', 'edge': round(INK * 0.6, 1), 'at': R2((x, top)), 'start': a, 'end': b, 'grow': 'scale'})
+    return [{'effect': 'sprites', 'place': 'over', 'items': items}]
+
+
+if __name__ == '__main__' and 'export' in __import__('sys').argv[1:]:
+    import json as _j
+    mp = ROOT / 'mapping.json'
+    M = _j.loads(mp.read_text())
+    for b in M['bindings']:
+        if b['id'] == 'cloud-age':
+            b['label'] = 'The cloud: drag across it to age the wheels; mushrooms and little flowers sprout along its top'
+            b['effects'] = export_effects()
+    mp.write_text(_j.dumps(M, indent=2) + '\n')
+    print('exported', len(export_effects()[0]['items']), 'shapes')
