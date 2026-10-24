@@ -197,7 +197,8 @@ bubble cloud and rainbow: the froth bubbles up, bubbles rise and gather into a c
 it, a candy rainbow sweeps out of it into the pool, and it rains (`scripts/stream_endframes.py`). **bottom-eye**
 (percussion), boing: the sleepy eye opens and springs out on a coil from a grey cup (`scripts/eye_endframes.py`); note
 103 moved off its iris to f087. **cloud** (wheel age), overgrown: spotted mushrooms and little flowers sprout one by one along
-the big cloud's top edge (`scripts/cloud_endframes.py`, `export` writes them into `mapping.json`).
+the big cloud's top edge (`scripts/cloud_endframes.py`, `export` writes them into `mapping.json`). **horned-ghost** (lower drawbar 6), waving twins: two
+little copies of the ghost pop up beside it and it waves a big lime hand (`scripts/ghost_endframes.py`).
 **stalk-drawbar-16 and stalk-drawbar-513**, sap rising: a green sap with a wavy surface climbs each stalk with the
 drawbar, turning a luminous light green (#9cf27c) towards the top; each bud on the stalk (roles `bud-1`..) swells
 24% and glows just as the sap reaches its height; and the stalk grows (`grow`): one new branch per drawbar step,

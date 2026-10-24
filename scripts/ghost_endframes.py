@@ -230,3 +230,146 @@ def main() -> None:
 
 if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- chosen: waving with twins (4 + 5) ----------------------------------------------------------------------------
+# One list of sprites drives both the mockup and the app (the app's drawSprites plays the same windows and easing).
+import re as _re
+
+
+def rot_path(d: str, ox: float, oy: float, deg: float) -> str:
+    """Rotate an M/L/C/A/Z path about (ox, oy)."""
+    a = math.radians(deg)
+    ca, sa = math.cos(a), math.sin(a)
+    R = lambda x, y: (ox + (x - ox) * ca - (y - oy) * sa, oy + (x - ox) * sa + (y - oy) * ca)
+    out = []
+    for cmd, args in _re.findall(r'([MLCAZ])([^MLCAZ]*)', d):
+        v = [float(t) for t in _re.findall(r'-?\d+\.?\d*', args)]
+        if cmd == 'A':
+            rx, ry, xr, la, sw, x, y = v
+            out.append(f'A{rx:.1f} {ry:.1f} {xr + deg:.1f} {int(la)} {int(sw)} {p(*R(x, y))}')
+        elif cmd == 'Z':
+            out.append('Z')
+        else:
+            out.append(cmd + ' '.join(p(*R(v[i], v[i + 1])) for i in range(0, len(v), 2)))
+    return ''.join(out)
+
+
+def twin_items(cx, top, w, h, deg, start, end) -> list[dict]:
+    """A little ghost as sprites: horns, pale body, its deeper blue right half, a magenta foot, a slit eye; it pops
+    up from its base."""
+    r = w / 2
+    bot = top + h
+    body = (f'M{p(cx - r * 0.95, bot)}C{p(cx - r * 1.05, top + h * 0.35)} {p(cx - r * 0.45, top)} {p(cx, top)}'
+            f'C{p(cx + r * 0.45, top)} {p(cx + r * 1.0, top + h * 0.4)} {p(cx + r * 1.3, bot)}Z')
+    right = f'M{p(cx, top)}C{p(cx + r * 0.45, top)} {p(cx + r * 1.0, top + h * 0.4)} {p(cx + r * 1.3, bot)}L{p(cx, bot)}Z'
+    fx0, fx1 = cx - r * 0.8, cx + r * 0.7
+    foot = f'M{p(fx0, bot)}C{p(fx0, bot - r * 0.8)} {p(fx1, bot - r * 0.8)} {p(fx1, bot)}Z'
+    hornL = tube(bez((cx - r * 0.3, top + h * 0.3), (cx - r * 1.2, top + h * 0.25), (cx - r * 1.5, top), (cx - r * 1.2, top - h * 0.2), 16), r * 0.32, r * 0.12)
+    hornR = tube(bez((cx + r * 0.3, top + h * 0.3), (cx + r * 1.2, top + h * 0.25), (cx + r * 1.5, top), (cx + r * 1.2, top - h * 0.2), 16), r * 0.3, r * 0.12)
+    eye = ellipse(cx - r * 0.4, top + h * 0.4, r * 0.2, h * 0.19)
+    ox, oy = cx, bot
+    at = [round(ox, 1), round(oy, 1)]
+    E = round(INK * 0.9, 1)
+    return [{'d': rot_path(d, ox, oy, deg), 'fill': f, 'edge': e, 'at': at, 'start': start, 'end': end, 'grow': 'scale'}
+            for d, f, e in [(hornL, HORN_L, E), (hornR, HORN_R, E), (body, PALE, INK), (right, BLUE, E), (foot, MAGENTA, E), (eye, LIME, E)]]
+
+
+def crescent(cx, cy, r, a0, a1, w) -> str:
+    """A motion crescent: an outlined band along an arc, pointed at both ends."""
+    n = 16
+    outer, inner = [], []
+    for i in range(n + 1):
+        u = i / n
+        a = math.radians(a0 + (a1 - a0) * u)
+        t = math.sin(u * math.pi) * w / 2
+        outer.append((cx + math.cos(a) * (r + t), cy - math.sin(a) * (r + t)))
+        inner.append((cx + math.cos(a) * (r - t), cy - math.sin(a) * (r - t)))
+    return 'M' + 'L'.join(p(*q) for q in outer + inner[::-1]) + 'Z'
+
+
+def wave_items() -> list[dict]:
+    """The waving arm: a blue arm with a big lime hand grows out from behind the ghost's right side (scaling from the
+    shoulder), then two motion crescents flick out round the hand."""
+    sx, sy = 3080.0, 1330.0
+    P = bez((sx, sy), (3180, 1300), (3250, 1200), (3250, 1060))
+    hx, hy = P[-1]
+    cx, cy = hx, hy - 50
+    items = []
+    A = lambda d, f, e: items.append({'d': d, 'fill': f, 'edge': e, 'at': [sx, sy], 'start': 0.45, 'end': 0.85, 'grow': 'scale'})
+    A(tube(P, 44, 40), BLUE, INK)
+    fingers = ((-165, 150), (-125, 205), (-95, 225), (-65, 205), (-35, 170))
+    for ang, ln in fingers:
+        a = math.radians(ang)
+        A(tube([(cx + math.cos(a) * 30, cy + math.sin(a) * 30), (cx + math.cos(a) * ln, cy + math.sin(a) * ln)], 34, 30), LIME, INK)
+    A(ellipse(cx, cy + 10, 92, 98), LIME, INK)
+    for ang, _ in fingers:
+        a = math.radians(ang)
+        A(ellipse(cx + math.cos(a) * 82, cy + math.sin(a) * 82 + 6, 28, 28), LIME, 0)
+    for k, (a0, a1) in enumerate([(10, 70), (110, 170)]):
+        items.append({'d': crescent(cx, cy, 270, a0, a1, 34), 'fill': '#ffffff', 'edge': round(INK * 0.8, 1), 'at': [round(cx, 1), round(cy, 1)],
+                      'start': 0.8 + 0.06 * k, 'end': 0.94 + 0.06 * k, 'grow': 'scale'})
+    return items
+
+
+def combo_items() -> list[dict]:
+    return (twin_items(2660, 1190, 170, 380, -14, 0.0, 0.42) + twin_items(3220, 1290, 140, 300, 12, 0.15, 0.55) + wave_items())
+
+
+FRONT_IDS = ['f232', 'f233', 'f234', 'f235']
+
+
+def sprite_svg(items, t) -> str:
+    out = ''
+    for it in items:
+        v = 1 - (1 - max(0.0, min(1.0, (t - it['start']) / (it['end'] - it['start'])))) ** 3
+        if v <= 0.01:
+            continue
+        x, y = it['at']
+        stroke = f' stroke="#000" stroke-width="{it["edge"]}" stroke-linejoin="round"' if it['edge'] > 0 else ''
+        out += f'<path d="{it["d"]}" fill="{it["fill"]}"{stroke} transform="translate({x} {y}) scale({v:.4f}) translate({-x} {-y})"/>'
+    return out
+
+
+def combo_frame(t: float) -> Image.Image:
+    if t <= 0:
+        return m.compose()
+    return comp(sprite_svg(combo_items(), t), ['f231'] + FRONT_IDS)
+
+
+def combo_main() -> None:
+    out = OUT.parent / 'waving-twins'
+    out.mkdir(parents=True, exist_ok=True)
+    combo_frame(1.0).save(out / 'end-frame.png')
+    frames = [0, 0.25, 0.5, 0.75, 1.0]
+    tiles = [combo_frame(t) for t in frames]
+    w, h = tiles[0].size
+    sc = 0.42
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * 5 + 60, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (tt, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {tt:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'combo' in __import__('sys').argv[1:]:
+    combo_main()
+
+if __name__ == '__main__' and 'export' in __import__('sys').argv[1:]:
+    import json as _j
+    mp = ROOT / 'mapping.json'
+    M = _j.loads(mp.read_text())
+    for b in M['bindings']:
+        if b['id'] == 'lower-db6':
+            b['label'] = "The blue ghost with orange horns, top centre: the Lower 2' drawbar; drag up and its twins pop up beside it and it waves"
+            b['effects'] = [{'effect': 'sprites', 'place': 'around', 'front': FRONT_IDS, 'items': combo_items()}]
+    mp.write_text(_j.dumps(M, indent=2) + '\n')
+    print('exported', len(combo_items()), 'shapes')

@@ -92,6 +92,10 @@ What the decisions have shown, to apply to later objects:
   overgrown, tonewheels. Picked overgrown (mushrooms and little flowers sprouting along its top, like moss on
   something left out a long time) straight away: age read as something living taking hold, not as decay or
   machinery.
+- **Ghost review, lower drawbar 6 (2026-10-24, object picked by Claude):** offered Boo!, ram horns, party blower,
+  waving, twins. Picked waving and twins together and said to build it without a separate progression review.
+  Again the character doing something friendly and social (company arriving, a wave) over decoration. From here on,
+  once a build is approved Claude picks the next object without asking.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
@@ -109,5 +113,6 @@ its thing in the painting's style.
 | stream (stream-vibrato) | `vib.upper` | the pale blue pool fed by a thin waterfall, with a white froth splash | built: the froth bubbles up, a column of bubbles rises into a cloud of bubbles and the bubbles shrink away into it, a candy rainbow sweeps from it into the pool, droplets fall onto clear water; 0.9 s glide so the switch plays it through; `docs/objects/stream-vibrato/mockup-vs-app.png` |
 | bottom-eye (eye-percussion) | `perc.on` | the sleepy half-lidded round eye at the end of the grey lying creature | built: it opens in place, then springs out on a coil from a grey cup with an overshoot, motion lines last; 0.7 s glide; `docs/objects/eye-percussion/mockup-vs-app.png` |
 | cloud (cloud-age) | `tg.age` | the big pale scalloped cloud behind the pyramid's apex, under the horned ghost | built: spotted mushrooms and little flowers come up one by one in a scattered order along its top edge; stems rise, caps swell and spot, petals pop open last; `docs/objects/cloud-age/mockup-vs-app.png` |
+| horned-ghost (lower-db6) | `lower.db6` | the tall two-tone blue ghost with orange horns and a slit eye, under the big cloud | built: two little twin ghosts pop up from behind it, one each side (0-0.55), then a blue arm with a big lime hand grows out from its right side (0.45-0.85) and motion crescents flick out round the hand; `docs/objects/lower-db6/mockup-vs-app.png` |
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
