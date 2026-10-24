@@ -107,7 +107,7 @@ def ripples() -> Image.Image:
         bands += f'<g transform="rotate({ang:.0f} {x} {y})">' + outlined(f'M{p(x - 22, y - 70)}L{p(x + 22, y - 70)}L{p(x + 22, y + 70)}L{p(x - 22, y + 70)}Z', ['#f64c76', '#c4a3f0', '#ffe066', '#7fd8f5', '#f64c76'][k], INK * 0.8) + '</g>'
     clip = f'<defs><clipPath id="worm-body"><path d="{m.FILLS[WORM]}"/></clipPath></defs>'
     worm_ink = ''.join(f'<path d="{m.INKS[i]}"/>' for i in m.own_ink(WORM))
-    worm = f'<path d="{m.FILLS[WORM]}" fill="{PINK}"/><g clip-path="url(#worm-body)">{bands}</g><g fill="#000">{worm_ink}</g>'
+    worm = f'<path d="{m.FILLS[WORM]}" fill="#FEC5FF" fill-opacity="0.7"/><g clip-path="url(#worm-body)">{bands}</g><g fill="#000">{worm_ink}</g>'
     return m.compose(front=clip + rings + worm)
 
 
@@ -146,5 +146,115 @@ def main() -> None:
     print('wrote', OUT / 'sheet.png')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- the chosen direction: trumpet bell + blooming crest + ripples and bands --------------------------------------
+def ease(u: float) -> float:
+    u = max(0.0, min(1.0, u))
+    return 1 - (1 - u) ** 3
+
+
+def win(t: float, a: float, b: float) -> float:
+    return ease((t - a) / (b - a))
+
+
+CENTRE = [(3305, 1560), (3300, 1450), (3330, 1360), (3400, 1280), (3500, 1240)]
+BAND_COLS = ['#f64c76', '#c4a3f0', '#ffe066', '#7fd8f5', '#f64c76']
+RINGS = [(330, '#c9f0ff'), (250, '#ffffff'), (175, '#a9cfdc')]
+
+
+def combo_frame(t: float) -> Image.Image:
+    """Expression at t: ripples spread from the hole first (0..0.45, innermost first), bands climb the body from the
+    base (0.15..0.7), the crest blooms (0.4..0.85), and the bell flares open last (0.55..1) with its sound waves."""
+    if t <= 0:
+        return m.compose()
+    bx, by = BASE
+    rings = ''
+    for k, (rx, col) in enumerate(RINGS):  # largest first, so the smaller sit on top; the innermost appears first
+        start = (len(RINGS) - 1 - k) * 0.12
+        g = win(t, start, start + 0.3)
+        if g > 0.01:
+            rings += outlined(ellipse(bx, by + 10, rx * g, rx * 0.35 * g), col, INK * 0.8)
+    bands = ''
+    for k, (x, y) in enumerate(CENTRE):
+        g = win(t, 0.15 + k * 0.1, 0.3 + k * 0.1)
+        if g <= 0.01:
+            continue
+        nx, ny = CENTRE[min(k + 1, len(CENTRE) - 1)]
+        px_, py_ = CENTRE[max(k - 1, 0)]
+        ang = math.degrees(math.atan2(ny - py_, nx - px_))
+        hw = 22 * g
+        bands += f'<g transform="rotate({ang:.0f} {x} {y})">' + outlined(f'M{p(x - hw, y - 70)}L{p(x + hw, y - 70)}L{p(x + hw, y + 70)}L{p(x - hw, y + 70)}Z', BAND_COLS[k], INK * 0.8) + '</g>'
+    clip = f'<defs><clipPath id="worm-body"><path d="{m.FILLS[WORM]}"/></clipPath></defs>'
+    worm_ink = ''.join(f'<path d="{m.INKS[i]}"/>' for i in m.own_ink(WORM))
+    worm = f'<path d="{m.FILLS[WORM]}" fill="#FEC5FF" fill-opacity="0.7"/><g clip-path="url(#worm-body)">{bands}</g><g fill="#000">{worm_ink}</g>'
+    # crest: puffs grow from the tuft, outer ring then inner
+    cg = win(t, 0.4, 0.85)
+    crest = ''
+    if cg > 0.01:
+        rnd = random.Random(3)
+        cx, cy = TUFT
+        cols = ['#f2a6c6', '#ffe066', '#c4a3f0', '#7fd8f5', '#b4e0a2', '#ffb36b', '#f2a6c6']
+        for k in range(7):
+            a = math.radians(200 + k * 24)
+            r = 210 * cg
+            rr = (70 + rnd.random() * 30) * cg
+            crest += outlined(circle(cx + math.cos(a) * r, cy + 70 + math.sin(a) * r, rr), cols[k], INK)
+        crest += ''.join(outlined(circle(cx + dx * cg, cy + dy * cg, rr * cg), '#fff3fb', INK * 0.8) for dx, dy, rr in [(-110, -40, 60), (0, -80, 70), (110, -40, 60)])
+    # bell: flares from the head; waves follow
+    bg = win(t, 0.55, 1.0)
+    bell_svg = ''
+    if bg > 0.01:
+        x, y = HEAD[0] + 40, HEAD[1] + 20
+        L, H = 200 * bg, 160 * bg + 55 * (1 - bg)
+        flare = (f'M{p(x - 40, y - 55)}C{p(x + 60 * bg, y - 55 - 15 * bg)} {p(x + 120 * bg, y - 55 - 95 * bg)} {p(x + 0.875 * L, y - H - 10 * bg)}'
+                 f'L{p(x + L, y + H - 10 * bg)}C{p(x + 130 * bg, y + 55 + 65 * bg)} {p(x + 60 * bg, y + 55 + 5 * bg)} {p(x - 40, y + 55)}Z')
+        bell_svg = outlined(flare, '#f7b3f0', INK) + outlined(ellipse(x + L - 12 * bg, y - 10, 34 * bg + 4, H), '#7a2a4f', INK)
+        for k, (r, w, col) in enumerate([(110, 40, '#ffffff'), (190, 36, '#fbe0ff'), (270, 30, '#ffffff')]):
+            wg = win(t, 0.7 + k * 0.08, 0.9 + k * 0.05)
+            if wg > 0.01:
+                bell_svg += swoosh(x + L - 10, y - 10, r * (0.6 + 0.4 * wg), -40 * wg, 40 * wg, w * wg, col)
+    return m.compose(fill_over={WORM: 'M0 0Z'}, ink_over={i: 'M0 0Z' for i in m.own_ink(WORM)},
+                     front=clip + rings + worm + crest + bell_svg)
+
+
+def combo_main() -> None:
+    m.CROP = (3020, 960, 1280, 880)
+    m.WASH, m.SCRIB = m.raster('wash.webp'), m.raster('scribbles.webp')
+    out = OUT.parent / 'combined'
+    out.mkdir(parents=True, exist_ok=True)
+    combo_frame(1.0).save(out / 'end-frame.png')
+    frames = [0, 0.25, 0.5, 0.75, 1.0]
+    tiles = [combo_frame(t) for t in frames]
+    w, h = tiles[0].size
+    sc = 0.42
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * 5 + 60, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=24)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (t, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {t:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    import shutil
+    import subprocess
+    tmp = out / '_frames'
+    tmp.mkdir(exist_ok=True)
+    seq = [k / 20 for k in range(21)] + [k / 20 for k in range(19, 0, -1)]
+    for i, t in enumerate(seq):
+        combo_frame(t).convert('RGB').resize((480, round(480 * h / w)), Image.LANCZOS).save(tmp / f'{i:03d}.png')
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', '12', '-i', str(tmp / '%03d.png'), '-vf',
+                    'split[a][b];[a]palettegen=max_colors=192[p];[b][p]paletteuse=dither=bayer:bayer_scale=4', '-loop', '0',
+                    str(out / 'sweep.gif')], check=True)
+    shutil.rmtree(tmp)
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'combo' in __import__('sys').argv[1:]:
+    combo_main()

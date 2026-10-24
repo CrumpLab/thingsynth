@@ -75,6 +75,10 @@ What the decisions have shown, to apply to later objects:
   propeller cap, pinwheel ear, dizzy, whirlwind, racing. Picked whirlwind, and asked that its little arm (the ribbed
   "baguette" under its cap) be raised as well. He knows his characters' anatomy: look for limbs and features that can
   move, not only for things to add around them.
+- **Worm review, Expression (2026-10-24):** offered trumpet bell, rearing up, singing, blooming crest, ripples and
+  bands. Picked three together: bell, crest, and ripples with bands. He likes layered, celebratory change (the
+  painting is called a celebration): several of the object's features transforming at once is welcome when each
+  arrives in its own part of the timeline.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
@@ -88,5 +92,6 @@ its thing in the painting's style.
 | object | binding | what it is | what it does |
 | --- | --- | --- | --- |
 | golden-pyramid | `amp.drive` | the big golden pyramid, centre-right, with creatures on it | built: a sunburst grows out behind it (frames 0-0.6), a big eye opens on its right face (0.25-0.8), small flames rise on its slopes (0.55-1), its faces warm throughout; `docs/objects/pyramid-drive/mockup-vs-app.png` |
+| pyramid-worm (worm-expression) | `amp.expression` | the pale pink worm rising from the tunnel's rim on the pyramid, droopy hooked head, frilly tuft | proposed: ripples spread from its hole, candy bands climb its body, its tuft blooms into a crest, its head flares into a trumpet bell with sound waves (`docs/objects/worm-expression/combined/`, awaiting approval) |
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
