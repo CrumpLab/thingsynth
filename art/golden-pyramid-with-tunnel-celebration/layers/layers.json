@@ -71,12 +71,14 @@
     "wash": {
       "layer": 8,
       "name": "Pixel layer",
-      "file": "wash.webp"
+      "file": "wash.webp",
+      "small": "wash.small.webp"
     },
     "scribbles": {
       "layer": 6,
       "name": "Pixel layer",
-      "file": "scribbles.webp"
+      "file": "scribbles.webp",
+      "small": "scribbles.small.webp"
     }
   },
   "caption": {

@@ -4,6 +4,7 @@
 import { createSynthlandHost } from '../runtime/host';
 import rawMapping from '../../mapping.json';
 import { buildArt } from './art';
+import { createOutput } from './output';
 import { mountEffects } from './effects';
 import { parseMapping } from './mapping';
 import { loadObjects, resolveObject } from './objects';
@@ -36,7 +37,10 @@ async function boot(): Promise<void> {
     console.error('[thingsynth] painting failed to load', err);
     status.textContent = `painting failed to load: ${err instanceof Error ? err.message : String(err)}`;
   });
+  const output = createOutput(query.has('mute'));
   const host = createSynthlandHost({
+    audioContext: output.context,
+    destination: output.input,
     pluginUrl: `${base}tonewheel/plugin.json`,
     presetsUrl: `${base}tonewheel/presets/index.json`,
     wasmBase: `${base}wasm/`,
@@ -48,6 +52,9 @@ async function boot(): Promise<void> {
   await host.ready();
   const manifest = host.manifest();
   document.getElementById('start-title')!.textContent = `Golden Pyramid With Tunnel Celebration · ${manifest.name}`;
+  if (matchMedia('(pointer: coarse)').matches) {
+    startOverlay.querySelector('.hint')!.textContent = 'Tap to start the organ. Hold the small shapes to play notes; drag or tap the bigger ones to change the sound.';
+  }
 
   // Warn about mapping entries that name a parameter Tonewheel does not have.
   const ids = new Set(host.params().map((p) => p.id));
@@ -118,7 +125,8 @@ async function boot(): Promise<void> {
     else { url.searchParams.set('seed', String(seed)); if (notes) url.searchParams.set('notes', 'shuffle'); else url.searchParams.delete('notes'); }
     history.replaceState(null, '', url);
     unshuffleBtn.hidden = seed === null;
-    shuffleBtn.textContent = seed === null ? 'Shuffle' : `Shuffle · ${seed}`;
+    shuffleBtn.textContent = 'Shuffle';
+    if (seed !== null) shuffleBtn.append(Object.assign(document.createElement('span'), { className: 'seed', textContent: ` · ${seed}` }));
   };
   shuffleBtn.addEventListener('click', (ev) => { void applyShuffle(1 + Math.floor(Math.random() * 9999), ev.shiftKey); });
   unshuffleBtn.addEventListener('click', () => { void applyShuffle(null, false); });
@@ -126,10 +134,14 @@ async function boot(): Promise<void> {
   if (query.has('seed') && Number.isInteger(seedParam)) void applyShuffle(seedParam, query.get('notes') === 'shuffle');
 
   // Audio state.
+  const showStatus = (): void => {
+    status.textContent = host.audio.running() ? `${host.audio.presetLabel()} · playing` : 'off';
+  };
   host.audio.onState((running) => {
     startOverlay.classList.toggle('hidden', running);
-    status.textContent = running ? `${host.audio.presetLabel()} · playing` : 'off';
+    showStatus();
   });
+  host.onPreset(() => showStatus()); // loads and the first edit ("*")
   const kick = (): void => { host.audio.start().catch((err: unknown) => { status.textContent = `audio failed: ${String(err)}`; }); };
   startOverlay.addEventListener('pointerdown', kick);
   startOverlay.addEventListener('keydown', kick);
@@ -140,7 +152,7 @@ async function boot(): Promise<void> {
     const { mountDebug } = await import('./debug');
     await layer.ready;
     mountDebug(layer, mapping, host, await effectsReady);
-    Object.assign((window as unknown as { thingsynth: object }).thingsynth, { wander, shuffle: applyShuffle, layer });
+    Object.assign((window as unknown as { thingsynth: object }).thingsynth, { wander, shuffle: applyShuffle, layer, output });
   }
 }
 

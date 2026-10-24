@@ -819,11 +819,11 @@
     },
     {
       "id": "tg-master",
-      "label": "The left cliff drifts in colour with the master tuning (display only)",
+      "label": "The left cliff turns in colour as the master tuning rises above 440 Hz (display only)",
       "object": "left-cliff",
       "param": "tg.master",
       "range": [
-        430,
+        440,
         450
       ],
       "curve": "linear",
@@ -836,11 +836,11 @@
     },
     {
       "id": "out-level",
-      "label": "The sky brightens with the output Volume (display only)",
+      "label": "The sky brightens as the output Volume rises above -8 dB (display only)",
       "object": "sky",
       "param": "out.level",
       "range": [
-        -30,
+        -8,
         12
       ],
       "curve": "linear",
@@ -870,11 +870,11 @@
     },
     {
       "id": "voice-split",
-      "label": "The purple ledge shows the split point (display only)",
+      "label": "The purple ledge turns in colour as the split point rises above C4 (display only)",
       "object": "purple-ledge",
       "param": "voice.split",
       "range": [
-        36,
+        60,
         72
       ],
       "curve": "linear",

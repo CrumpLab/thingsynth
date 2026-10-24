@@ -9,6 +9,8 @@ import fillsUrl from '../../art/golden-pyramid-with-tunnel-celebration/layers/fi
 import inkUrl from '../../art/golden-pyramid-with-tunnel-celebration/layers/ink.svg?url';
 import washUrl from '../../art/golden-pyramid-with-tunnel-celebration/layers/wash.webp?url';
 import scribblesUrl from '../../art/golden-pyramid-with-tunnel-celebration/layers/scribbles.webp?url';
+import washSmallUrl from '../../art/golden-pyramid-with-tunnel-celebration/layers/wash.small.webp?url';
+import scribblesSmallUrl from '../../art/golden-pyramid-with-tunnel-celebration/layers/scribbles.small.webp?url';
 import captionUrl from '../../art/golden-pyramid-with-tunnel-celebration/layers/caption.webp?url';
 import jpegUrl from '../../art/golden-pyramid-with-tunnel-celebration/golden-pyramid-with-tunnel-celebration.jpg';
 
@@ -110,11 +112,15 @@ export function buildArt(flat: boolean): Art {
   const caption = el('image', { x: cx, y: cy, width: cw, height: ch, preserveAspectRatio: 'none' });
   svg.append(defs, paper, painted, caption);
 
+  // Half-size rasters (1238 px) when the painting is shown at most ~1300 device pixels across (phones): the same
+  // picture at a third of the download.
+  const shown = Math.min(window.innerWidth, window.innerHeight) * (window.devicePixelRatio || 1);
+  const small = shown <= 1300;
   const ready = Promise.all([
     loadPaths(fillsUrl, fillsG, fills),
     loadPaths(inkUrl, inkG, ink),
-    loaded(wash, washUrl),
-    loaded(scribbles, scribblesUrl),
+    loaded(wash, small ? washSmallUrl : washUrl),
+    loaded(scribbles, small ? scribblesSmallUrl : scribblesUrl),
     loaded(caption, captionUrl),
   ]).then(() => {
     if (fills.size !== layers.counts.fills || ink.size !== layers.counts.ink) {

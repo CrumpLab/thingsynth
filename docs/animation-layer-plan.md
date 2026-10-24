@@ -1,7 +1,7 @@
 # Animation layer: plan for review
 
 *Written 2026-10-24, revised the same day after reading the PSD, approved by Matt the same day.
-Status: milestones 1 to 4 done (see section 6).*
+Status: milestones 1 to 5 done (see section 6).*
 
 ## 0. In one paragraph
 
@@ -276,7 +276,29 @@ shuffle:
    files and wrong schemas; selecting by click and shift-click, preview, save (one binding changed, nothing else in
    the file) and creating a new object (both files in one write) all worked, with the page reloading into the
    editor. Not yet seen by Matt: the names and the pairings.
-5. **Polish**: line boil quality, scribble style tuned against the real scribbles, phone performance, a
+5. **Polish** (done 2026-10-24):
+   - **Boil** is now a redraw, not a jiggle: each boiling stroke gets three wobbled drawings (every outline point
+     pushed by a smooth field of crossed sine waves, 170 and 260 px wavelengths, so both edges of a stroke move
+     together and the line bends without breaking), cycled 8 times a second, depth in quarter steps from the
+     value; at 0 the original path comes back exactly.
+   - **Scribbles** were measured against the painting's own scribble layer and matched: its pastel palette and hue
+     shares (lavender 30%, yellow 15%, pink 13%, purple 9%, blue 7%, gold 5%, green 5%), ~10 canvas px at 55%
+     opacity, a static fractal-noise pencil grain, and long loose loops instead of small tight ones.
+   - **Phones**: half-size wash and scribble rasters (1238 px, 1.5 MB instead of 4.3 MB) when the painting shows at
+     most ~1300 device px across; a lite mode on small touch screens (20 Hz redraw, 20 idling shapes; `?lite`,
+     `?lite=0`); a bar that fits 375 px; touch wording on the start card. Checked in a 375 x 812 emulation; not
+     measured on a real phone.
+   - **Output safety**: recording the demo showed Tonewheel running up to +6 dBFS with Drive, many drawbars and
+     wander, which the browser clips harshly. The page now owns its path to the speakers (`web/src/output.ts`):
+     exactly linear to -4.4 dBFS, a tanh knee above, never past -1 dBFS. Measured: -31.1 dB and -6 dB pass
+     unchanged, +6 dB comes out at -1.0 dB.
+   - **Demo**: `scripts/record_demo.mjs` (`pnpm demo`) plays a scripted 28 s performance in a headless Chrome and
+     records the page's own output stage with the screencast; `docs/demo/thingsynth-demo.mp4` (5 MB, 800 px,
+     peaks -4 dB) and `poster.jpg`.
+   - Display-only bindings on large backgrounds now start their ranges at the usual value (volume from -8 dB,
+     master tune from 440 Hz, split from C4), so the sky, the cliff and the ledge look as painted unless a preset
+     moves them. The status line follows preset changes.
+   Original milestone 5 note: line boil quality, scribble style tuned against the real scribbles, phone performance, a
    recorded demo.
 
 ## 7. Open questions for Matt

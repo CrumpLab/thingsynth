@@ -354,5 +354,6 @@ the PSD's vector layers and animates its own fill shapes and ink strokes so the 
 own something visible. Milestones 1 to 4 are done: the painting is drawn from its PSD layers, nine effects
 show the bound values, wander keeps the parameters moving (5.1), all 47 parameters and 88 notes are bound in a
 proposal (`docs/mapping-proposal.md`) that the bind editor changes (section 6), and shuffle re-deals it (5.2).
-Next is milestone 5, polish: boil quality, scribble style against the real scribbles, phone performance, and a
-recorded demo.
+Milestone 5 (polish) is done too: boil redraws lines, scribbles match the painting's own, phones get lighter
+layers and a lite mode, the output has a safety knee, and `docs/demo/thingsynth-demo.mp4` shows it all with
+sound. What is left is Matt's: reviewing the names and pairings in `docs/mapping-proposal.md`.

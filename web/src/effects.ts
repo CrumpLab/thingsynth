@@ -4,8 +4,10 @@
 //                      to hold that chroma, mid and dark colours lift towards light (so glow never dims a shape)
 //            hue       turns round the colour wheel, 60 degrees at amount 1
 //   reveal   fill      a vivid copy of the shape rises from an edge (bottom by default), like a drawbar
-//            scribble  pencil loops in a deeper shade of the shape's colour draw themselves in, clipped to it
-//   motion   boil      every outline stroke jitters a few px, re-drawn 8 times a second (hand-drawn line boil)
+//            scribble  pencil loops draw themselves in, clipped to the shape, matched to the painting's own scribble
+//                      layer: its pastel palette, ~10 px grainy pencil at ~55% opacity, long loose loops
+//   motion   boil      the outline strokes are redrawn: three wobbled drawings of each line, cycled 8 times a
+//                      second (the hand-drawn line boil); depth follows the value, the original line at 0
 //            pulse     the object breathes: scale about its centre, depth follows the value
 //            wobble    a heat-shimmer sway and skew, depth follows the value
 //            spin      the object turns about its centre, speed follows the value; it stops where it is
@@ -28,12 +30,21 @@ const HUE_DEG = 60;
 const GLOW_OPACITY = 0.6;
 /** fill: the rising copy is the shape's own colour glowing this much (vivid, lighter for mid and dark colours). */
 const FILL_GLOW = 1.4;
-const BOIL_PX = 10, BOIL_DEG = 0.6, BOIL_HZ = 8;
+const BOIL_PX = 12, BOIL_HZ = 8, BOIL_DRAWINGS = 3;
+/** Wavelengths of the wobble field in canvas px: long enough that both edges of a stroke move together. */
+const BOIL_WAVE: readonly [number, number] = [170, 260];
 const PULSE_DEPTH = 0.05, PULSE_HZ = 0.6;
 const WOBBLE_PX = 10, WOBBLE_DEG = 2, WOBBLE_HZ = 1.6;
 const SPIN_RPS = 0.75;
 const BLINK_MS = 160;
-const SCRIBBLE_COUNT = 14, SCRIBBLE_WIDTH = 6;
+const SCRIBBLE_COUNT = 14, SCRIBBLE_WIDTH = 10, SCRIBBLE_OPACITY = 0.55;
+/**
+ * The real scribble layer's colours, measured from scribbles.webp (hue share of its pencil pixels): lavender 30%,
+ * yellow 15%, pink 13%, purple 9%, blue 7%, gold 5%, green 5%; pastel, lightness ~0.8.
+ */
+const SCRIBBLE_PALETTE: ReadonlyArray<[string, number]> = [
+  ['#c4a3f0', 30], ['#efe38a', 15], ['#f2a6c6', 13], ['#b38be8', 9], ['#9fbcec', 7], ['#f0d27a', 5], ['#b4e0a2', 5],
+];
 const GLIDE_MS = 150, PRESET_GLIDE_MS = 400, WAVE_MS = 450;
 const ATTACK_MS = 10;
 /**
@@ -42,7 +53,17 @@ const ATTACK_MS = 10;
  * long frames; 30 Hz ("on twos") keeps motion smooth and matches hand-drawn animation.
  */
 const PAINT_HZ = 30;
-const IDLE_AFTER_MS = 60_000, IDLE_FILLS = 40, IDLE_HUE_DEG = 7, IDLE_FADE_MS = 2000, IDLE_HZ = 10, SCRIBBLE_DRIFT_PX = 6;
+/**
+ * Lite: small touch screens (phones), or ?lite; ?lite=0 turns it off. The painting is redrawn at most 20 times a
+ * second and half as many shapes idle; everything else is the same.
+ */
+const LITE = ((): boolean => {
+  const q = new URLSearchParams(location.search);
+  if (q.has('lite')) return q.get('lite') !== '0';
+  return matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 800;
+})();
+const PAINT_EVERY_MS = 1000 / (LITE ? 20 : PAINT_HZ);
+const IDLE_AFTER_MS = 60_000, IDLE_FILLS = LITE ? 20 : 40, IDLE_HUE_DEG = 7, IDLE_FADE_MS = 2000, IDLE_HZ = 10, SCRIBBLE_DRIFT_PX = 6;
 
 type Fill = { el: SVGPathElement; hex: string; base: Oklch; opacity: number; hue: number; glow: number; written: string };
 type Move = { spec: EffectSpec; targets: SVGPathElement[]; cx: number; cy: number; phase: number };
@@ -78,6 +99,8 @@ export interface Effects {
   /** Notes currently sounding (held or releasing). */
   notes(): number[];
   idle(): boolean;
+  /** Lite mode (small touch screens, or ?lite). */
+  lite: boolean;
   dispose(): void;
 }
 
@@ -97,7 +120,11 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
   if (!stack) throw new Error('effects need the layered painting');
   const motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const fills = new Map<string, Fill>();
-  const boilWritten = new Map<SVGPathElement, string>();
+  // Boil drawings: per stroke, its original outline and wobbled redraws per depth level (cached, made lazily).
+  const inkOriginal = new Map<string, string>();
+  const boilCache = new Map<string, string[]>();
+  const boilShown = new Map<string, string>();
+  let boilFrame = 0;
   const transformed = new Set<SVGPathElement>();
   let live: Live[] = [];
   const byNote = new Map<number, Live[]>();
@@ -111,6 +138,27 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     f = { el, hex: part.fill, base: hexToOklch(part.fill), opacity: part.opacity, hue: 0, glow: 0, written: '' };
     fills.set(id, f);
     return f;
+  };
+  // The pencil grain for scribbles: fractal noise as a speckled mask, shared by every scribble group. Static, so it
+  // costs nothing per frame beyond re-rasterising the strokes it masks.
+  let pencilId = '';
+  const pencilFilter = (): string => {
+    if (pencilId) return pencilId;
+    pencilId = 'ts-pencil';
+    const f = document.createElementNS(SVG, 'filter');
+    f.id = pencilId;
+    f.setAttribute('x', '-2%'); f.setAttribute('y', '-2%'); f.setAttribute('width', '104%'); f.setAttribute('height', '104%');
+    const turb = document.createElementNS(SVG, 'feTurbulence');
+    turb.setAttribute('type', 'fractalNoise'); turb.setAttribute('baseFrequency', '0.45'); turb.setAttribute('numOctaves', '2');
+    turb.setAttribute('seed', '7'); turb.setAttribute('result', 'noise');
+    const cm = document.createElementNS(SVG, 'feColorMatrix');
+    cm.setAttribute('in', 'noise'); cm.setAttribute('type', 'matrix'); cm.setAttribute('result', 'grain');
+    cm.setAttribute('values', '0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  2.6 0 0 0 -0.6');
+    const comp = document.createElementNS(SVG, 'feComposite');
+    comp.setAttribute('in', 'SourceGraphic'); comp.setAttribute('in2', 'grain'); comp.setAttribute('operator', 'in');
+    f.append(turb, cm, comp);
+    stack.defs.append(f);
+    return pencilId;
   };
   const partsOf = (obj: ArtObject, spec: EffectSpec, bindingId: string): string[] => spec.parts
     ? spec.parts.flatMap((r) => {
@@ -188,11 +236,9 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
           g.setAttribute('stroke-linecap', 'round');
           g.setAttribute('stroke-linejoin', 'round');
           g.style.pointerEvents = 'none';
-          const first = fillParts.get(ids[0] ?? '');
-          const base = hexToOklch(first?.fill ?? '#888888');
-          g.setAttribute('stroke', oklchToHex({ l: Math.max(0.2, base.l - 0.28), c: base.c + 0.06, h: base.h }));
-          g.setAttribute('stroke-opacity', '0.75');
+          g.setAttribute('stroke-opacity', String(SCRIBBLE_OPACITY));
           g.setAttribute('stroke-width', String(SCRIBBLE_WIDTH));
+          g.setAttribute('filter', `url(#${pencilFilter()})`);
           const count = spec.count ?? SCRIBBLE_COUNT;
           const [bx, by, bw, bh] = obj.bbox;
           const strokes: SVGPathElement[] = [];
@@ -360,24 +406,38 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
         if (tr) for (const el of m.targets) add(el, tr);
       }
     }
-    // Boil: amplitude per stroke = the largest from any binding; the jitter is re-rolled BOIL_HZ times a second.
-    if (motionOK) {
-      const amp = new Map<string, number>();
-      for (const L of live) for (const [id, a] of L.boil) amp.set(id, Math.max(amp.get(id) ?? 0, a * L.shown));
-      const r = (): number => Math.random() * 2 - 1;
-      for (const [id, a] of amp) {
-        const el = art.ink.get(id);
-        if (!el) continue;
-        if (a <= 0.002) { boilWritten.delete(el); continue; }
+    // Boil: depth per stroke = the largest from any binding, in quarter steps; the next drawing every 1/BOIL_HZ s.
+    const amp = new Map<string, number>();
+    if (motionOK) for (const L of live) for (const [id, a] of L.boil) amp.set(id, Math.max(amp.get(id) ?? 0, a * L.shown));
+    if (reroll) boilFrame = (boilFrame + 1) % BOIL_DRAWINGS;
+    for (const [id, a] of amp) {
+      const el = art.ink.get(id);
+      if (!el) continue;
+      const level = Math.min(8, Math.round(a * 4)); // 0, 0.25 .. 2 (amounts above 1 boil harder)
+      if (!inkOriginal.has(id)) inkOriginal.set(id, el.getAttribute('d') ?? '');
+      const orig = inkOriginal.get(id)!;
+      let d = orig;
+      if (level > 0) {
         busy = true;
-        let b = boilWritten.get(el);
-        if (reroll || !b) {
-          const s = inkParts.get(id)!;
-          b = `translate(${(r() * BOIL_PX * a).toFixed(1)} ${(r() * BOIL_PX * a).toFixed(1)}) rotate(${(r() * BOIL_DEG * a).toFixed(2)} ${s.centroid[0]} ${s.centroid[1]})`;
-          boilWritten.set(el, b);
+        const key = `${id}@${level}`;
+        let drawings = boilCache.get(key);
+        if (!drawings) {
+          drawings = Array.from({ length: BOIL_DRAWINGS }, (_, k) => wobblePath(orig, (BOIL_PX * level) / 4, rng(`${id}#${k}`)));
+          boilCache.set(key, drawings);
         }
-        add(el, b);
+        // Strokes start at different drawings so neighbours do not all flip on the same beat.
+        d = drawings[(boilFrame + id.charCodeAt(id.length - 1)) % BOIL_DRAWINGS]!;
       }
+      if ((boilShown.get(id) ?? orig) === d) continue;
+      boilShown.set(id, d);
+      el.setAttribute('d', d);
+    }
+    // Strokes no binding boils any more go back to their own line.
+    for (const [id, d] of boilShown) {
+      if (amp.has(id)) continue;
+      const orig = inkOriginal.get(id);
+      if (orig !== undefined && d !== orig) art.ink.get(id)?.setAttribute('d', orig);
+      boilShown.delete(id);
     }
     for (const [el, list] of parts) {
       const s = list.join(' ');
@@ -434,7 +494,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     // between writes so its speed is exact).
     motionDt += dt;
     let busy = true;
-    if (now - lastPaint >= 1000 / PAINT_HZ - 1) {
+    if (now - lastPaint >= PAINT_EVERY_MS - 1) {
       lastPaint = now;
       if (colourDirty || idleTick || idleLevel !== idleWanted) { paintColours(now); colourDirty = false; }
       paintReveals();
@@ -551,6 +611,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     shown: () => live.filter((L) => !L.retiring).map((L) => ({ id: L.binding.id, value: L.shown })),
     notes: () => Array.from(sounding).sort((a, b) => a - b),
     idle: () => idleLevel > 0,
+    lite: LITE,
     dispose: () => {
       disposed = true;
       offParam(); offPreset();
@@ -562,27 +623,59 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
   };
 }
 
-/** One loopy pencil stroke, like the painting's scribble layer: a few elliptical loops drifting across the box. */
+/**
+ * One pencil stroke like the painting's scribble layer: one to three and a half long, loose loops, drifting across
+ * the object's box, with a slightly irregular radius, in a colour from the layer's palette.
+ */
 function scribbleStroke(into: SVGGElement, rand: () => number, bx: number, by: number, bw: number, bh: number): SVGPathElement {
   const m = Math.min(bw, bh);
-  const loops = 2 + Math.floor(rand() * 4);
-  const r = m * (0.08 + rand() * 0.14), squash = 0.45 + rand() * 0.45, tilt = rand() * Math.PI;
-  const drift = m * (0.06 + rand() * 0.1), dir = rand() * Math.PI * 2;
-  const cx0 = bx + bw * (0.15 + rand() * 0.7), cy0 = by + bh * (0.15 + rand() * 0.7);
-  const n = loops * 22;
+  const turns = 1 + rand() * 2.5;
+  const r = m * (0.18 + rand() * 0.24), squash = 0.35 + rand() * 0.5, tilt = rand() * Math.PI;
+  const drift = m * (0.15 + rand() * 0.15), dir = rand() * Math.PI * 2, wob = rand() * Math.PI * 2;
+  const cx0 = bx + bw * rand(), cy0 = by + bh * rand();
+  const per = 28, n = Math.round(turns * per);
   let d = '';
   for (let i = 0; i <= n; i++) {
-    const a = (i / 22) * Math.PI * 2;
-    const ex = Math.cos(a) * r, ey = Math.sin(a) * r * squash;
+    const a = (i / per) * Math.PI * 2;
+    const rr = r * (1 + 0.08 * Math.sin(3 * a + wob));
+    const ex = Math.cos(a) * rr, ey = Math.sin(a) * rr * squash;
     const x = cx0 + Math.cos(dir) * drift * (a / Math.PI) + ex * Math.cos(tilt) - ey * Math.sin(tilt);
     const y = cy0 + Math.sin(dir) * drift * (a / Math.PI) + ex * Math.sin(tilt) + ey * Math.cos(tilt);
     d += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
   }
+  const total = SCRIBBLE_PALETTE.reduce((t, [, w]) => t + w, 0);
+  let pick = rand() * total, colour = SCRIBBLE_PALETTE[0]![0];
+  for (const [c, w] of SCRIBBLE_PALETTE) { if ((pick -= w) <= 0) { colour = c; break; } }
   const p = document.createElementNS(SVG, 'path');
   p.setAttribute('d', d);
+  p.setAttribute('stroke', colour);
   p.setAttribute('pathLength', '1');
   p.setAttribute('stroke-dasharray', '1 1');
   p.setAttribute('stroke-dashoffset', '1');
   into.append(p);
   return p;
+}
+
+/**
+ * One redrawn version of an outline: every point of the path is pushed by a smooth wobble field (two crossed sine
+ * waves per axis with random phases), so both edges of a stroke move together and the line bends along its length
+ * instead of breaking up. The path is Fresco's absolute M/C/Z; numbers come in x y pairs.
+ */
+function wobblePath(d: string, px: number, rand: () => number): string {
+  const [p0, p1, p2, p3] = [rand(), rand(), rand(), rand()].map((v) => v * Math.PI * 2) as [number, number, number, number];
+  const [l1, l2] = BOIL_WAVE;
+  const tokens = d.match(/[MCZmcz]|-?\d+\.?\d*(?:e[-+]?\d+)?/gi) ?? [];
+  let out = '';
+  let pending: number | null = null;
+  for (const t of tokens) {
+    if (/^[a-z]$/i.test(t)) { out += t; continue; }
+    const v = Number(t);
+    if (pending === null) { pending = v; continue; }
+    const x = pending, y = v;
+    pending = null;
+    const nx = x + px * (0.6 * Math.sin(x / l1 + p0) + 0.4 * Math.sin(y / l2 + p1));
+    const ny = y + px * (0.6 * Math.sin(y / l1 + p2) + 0.4 * Math.sin(x / l2 + p3));
+    out += `${/[0-9.]$/.test(out) ? ' ' : ''}${nx.toFixed(1)} ${ny.toFixed(1)}`;
+  }
+  return out;
 }

@@ -7,6 +7,11 @@ and Web MIDI play notes. Everything runs in the browser (WebAssembly in an Audio
 
 See [PLAN.md](PLAN.md) for the architecture, the mapping schema and the parameter list.
 
+[![thingsynth demo: the painting playing Tonewheel](docs/demo/poster.jpg)](docs/demo/thingsynth-demo.mp4)
+
+*A 28-second demo with sound (`docs/demo/thingsynth-demo.mp4`): a jazz progression, Drive heating the pyramid,
+drawbars filling the stalks, wander, a preset change travelling across the painting, and a shuffle.*
+
 ## Run
 
 Needs Node 22 and pnpm (`corepack enable` gives you the pinned pnpm).
@@ -42,7 +47,12 @@ Open the printed URL (http://localhost:5173). Click or press a key to start audi
   running silently (for automated checks).
 
 Other scripts: `pnpm build` (typecheck + production build into `dist/`), `pnpm preview`, `pnpm typecheck`,
-`pnpm presets` (rebuild the preset index), `pnpm sync` (re-copy from SynthLand, see [UPSTREAM.md](UPSTREAM.md)).
+`pnpm presets` (rebuild the preset index), `pnpm sync` (re-copy from SynthLand, see [UPSTREAM.md](UPSTREAM.md)),
+`pnpm demo [url]` (record the demo video: needs the dev server running, ffmpeg and Google Chrome; it drives a
+headless Chrome with a throwaway profile and writes `docs/demo/`).
+
+On phones (small touch screens) the page uses half-size raster layers and a lite mode (redrawn at most 20 times
+a second, fewer idling shapes); `?lite` and `?lite=0` force it on or off.
 
 ## Layout
 
@@ -63,12 +73,13 @@ web/                    Vite app, plain TypeScript, no framework
   src/dial.ts           the small rotary dial used for wander speed and amount
   src/shuffle.ts        seeded, shape-aware re-dealing of parameters (and notes) onto objects
   src/editor.ts         the bind editor (debug only; saves through the dev server, web/vite.config.ts)
+  src/output.ts         the path to the speakers: linear to -4.4 dBFS, a soft knee that never passes -1 dBFS
   src/debug.ts          ?debug overlay, HUD and region editor
   runtime/              copy of SynthLand's web runtime (do not edit here)
   public/wasm/          additive.wasm (Tonewheel's engine)
   public/tonewheel/     plugin.json and presets
 upstream/               reference copies of the Tonewheel manifest and engine params.json
-scripts/                sync_upstream.sh, build_preset_index.mjs, build_worklet.mjs
+scripts/                sync_upstream.sh, build_preset_index.mjs, build_worklet.mjs, record_demo.mjs
 tools/extract_psd.py    PSD -> art/<slug>/layers (run with uv, authoring time only; see below)
 tools/propose_objects.py  which shapes are details of which (a starting point for naming objects; uv)
 tools/mapping_report.py   mapping.json + objects.json -> docs/mapping-proposal.md

@@ -11,12 +11,14 @@
     "preview": "vite preview --config web/vite.config.ts",
     "typecheck": "tsc -p web/tsconfig.json && tsc -p web/tsconfig.worklet.json",
     "presets": "node scripts/build_preset_index.mjs",
-    "sync": "bash scripts/sync_upstream.sh"
+    "sync": "bash scripts/sync_upstream.sh",
+    "demo": "node scripts/record_demo.mjs"
   },
   "devDependencies": {
     "@types/audioworklet": "^0.0.60",
     "@types/webmidi": "^2.1.0",
     "esbuild": "^0.25.0",
+    "puppeteer-core": "25.16.0",
     "typescript": "^5.6.3",
     "vite": "^6.0.0"
   }

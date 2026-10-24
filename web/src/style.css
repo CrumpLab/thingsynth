@@ -50,6 +50,14 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); f
 body.wandering .dial .fill { stroke: var(--accent); }
 .dial .tick { stroke: var(--fg); stroke-width: 2; stroke-linecap: round; }
 @media (max-width: 560px) { .dial span { display: none; } #bar { gap: 8px; } #bar label { font-size: 0; } #bar select { font-size: 13px; max-width: 150px; } }
+/* Phones: the bar keeps preset, wander and shuffle; status and the debug link step aside (?debug still works). */
+@media (max-width: 480px) {
+  #bar { gap: 6px; padding: 0 8px; }
+  #bar select { max-width: 112px; }
+  #bar #status, #bar #debug-link, #shuffle .seed { display: none; }
+  #wander, #shuffle, #unshuffle { padding: 3px 7px; }
+  .dial svg { width: 24px; height: 24px; }
+}
 
 /* ?debug */
 body.debug .region { stroke: #ff2bd6; stroke-width: 6; fill: #ff2bd6; fill-opacity: 0.12; }

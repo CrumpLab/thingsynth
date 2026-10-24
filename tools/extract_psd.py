@@ -11,6 +11,7 @@ Writes art/<slug>/layers/:
                   (the PSD itself is not copied)
   wash.webp       the soft colour-wash pixel layer, on the full canvas, at --scale (default 0.5: 2475 px)
   scribbles.webp  the pencil-scribble pixel layer, same, with alpha
+  *.small.webp    both again at half that size (1238 px), for phones, where the painting is ~1100 px across
   fills.svg       every coloured vector fill as <path id="fNNN" fill=... fill-opacity=...>, canvas coordinates
   ink.svg         every black vector ink shape as <path id="iNNNN">, canvas coordinates
   caption.webp    the white margin below the painted area with the hand-lettered title and signature, cropped
@@ -273,8 +274,10 @@ def main() -> int:
     big = [l for l in pixel if l.bbox[2] - l.bbox[0] > canvas / 2 and l.bbox[3] - l.bbox[1] > canvas / 2]
     rasters = {}
     for role, l in zip(("wash", "scribbles"), big):
-        save_webp(raster(l, canvas, args.scale), out / f"{role}.webp", args.quality)
-        rasters[role] = {"layer": l.layer_id, "name": l.name, "file": f"{role}.webp"}
+        full = raster(l, canvas, args.scale)
+        save_webp(full, out / f"{role}.webp", args.quality)
+        save_webp(full.resize((full.width // 2, full.height // 2), Image.LANCZOS), out / f"{role}.small.webp", args.quality)
+        rasters[role] = {"layer": l.layer_id, "name": l.name, "file": f"{role}.webp", "small": f"{role}.small.webp"}
         print(f"  {role}: layer {l.layer_id} {l.name!r} -> {role}.webp")
 
     # Caption: the reference image's margin below the painted area, mapped to canvas coordinates.
