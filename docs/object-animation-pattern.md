@@ -54,7 +54,9 @@ Until Matt says the choices can be made without him, every object goes through t
    mockup.
 6. **Log the choice** below: what was offered, what was picked, and what that says about his taste.
 
-Once Matt hands it over, the loop runs without him, using the log to choose.
+Since 2026-10-24 Matt only stops the loop at step 3: his pick of end frames means build it (steps 4-6 run without a
+separate approval), and after the build Claude picks the next object and starts it. Once Matt hands it over, the
+loop runs without him, using the log to choose.
 
 ## 5. Matt's choices so far
 
@@ -108,6 +110,10 @@ What the decisions have shown, to apply to later objects:
 
   From round two (balloon cactus, graffiti eyeballs, party balloons, big croak, frog face) he picked graffiti
   eyeballs and said to build it.
+- **Tunnel review, vibrato mode (2026-10-24, object picked by Claude):** offered train, eyes in the dark, rainbow
+  rings, singing mouth, tunnel flower. Picked eyes in the dark with rainbow rings, and said a pick means build it.
+  Most of the tunnel is hidden behind the frog and bush, so ideas had to live in the visible band or come out in
+  front of it.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
@@ -127,5 +133,6 @@ its thing in the painting's style.
 | cloud (cloud-age) | `tg.age` | the big pale scalloped cloud behind the pyramid's apex, under the horned ghost | built: spotted mushrooms and little flowers come up one by one in a scattered order along its top edge; stems rise, caps swell and spot, petals pop open last; `docs/objects/cloud-age/mockup-vs-app.png` |
 | horned-ghost (lower-db6) | `lower.db6` | the tall two-tone blue ghost with orange horns and a slit eye, under the big cloud | built: two little twin ghosts pop up from behind it, one each side (0-0.55), then a blue arm with a big lime hand grows out from its right side (0.45-0.85) and motion crescents flick out round the hand; `docs/objects/lower-db6/mockup-vs-app.png` |
 | acorn-frog (tg-complex) | `tg.complex` | the pale yellow frog body with a little blue head and two acorns on its back | built: on complex the acorns fade and two big spray-painted eyeballs pop up in their place, drop shadows land behind them, irises and pupils open, white paint drips run down; 0.8 s glide; notes A3 and C4 moved from the acorns to the pink petals f216 and f217; `docs/objects/tg-complex/mockup-vs-app.png` |
+| tunnel (vib-mode) | `vib.mode` | the dark teal arch in the golden pyramid, its mouth mostly hidden by the acorn frog and bush | built: each of the six modes brings rainbow rings up out of the tunnel's depth (outer first, the innermost night-dark), then two glowing yellow eyes open in dark sockets, peeking out; drawn on the tunnel, under the frog and ink; 0.6 s glide; `docs/objects/vib-mode/mockup-vs-app.png` |
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |

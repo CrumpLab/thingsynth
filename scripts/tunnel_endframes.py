@@ -203,3 +203,77 @@ def main() -> None:
 
 if __name__ == '__main__' and len(__import__('sys').argv) == 1:
     main()
+
+
+# ---- chosen: rainbow rings with eyes in the dark (2 + 3) ----------------------------------------------------------
+# Vibrato mode has six settings, so the frames step 0, 0.2 .. 1. Each step brings rings up out of the tunnel's depth
+# (each ring grows from the vanishing point to its place, outer rings first), the innermost ring is night-dark, and
+# the two glowing eyes open last, each in a dark socket, peeking out from behind the frog.
+RING_COLS = ['#f64c76', '#ff9f43', '#ffe066', '#7fd36b', '#2DFFF4', '#b44cff', '#141a3a']
+EYES = [(3530.0, 1625.0, 70.0), (3280.0, 1805.0, 66.0)]
+
+
+def rings_items() -> list[dict]:
+    d = tunnel_d()
+    items = []
+    at = [VP[0], VP[1]]
+    for k, col in enumerate(RING_COLS):
+        s = 1 - 0.13 * k
+        start = 0.02 + 0.11 * k
+        items.append({'d': scaled(d, s) if k else d, 'fill': col, 'edge': INK if k else 0, 'at': at, 'start': round(start, 3),
+                      'end': round(start + 0.18, 3), 'grow': 'scale'})
+    for j, (x, y, r) in enumerate(EYES):
+        o = 0.06 * j
+        A = lambda dd, f, e, s0, s1, grow='scale', a=(x, y): items.append({'d': dd, 'fill': f, 'edge': e, 'at': [round(a[0], 1), round(a[1], 1)],
+                                                                        'start': round(s0 + o, 3), 'end': round(s1 + o, 3), 'grow': grow})
+        A(ellipse(x, y, r * 1.45, r * 1.3), '#141a3a', INK, 0.7, 0.82)
+        A(ellipse(x, y, r * 1.1, r), '#ffe066', INK, 0.78, 0.92, 'y')
+        A(ellipse(x, y, r * 0.75, r * 0.7), '#ffb84d', INK * 0.6, 0.8, 0.94, 'y')
+        A(ellipse(x + 8, y + 5, r * 0.22, r * 0.62), '#000000', 0, 0.82, 0.96, 'y')
+        A(circle(x + r * 0.4, y - r * 0.4, r * 0.16), '#ffffff', INK * 0.5, 0.86, 0.98, 'scale', (x + r * 0.4, y - r * 0.4))
+    return items
+
+
+def rings_frame(t: float) -> Image.Image:
+    if t <= 0:
+        return m.compose()
+    return draw(clipped(g.sprite_svg(rings_items(), t)))
+
+
+def rings_main() -> None:
+    out = OUT.parent / 'rings-and-eyes'
+    out.mkdir(parents=True, exist_ok=True)
+    frames = [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+    tiles = [rings_frame(t) for t in frames]
+    tiles[-1].save(out / 'end-frame.png')
+    w, h = tiles[0].size
+    sc = 0.3
+    tw, th = int(w * sc), int(h * sc)
+    strip = Image.new('RGB', (tw * 6 + 70, th + 56), 'white')
+    try:
+        font = ImageFont.load_default(size=22)
+    except TypeError:
+        font = ImageFont.load_default()
+    d = ImageDraw.Draw(strip)
+    for i, (tt, im) in enumerate(zip(frames, tiles)):
+        x = 10 + i * (tw + 10)
+        d.text((x, 12), f'frame {tt:.2f}', fill='black', font=font)
+        strip.paste(im.convert('RGB').resize((tw, th), Image.LANCZOS), (x, 48))
+    strip.save(out / 'strip.png')
+    print('wrote', out)
+
+
+if __name__ == '__main__' and 'rings' in __import__('sys').argv[1:]:
+    rings_main()
+
+if __name__ == '__main__' and 'export' in __import__('sys').argv[1:]:
+    import json as _j
+    mp = ROOT / 'mapping.json'
+    M = _j.loads(mp.read_text())
+    for b in M['bindings']:
+        if b['id'] == 'vib-mode':
+            b['label'] = 'The tunnel: tap through the six vibrato and chorus modes; rainbow rings rise out of its depth and two eyes open in the dark'
+            b['glide'] = 600
+            b['effects'] = [{'effect': 'sprites', 'place': 'on', 'items': rings_items()}]
+    mp.write_text(_j.dumps(M, indent=2) + '\n')
+    print('exported', len(rings_items()), 'shapes')
