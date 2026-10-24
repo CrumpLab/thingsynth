@@ -529,9 +529,11 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
         const key = p.toFixed(3);
         if (key === f.written) continue;
         f.written = key;
-        if (f.kind === 'draw') {
-          f.el.setAttribute('stroke-dashoffset', (1 - p).toFixed(4));
-          f.el.style.visibility = p > 0 ? 'visible' : 'hidden';
+        if (f.kind === 'ribbon' && f.ribbon) {
+          const r = ribbon(f.ribbon.pts, f.ribbon.halfWidth, p);
+          f.el.setAttribute('d', r.fill);
+          f.ribbon.line.setAttribute('d', r.line);
+          f.el.style.visibility = f.ribbon.line.style.visibility = p > 0 ? 'visible' : 'hidden';
         } else {
           const s = p <= 0 ? 0 : popEase(p);
           f.el.style.visibility = p > 0 ? 'visible' : 'hidden';
@@ -760,14 +762,20 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
 // ---- grow ----------------------------------------------------------------------------------------------------------
 
 const GROW_COUNT = 8;
-/** Line weights in canvas px, close to the painting's own ink (its strokes are 14 to 40 px wide). */
-const GROW_STEM_PX = 26, GROW_EDGE_PX = 16;
+/**
+ * Outline weight in canvas px, the painting's finer ink (its outlines run 14 to 40 px; the stalks' own are at the
+ * thin end), and a branch's width where it leaves the stalk, as a share of its length.
+ */
+const GROW_EDGE_PX = 11, GROW_BASE_WIDTH = 0.14;
 const LEAF_COLOURS = ['#9cf27c', '#c6f58a', '#7fe8b0', '#f2ef7a', '#b4e0a2'];
 const BUD_COLOURS = ['#f2a6c6', '#c4a3f0', '#ffb36b', '#7fd8f5', '#ff8fa3'];
 
 interface GrowFeature {
-  kind: 'draw' | 'pop';
+  kind: 'ribbon' | 'pop';
+  /** ribbon: the fill path; pop: the group that scales in */
   el: SVGElement;
+  /** ribbon: the centreline, its half-width at the base, and the outline path (open at the base) */
+  ribbon?: { pts: Pt[]; halfWidth: number; line: SVGPathElement };
   /** the window of the effect's timeline (0..1) it grows over */
   from: number;
   to: number;
@@ -792,7 +800,39 @@ const rot = (a: Pt, deg: number): Pt => {
   return [a[0] * c - a[1] * s, a[0] * s + a[1] * c];
 };
 const norm = (a: Pt): Pt => { const l = Math.hypot(a[0], a[1]) || 1; return [a[0] / l, a[1] / l]; };
-const poly = (pts: Pt[]): string => pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('');
+const fmt = (p: Pt): string => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+
+/**
+ * A tapered shape along a centreline, grown to p (0..1) of its length: wide at the base, narrowing along its length
+ * (a spiral tendril thins as it curls), with a pointed growing tip. Returns the fill outline (closed) and the ink
+ * line (open across the base, so the shape joins its parent without a seam).
+ */
+function ribbon(pts: Pt[], half: number, p: number): { fill: string; line: string } {
+  if (p <= 0 || pts.length < 2) return { fill: 'M0 0Z', line: 'M0 0' };
+  const n = pts.length - 1;
+  const end = p * n;
+  const k = Math.floor(end);
+  const centre: Pt[] = pts.slice(0, k + 1);
+  if (end > k && k < n) {
+    const a = pts[k]!, b = pts[k + 1]!, f = end - k;
+    centre.push([a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f]);
+  }
+  const m = centre.length - 1;
+  if (m < 1) return { fill: 'M0 0Z', line: 'M0 0' };
+  const left: Pt[] = [], right: Pt[] = [];
+  for (let i = 0; i <= m; i++) {
+    const t = (i / m) * p; // position along the full branch
+    const tipT = m === 0 ? 1 : i / m; // position along what has grown
+    const w = half * Math.max(0.12, 1 - 0.85 * t) * Math.min(1, (1 - tipT) * 6 + 0.04);
+    const a = centre[Math.max(0, i - 1)]!, b = centre[Math.min(m, i + 1)]!;
+    const d = norm([b[0] - a[0], b[1] - a[1]]);
+    const nn: Pt = [-d[1], d[0]];
+    left.push(add(centre[i]!, mul(nn, w)));
+    right.push(add(centre[i]!, mul(nn, -w)));
+  }
+  const outline = [...left, ...right.reverse()];
+  return { fill: `M${outline.map(fmt).join('L')}Z`, line: `M${outline.map(fmt).join('L')}` };
+}
 
 /**
  * Lay out the growth on a host shape: `count` branches, climbing from its base, alternating sides. Each branch
@@ -818,6 +858,7 @@ function buildGrowth(g: SVGGElement, host: SVGPathElement, box: [number, number,
     g.append(e);
     return e;
   };
+  const hostColour = host.getAttribute('fill') ?? '#53A85A';
   // Branch length follows the shape's height (a tall stalk grows long branches), capped by its size overall.
   const scale = Math.min(bh, Math.max(bw, bh) * 0.9) * size;
   for (let k = 0; k < count; k++) {
@@ -825,13 +866,15 @@ function buildGrowth(g: SVGGElement, host: SVGPathElement, box: [number, number,
     const win = (a: number, b: number): [number, number] => [from + (to - from) * a, from + (to - from) * b];
     const side: -1 | 1 = k % 2 === 0 ? -1 : 1;
     const y = by + bh * (0.92 - 0.8 * ((k + 0.5) / count)) + (rand() - 0.5) * bh * 0.04;
-    const A = edge(y, side);
-    if (!A) continue;
+    const E = edge(y, side);
+    if (!E) continue;
     // Outward, then turned upward 25..55 degrees, with a bend one way or the other.
     const lean = 25 + rand() * 30;
     const dir = norm(rot([side, 0], side < 0 ? lean : -lean));
     const nrm: Pt = [-dir[1], dir[0]];
     const len = scale * (0.24 + rand() * 0.14);
+    // Start inside the stalk, so the branch's fill covers the stalk's outline where they join (no seam).
+    const A = add(E, mul([side, 0], -len * 0.09));
     const bend = (rand() < 0.5 ? -1 : 1) * len * (0.12 + rand() * 0.1);
     const P1 = add(add(A, mul(dir, len * 0.35)), mul(nrm, bend));
     const P2 = add(add(A, mul(dir, len * 0.75)), mul(nrm, -bend * 0.6));
@@ -857,9 +900,11 @@ function buildGrowth(g: SVGGElement, host: SVGPathElement, box: [number, number,
       }
       a0 = 0;
     }
-    const branch = mk('path', { d: poly(stem), fill: 'none', stroke: '#000', 'stroke-width': String(GROW_STEM_PX), 'stroke-linecap': 'round', 'stroke-linejoin': 'round', pathLength: '1', 'stroke-dasharray': '1 1', 'stroke-dashoffset': '1' });
+    // The branch: a tapered shape in the stalk's colour, outlined in black except across its base.
+    const branchFill = mk('path', { d: 'M0 0Z', fill: hostColour });
+    const branchLine = mk('path', { d: 'M0 0', fill: 'none', stroke: '#000', 'stroke-width': String(GROW_EDGE_PX), 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
     const [b0, b1] = win(0, curl ? 0.75 : 0.6);
-    features.push({ kind: 'draw', el: branch, from: b0, to: b1, at: A, written: '' });
+    features.push({ kind: 'ribbon', el: branchFill, ribbon: { pts: stem, halfWidth: (len * GROW_BASE_WIDTH) / 2, line: branchLine }, from: b0, to: b1, at: A, written: '' });
 
     // One or two leaves along the stem, on alternating sides of it.
     const leaves = 1 + (rand() < 0.6 ? 1 : 0);
@@ -880,7 +925,7 @@ function buildGrowth(g: SVGGElement, host: SVGPathElement, box: [number, number,
       const rib = document.createElementNS(SVG, 'path');
       const ribEnd = add(Q, mul(D, l * 0.72));
       rib.setAttribute('d', `M${Q[0].toFixed(1)} ${Q[1].toFixed(1)}L${ribEnd[0].toFixed(1)} ${ribEnd[1].toFixed(1)}`);
-      rib.setAttribute('stroke', '#000'); rib.setAttribute('stroke-width', String(GROW_EDGE_PX * 0.6)); rib.setAttribute('stroke-linecap', 'round');
+      rib.setAttribute('stroke', '#000'); rib.setAttribute('stroke-width', String(GROW_EDGE_PX * 0.7)); rib.setAttribute('stroke-linecap', 'round');
       leaf.append(body, rib);
       const [l0, l1] = win(0.35 + j * 0.18, 0.75 + j * 0.12);
       features.push({ kind: 'pop', el: leaf, from: l0, to: Math.min(to, l1), at: Q, written: '' });
