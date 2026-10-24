@@ -1,0 +1,14 @@
+{
+  "schema": "thingsynth.objects/1",
+  "canvas": [4950, 4950],
+  "objects": {
+    "golden-pyramid": {
+      "label": "The golden pyramid, both faces",
+      "parts": {
+        "face-left": ["f135"],
+        "face-right": ["f136"]
+      },
+      "ink": "auto"
+    }
+  }
+}

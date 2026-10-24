@@ -95,7 +95,47 @@ parameter may appear in several regions; the last gesture wins. A region naming 
 have is reported in the console and otherwise ignored. Regions are drawn in file order; a later region on top
 receives the pointer events where they overlap.
 
-Possible later additions (not implemented, keep the schema version at `/1` until one lands): `"params": [...]`
+### 3.1 v2: objects and bindings
+
+`"schema": "thingsynth.mapping/2"` keeps `regions` (as above) and adds `bindings`. A binding binds an
+**object**, a named group of the painting's own fill shapes from `art/<slug>/objects.json`, to a parameter.
+The parameter's value is drawn on the object, and an optional gesture makes the object itself the control (its
+hit area is its own outline, not a rectangle).
+
+```jsonc
+// art/<slug>/objects.json
+{ "schema": "thingsynth.objects/1", "canvas": [4950, 4950],
+  "objects": {
+    "golden-pyramid": { "label": "The golden pyramid, both faces",
+                        "parts": { "face-left": ["f135"], "face-right": ["f136"] },   // role -> fill ids
+                        "ink": "auto" } } }      // "auto": every stroke that runs along one of its fills
+
+// mapping.json
+{ "schema": "thingsynth.mapping/2", "image": "...", "size": [2475, 2475],
+  "bindings": [
+    { "id": "pyramid-drive", "object": "golden-pyramid", "param": "amp.drive", "range": [0, 1], "curve": "linear",
+      "gesture": "drag-x",                         // optional; tap | drag-x | drag-y | hold | hover
+      "effects": [ { "effect": "hue", "amount": -0.3 },             // optional "parts": role or [roles]
+                   { "effect": "glow", "amount": 1 },
+                   { "effect": "boil", "amount": 1 } ] } ],
+  "regions": [ ... ] }
+```
+
+The value drawn is the parameter's position in `range` through `curve` (0..1), so a drag, a preset or MIDI all
+move the picture. Effects (`web/src/effects.ts`), at amount 1 and value 1:
+
+| effect | on | what it does |
+| --- | --- | --- |
+| `glow` | fills | OKLCH chroma +0.09, deepened by up to 0.18 lightness only as far as needed to hold that chroma (pastels near white have no room for it otherwise), opacity 60% of the way to solid |
+| `hue` | fills | turns the hue by 60 degrees (negative amounts turn the other way) |
+| `boil` | ink | every outline stroke jitters by up to 10 canvas px and 0.6 degrees about its centre, re-drawn 8 times a second; still at 0 |
+
+Values glide (150 ms, 400 ms after a preset load). Several bindings may touch the same fill or stroke: hue turns
+and glows add up, boils take the largest. Fill ids (`f001`..) and ink ids (`i0001`..) come from the extractor
+and are stable as long as the PSD's drawing does not change; `?debug`'s parts mode (backquote) shows the id of
+the shape under the pointer.
+
+Possible later additions (not implemented): `"params": [...]`
 to fan one gesture out to several parameters, `"relative": true` for drags that nudge from the current value
 instead of setting an absolute position, `"note"` regions that play a pitch instead of setting a parameter,
 and a `"transition"` (ms) for smoothing taps.
@@ -233,6 +273,7 @@ layer, 3 MB of WebP, is the largest piece). Nothing is deployed yet.
 
 [docs/animation-layer-plan.md](docs/animation-layer-plan.md) (approved 2026-10-24) rebuilds the painting from
 the PSD's vector layers and animates its own fill shapes and ink strokes so the 47 parameters and 88 notes each
-own something visible. Milestone 1 is done: `tools/extract_psd.py` exports the layers into
-`art/<slug>/layers/`, the page draws the painting from them, and `?debug` has a parts mode for picking shapes.
-Nothing animates yet; that is milestone 2.
+own something visible. Milestones 1 and 2 are done: `tools/extract_psd.py` exports the layers into
+`art/<slug>/layers/`, the page draws the painting from them, `?debug` has a parts mode for picking shapes, and
+mapping.json v2 binds the golden pyramid to Drive with glow, hue and boil (section 3.1). Next is milestone 3,
+the rest of the effect vocabulary and the note parts.

@@ -6,31 +6,25 @@
 // the mapping regions; the shape under the pointer is outlined and its id, colour, area and box are shown;
 // click logs the full parts.json record.
 import type { WebSynthlandHost } from '../runtime/types';
-import partsJson from '../../art/golden-pyramid-with-tunnel-celebration/layers/parts.json';
 import { layers } from './art';
+import type { Effects } from './effects';
 import { formatEntry, positionOf, type Mapping, type Point, type RegionEntry } from './mapping';
+import { fillParts, type FillPart } from './objects';
 import type { PaintingLayer } from './painting';
 
 const SVG = 'http://www.w3.org/2000/svg';
 
-interface FillPart {
-  id: string; layer: number; n: number; fill: string; opacity: number;
-  bbox: [number, number, number, number]; centroid: [number, number]; area: number; ink: string[];
-}
-const fillParts = new Map((partsJson as unknown as { fills: FillPart[] }).fills.map((f) => [f.id, f]));
-
-export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynthlandHost): void {
+export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynthlandHost, effects: Effects | null): void {
   document.body.classList.add('debug');
   const [W, H] = mapping.size;
 
-  // Labels at each region's first vertex.
-  for (const [entry, poly] of layer.shapes) {
-    const pts = poly.getAttribute('points')!.split(' ')[0]!.split(',').map(Number);
+  // Labels at each control's top-left corner.
+  for (const { control, box } of layer.controls) {
     const t = document.createElementNS(SVG, 'text');
-    t.setAttribute('x', String((pts[0] ?? 0) + 12));
-    t.setAttribute('y', String((pts[1] ?? 0) + 44));
+    t.setAttribute('x', String(box.x + 12));
+    t.setAttribute('y', String(box.y + 44));
     t.classList.add('region-label');
-    t.textContent = `${entry.id} · ${entry.gesture} · ${entry.param}`;
+    t.textContent = `${control.id} · ${control.gesture} · ${control.param}`;
     layer.svg.append(t);
   }
 
@@ -41,7 +35,7 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
   coords.className = 'coords';
   const table = document.createElement('table');
   const rows = new Map<string, HTMLTableCellElement>();
-  const mapped = Array.from(new Set(mapping.regions.map((r) => r.param)));
+  const mapped = Array.from(new Set([...mapping.regions, ...mapping.bindings].map((r) => r.param)));
   for (const id of mapped) {
     const tr = document.createElement('tr');
     const name = document.createElement('td');
@@ -68,8 +62,8 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
   };
   const refresh = (): void => {
     for (const [id, cell] of rows) cell.textContent = fmt(id, host.get(id));
-    for (const [entry, poly] of layer.shapes) {
-      poly.style.fillOpacity = String(0.08 + 0.35 * positionOf(entry, host.get(entry.param)));
+    for (const { control, el } of layer.controls) {
+      el.style.fillOpacity = String(0.08 + 0.35 * positionOf(control, host.get(control.param)));
     }
   };
   refresh();
@@ -180,8 +174,9 @@ export function mountDebug(layer: PaintingLayer, mapping: Mapping, host: WebSynt
       entry: printDraft,
       art: layer.art,
       part: (id: string) => fillParts.get(id),
+      effects,
       partsMode: setPartsMode,
     },
   });
-  console.log('[thingsynth] debug mode: window.thingsynth = { host, mapping, set, get, params, draft, entry, art, part, partsMode }');
+  console.log('[thingsynth] debug mode: window.thingsynth = { host, mapping, set, get, params, draft, entry, art, part, partsMode, effects }');
 }

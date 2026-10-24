@@ -183,7 +183,7 @@ def main() -> int:
         paths, place = read_vector_layer(l)
         for n, p in enumerate(paths):
             d, pts = translate(p["d"], place)
-            rec = {"layer": l.layer_id, "n": n, "d": d, **geometry(pts)}
+            rec = {"layer": l.layer_id, "n": n, "d": d, **geometry(pts), "_pts": np.array(pts, dtype=np.float32)}
             if p["fill"] == "#000000":
                 inks.append(rec)
             else:
@@ -197,12 +197,32 @@ def main() -> int:
         s["id"] = f"i{i + 1:04d}"
     print(f"  {len(fills)} fills, {len(inks)} ink strokes")
 
-    # ink strokes whose bbox overlaps each fill's bbox (cheap; refined by hand in objects.json later)
-    ib = np.array([s["bbox"] for s in inks])
+    # Ink that outlines each fill: a stroke belongs to a fill when enough of its outline runs along the fill's
+    # edge. Ink strokes are filled outline shapes about 40 px wide here, so both sides of a stroke that traces a
+    # fill's edge lie within ~25 px of it; NEAR allows for that plus the fill sitting under the line.
+    NEAR, SHARE = 40.0, 0.3
+    ib = np.array([s_["bbox"] for s_ in inks])
     for f in fills:
         x, y, w, h = f["bbox"]
-        hit = (ib[:, 0] < x + w) & (ib[:, 0] + ib[:, 2] > x) & (ib[:, 1] < y + h) & (ib[:, 1] + ib[:, 3] > y)
-        f["ink"] = [inks[k]["id"] for k in np.flatnonzero(hit)]
+        cand = np.flatnonzero((ib[:, 0] < x + w + NEAR) & (ib[:, 0] + ib[:, 2] > x - NEAR)
+                              & (ib[:, 1] < y + h + NEAR) & (ib[:, 1] + ib[:, 3] > y - NEAR))
+        edge = f["_pts"]
+        near: list[tuple[float, str]] = []
+        for k in cand:
+            ip = inks[k]["_pts"]
+            # nearest edge point for every ink point, in chunks to bound memory
+            best = np.empty(len(ip), dtype=np.float32)
+            for c in range(0, len(ip), 512):
+                d2 = ((ip[c:c + 512, None, :] - edge[None, :, :]) ** 2).sum(-1)
+                best[c:c + 512] = np.sqrt(d2.min(1))
+            share = float((best < NEAR).mean())
+            if share >= SHARE:
+                near.append((share, inks[k]["id"]))
+        near.sort(reverse=True)
+        f["ink"] = [i for _, i in near]
+    for r in fills + inks:
+        r.pop("_pts", None)
+    print(f"  ink per fill (outline adjacency): median {int(np.median([len(f['ink']) for f in fills]))}, max {max(len(f['ink']) for f in fills)}")
 
     body = "".join(
         f'<path id="{f["id"]}" fill="{f["fill"]}"' + (f' fill-opacity="{f["opacity"]:.3f}"' if f["opacity"] < 1 else "") + f' d="{f["d"]}"/>\n'

@@ -2,26 +2,44 @@
 // top whose coordinate system is mapping.json's image-pixel grid, so regions are drawn and hit-tested unchanged.
 // The art and the hit layer are separate SVGs of the same aspect in the same box, so they line up exactly and
 // changes in the hit layer (debug outlines, highlights) never make the browser repaint the painting.
+//
+// Controls come from two places: v1 regions (hand-drawn rects and polygons) and v2 bindings with a gesture,
+// whose hit area is the bound object's own fill outlines, cloned into the hit layer once the art has loaded.
 import type { WebSynthlandHost } from '../runtime/types';
 import type { Art } from './art';
+import { layers } from './art';
+import type { ArtObject } from './objects';
 import {
-  axisPosition, boundingBox, shapePoints, tapNext, valueAt, type Mapping, type Point, type RegionEntry,
+  axisPosition, boundingBox, shapePoints, tapNext, valueAt, type Binding, type Box, type Control, type Mapping, type Point,
 } from './mapping';
 
 const SVG = 'http://www.w3.org/2000/svg';
+
+export interface ControlShape {
+  control: Control;
+  /** The hit element: a <polygon> for regions, a <g> of the object's outlines for bindings. */
+  el: SVGGraphicsElement;
+  /** Bounding box in mapping (image-pixel) coordinates; gestures measure positions against it. */
+  box: Box;
+  binding?: Binding;
+}
 
 export interface PaintingLayer {
   svg: SVGSVGElement;
   art: Art;
   /** Screen (client) coordinates -> image pixels. */
   toImage(clientX: number, clientY: number): Point;
-  /** One SVG element per region, in mapping order. */
-  shapes: Map<RegionEntry, SVGPolygonElement>;
-  /** Called with the entry and the value just sent to the host. */
-  onChange(cb: (entry: RegionEntry, value: number) => void): void;
+  /** Every control, regions first then bindings, in mapping order. Binding shapes arrive once `ready` resolves. */
+  controls: ControlShape[];
+  /** Resolves when every control's hit shape is in place. */
+  ready: Promise<void>;
+  /** Called with the control and the value just sent to the host. */
+  onChange(cb: (control: Control, value: number) => void): void;
 }
 
-export function mountPainting(stage: HTMLElement, art: Art, mapping: Mapping, host: WebSynthlandHost): PaintingLayer {
+export function mountPainting(
+  stage: HTMLElement, art: Art, mapping: Mapping, host: WebSynthlandHost, objects: Map<string, ArtObject>,
+): PaintingLayer {
   const [W, H] = mapping.size;
 
   const svg = document.createElementNS(SVG, 'svg');
@@ -37,42 +55,79 @@ export function mountPainting(stage: HTMLElement, art: Art, mapping: Mapping, ho
     return [Math.round(p.x), Math.round(p.y)];
   };
 
-  const listeners: Array<(entry: RegionEntry, value: number) => void> = [];
-  const send = (entry: RegionEntry, value: number): void => {
-    host.set(entry.param, value);
-    const v = host.get(entry.param);
-    for (const cb of listeners) cb(entry, v);
+  const listeners: Array<(control: Control, value: number) => void> = [];
+  const send = (control: Control, value: number): void => {
+    host.set(control.param, value);
+    const v = host.get(control.param);
+    for (const cb of listeners) cb(control, v);
   };
   const desc = (id: string) => host.params().find((p) => p.id === id);
+  const label = (el: SVGElement, control: Control): void => {
+    el.classList.add('region', `g-${control.gesture}`);
+    el.dataset.id = control.id;
+    if (control.label) {
+      const title = document.createElementNS(SVG, 'title');
+      title.textContent = control.label;
+      el.append(title);
+    }
+  };
 
-  const shapes = new Map<RegionEntry, SVGPolygonElement>();
+  const controls: ControlShape[] = [];
   for (const entry of mapping.regions) {
     const el = document.createElementNS(SVG, 'polygon');
     el.setAttribute('points', shapePoints(entry.region).map(([x, y]) => `${x},${y}`).join(' '));
-    el.classList.add('region', `g-${entry.gesture}`);
-    el.dataset.id = entry.id;
-    if (entry.label) {
-      const title = document.createElementNS(SVG, 'title');
-      title.textContent = entry.label;
-      el.append(title);
-    }
+    label(el, entry);
     svg.append(el);
-    shapes.set(entry, el);
-    bindGesture(el, entry, toImage, send, () => desc(entry.param), host);
+    const box = boundingBox(entry.region);
+    controls.push({ control: entry, el, box });
+    bindGesture(el, entry, box, toImage, send, () => desc(entry.param), host);
   }
 
-  return { svg, art, toImage, shapes, onChange: (cb) => { listeners.push(cb); } };
+  // Bindings with a gesture: the object's fills, in canvas units, scaled into mapping units.
+  const k = W / layers.canvas[0];
+  const ready = art.ready.catch(() => undefined).then(() => {
+    for (const binding of mapping.bindings) {
+      if (!binding.gesture) continue;
+      const obj = objects.get(binding.object);
+      if (!obj) { console.warn(`[thingsynth] binding "${binding.id}" names unknown object "${binding.object}"`); continue; }
+      const control: Control = { ...binding, gesture: binding.gesture };
+      const g = document.createElementNS(SVG, 'g');
+      g.setAttribute('transform', `scale(${k})`);
+      const ds = obj.fills.map((id) => art.fills.get(id)?.getAttribute('d')).filter((d): d is string => !!d);
+      if (ds.length > 0) {
+        for (const d of ds) {
+          const p = document.createElementNS(SVG, 'path');
+          p.setAttribute('d', d);
+          g.append(p);
+        }
+      } else {
+        // ?flat has no vector fills: fall back to the object's bounding box.
+        const [x, y, w, h] = obj.bbox;
+        const r = document.createElementNS(SVG, 'rect');
+        r.setAttribute('x', String(x)); r.setAttribute('y', String(y)); r.setAttribute('width', String(w)); r.setAttribute('height', String(h));
+        g.append(r);
+      }
+      label(g, control);
+      svg.append(g);
+      const [x, y, w, h] = obj.bbox;
+      const box: Box = { x: x * k, y: y * k, w: Math.max(1, w * k), h: Math.max(1, h * k) };
+      controls.push({ control, el: g, box, binding });
+      bindGesture(g, control, box, toImage, send, () => desc(control.param), host);
+    }
+  });
+
+  return { svg, art, toImage, controls, ready, onChange: (cb) => { listeners.push(cb); } };
 }
 
 function bindGesture(
   el: SVGElement,
-  entry: RegionEntry,
+  entry: Control,
+  box: Box,
   toImage: (x: number, y: number) => Point,
-  send: (entry: RegionEntry, v: number) => void,
+  send: (entry: Control, v: number) => void,
   desc: () => ReturnType<WebSynthlandHost['params']>[number] | undefined,
   host: WebSynthlandHost,
 ): void {
-  const box = boundingBox(entry.region);
   const start = (): void => { void host.audio.start().catch(() => undefined); };
   const atPointer = (ev: PointerEvent): number => valueAt(entry, axisPosition(entry, box, toImage(ev.clientX, ev.clientY)));
 

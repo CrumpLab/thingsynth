@@ -35,15 +35,18 @@ Other scripts: `pnpm build` (typecheck + production build into `dist/`), `pnpm p
 ## Layout
 
 ```
-art/<slug>/             the published JPEG and meta.json
+art/<slug>/             the published JPEG, meta.json, and objects.json (named groups of fill shapes)
   layers/               the painting taken apart from the PSD (tools/extract_psd.py): wash.webp, fills.svg,
                         scribbles.webp, ink.svg, caption.webp, layers.json, parts.json, check.jpg
-mapping.json            regions of the painting -> Tonewheel parameters (the thing Matt edits)
+mapping.json            objects and regions of the painting -> Tonewheel parameters (the thing Matt edits)
 web/                    Vite app, plain TypeScript, no framework
   src/main.ts           boots the runtime, presets, start overlay
   src/art.ts            rebuilds the painting from art/<slug>/layers as one static SVG (or the JPEG with ?flat)
   src/painting.ts       the art + an SVG hit layer in image-pixel coordinates, gesture handling
-  src/mapping.ts        mapping.json schema, validation, value curves
+  src/mapping.ts        mapping.json schema (v1 regions, v2 bindings), validation, value curves
+  src/objects.ts        art/<slug>/objects.json resolved against the parts table
+  src/effects.ts        glow, hue and boil on the painting's own paths, driven by parameter values
+  src/color.ts          OKLCH colour math with darken-first gamut mapping
   src/debug.ts          ?debug overlay, HUD and region editor
   runtime/              copy of SynthLand's web runtime (do not edit here)
   public/wasm/          additive.wasm (Tonewheel's engine)

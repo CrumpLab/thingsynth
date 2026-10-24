@@ -1,7 +1,7 @@
 # Animation layer: plan for review
 
 *Written 2026-10-24, revised the same day after reading the PSD, approved by Matt the same day.
-Status: milestone 1 done (see section 6).*
+Status: milestones 1 and 2 done (see section 6).*
 
 ## 0. In one paragraph
 
@@ -213,10 +213,26 @@ shuffle:
      fills.svg 1.9 MB (0.6 MB gzipped). First load is about 6.4 MB over the wire. Fine on a desktop; for phones,
      a lower WebP quality on the scribbles or one-decimal-less ink paths are the first levers.
    - Readiness waits on the images' load events, not `decode()`, which never settles in a background tab.
-2. **Render**: `glow` and `hue` on fill paths, `boil` on ink strokes, `amp.drive` driving the pyramid end to
-   end through `mapping.json` v2. Checked in the browser with `?debug` and the meter. Animated elements will
-   need to move into their own small SVG layer (or be promoted) so that a change does not make the browser
-   re-rasterise all 1,942 static paths every frame.
+2. **Render** (done 2026-10-24): `glow` and `hue` on fill paths, `boil` on ink strokes, and `amp.drive`
+   driving the golden pyramid (fills f135 and f136) end to end through `mapping.json` v2 and the first
+   `objects.json`. The pyramid is also the control: drag across it. Schema and effect constants are in
+   PLAN.md section 3.1. Findings:
+   - Ink adjacency is now measured along outlines (a stroke belongs to a fill when 30% of its outline lies
+     within 40 canvas px of the fill's edge): a median of 8 strokes per fill instead of about 60 from
+     bounding boxes. The pyramid's outline is 112 strokes, including the borders it shares with the creatures
+     drawn on it, which boil with it.
+   - Colour: in OKLCH, a hue turn or a chroma lift on these near-white pastels falls outside sRGB, and trimming
+     chroma washed them out to near-white. Gamut mapping now darkens first (up to 0.18), then trims chroma.
+     With hue -0.3, glow 1: the pale yellow face goes #FFF0AC, gold #FFD66C at 0.5, amber #EAA600 at 1; the
+     peach face #FFBFAC, salmon #FF9A8C, coral #FF757C. At rest the original colours are written back exactly.
+   - Performance: one object animating in place inside the single art SVG held a steady 120 fps with no long
+     animation frames, while boiling and during a continuous drive sweep, in the pane and at 1440 x 900, at 2x
+     pixel density, on Matt's Mac. That is main-thread timing with one bound object; splitting animated
+     elements into their own layer stays the fallback if 47 objects say otherwise.
+   - The pyramid's fills have holes where the worm, the tunnel and creatures are drawn on it, so those do not
+     belong to the pyramid's hit area: they will be their own objects.
+   - Glides use real elapsed time, so a throttled tab catches up instead of crawling; a background tab applies
+     values immediately.
 3. **Vocabulary**: the rest of the effects, note parts, envelopes, transitions, idle.
 4. **Objects and bindings**: grouping, names, the proposal for all 47 + 88, the bind editor; Matt's review.
 5. **Polish**: line boil quality, scribble style tuned against the real scribbles, phone performance, a

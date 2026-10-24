@@ -1,18 +1,25 @@
 {
-  "schema": "thingsynth.mapping/1",
+  "schema": "thingsynth.mapping/2",
   "image": "art/golden-pyramid-with-tunnel-celebration/golden-pyramid-with-tunnel-celebration.jpg",
   "size": [2475, 2475],
   "defaultPreset": "jazz-trio",
-  "regions": [
+  "bindings": [
     {
-      "id": "placeholder-drive",
-      "label": "Placeholder: drag left/right for Drive",
-      "region": { "rect": [160, 160, 900, 360] },
-      "gesture": "drag-x",
+      "id": "pyramid-drive",
+      "label": "The golden pyramid: drag across it for Drive; it heats towards red, deepens and its lines boil",
+      "object": "golden-pyramid",
       "param": "amp.drive",
       "range": [0, 1],
-      "curve": "linear"
-    },
+      "curve": "linear",
+      "gesture": "drag-x",
+      "effects": [
+        { "effect": "hue", "amount": -0.3 },
+        { "effect": "glow", "amount": 1 },
+        { "effect": "boil", "amount": 1 }
+      ]
+    }
+  ],
+  "regions": [
     {
       "id": "placeholder-drawbar",
       "label": "Placeholder: drag up/down for the Upper 16' drawbar",
