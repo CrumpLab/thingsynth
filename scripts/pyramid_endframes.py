@@ -123,7 +123,8 @@ def compose(fill_over: dict[str, str] | None = None, fill_colour: dict[str, str]
     ink = ''.join(f'<path d="{ink_over.get(i, d)}"/>' for i, d in INKS.items())
     front_again = ''.join(t for t in tags if re.search(r'id="(f\d+)"', t).group(1) in FRONT)
     front_ink = ''.join(f'<path d="{INKS[i]}"/>' for i in FRONT_INK)
-    im = WASH.copy()
+    im = Image.new('RGBA', WASH.size, (255, 255, 255, 255))  # the paper
+    im.alpha_composite(WASH)
     im.alpha_composite(svg(body_fills))
     im.alpha_composite(SCRIB)
     im.alpha_composite(svg(f'<g fill="#000">{ink}</g>'))
