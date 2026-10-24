@@ -1,0 +1,5 @@
+node_modules/
+dist/
+web/public/runtime/
+.DS_Store
+*.log

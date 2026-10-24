@@ -1,0 +1,34 @@
+{
+  "title": "Golden Pyramid With Tunnel Celebration",
+  "artist": "Matt Crump",
+  "series": "Colorlands",
+  "medium": "digital",
+  "year": 2022,
+  "description": "A crowded cartoon valley of horned creatures, a golden pyramid, a tunnel and a stream, in candy colours with heavy black outlines, signed 2021.",
+  "source": {
+    "page": "https://things.instances.crumplab.com/work/colorlands/golden-pyramid-with-tunnel-celebration/",
+    "image": "https://things.instances.crumplab.com/images/Colorlands/Golden-pyramid-with-tunnel-celebration.jpg",
+    "fetched": "2026-10-23"
+  },
+  "image": {
+    "file": "golden-pyramid-with-tunnel-celebration.jpg",
+    "width": 2475,
+    "height": 2475,
+    "format": "jpeg",
+    "bytes": 597844,
+    "exifDescription": "Digital Work"
+  },
+  "tags": {
+    "characters": ["horned creature", "antenna blob", "one eyed creature", "rabbit eared figure", "toothy monster"],
+    "subjects": ["landscape", "pyramid", "tunnel", "creatures", "waterfall", "river", "trees"],
+    "themes": ["imaginary worlds", "crowded life", "gathering", "faces in things"],
+    "style": ["cartoon", "doodle", "psychedelic", "seek and find density"],
+    "mood": ["playful", "celebratory", "busy"],
+    "setting": ["invented landscape", "valley"],
+    "composition": ["all over", "central feature", "dense", "border framed"],
+    "line": ["thick black outline", "pencil scribble underlayer", "flat fill", "soft shading"],
+    "color": ["candy", "rainbow", "saturated", "pastel sky"],
+    "elements": ["hand lettered title", "signature", "white border", "waterfall", "ring in sky", "eyes in things", "stalk trees"]
+  },
+  "rights": "All rights reserved, Matt Crump. Not covered by the repository's GPLv3 licence."
+}
