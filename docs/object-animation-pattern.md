@@ -96,6 +96,15 @@ What the decisions have shown, to apply to later objects:
   waving, twins. Picked waving and twins together and said to build it without a separate progression review.
   Again the character doing something friendly and social (company arriving, a wave) over decoration. From here on,
   once a build is approved Claude picks the next object without asking.
+- **Acorn frog review, round one (2026-10-24):** rejected all five (sprouting, acorn friends, croak, acorn pile, frog
+  legs) for being too small: little fingers, toes, faces and leaves read as fiddly next to the painting's shapes.
+  Two principles came out of it:
+  - **New parts are the size of the painting's own shapes.** Added things should be roughly as big as the
+    neighbouring forms (the acorns, the frog's head, the petals: about 150-300 px on the 4950 canvas), not small
+    details on top of them.
+  - **Small things can morph into something else.** A small object (the acorns) can turn into a different thing that
+    could live there instead: a bulbous balloon cactus, graffiti-style eyeballs. Morphing replaces the shape; it
+    doesn't decorate it.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 6. Repeat
