@@ -222,3 +222,9 @@ Node and pnpm. `pnpm build` typechecks the app, the runtime copy and the worklet
   JPEG shows, ask Matt for the original.
 - **Runtime drift.** The runtime is a copy; if SynthLand changes the worklet ABI or `HostOptions`, re-sync and
   fix `web/src/main.ts`. A thin `@synthland/runtime` npm package upstream would make this a dependency instead.
+
+## 9. Next: the animation layer
+
+[docs/animation-layer-plan.md](docs/animation-layer-plan.md) proposes cutting the painting into line-bounded
+cells, grouping them into objects, and animating the painting's own pixels per cell so the 47 parameters and
+88 notes each own something visible. Under review; not implemented.
