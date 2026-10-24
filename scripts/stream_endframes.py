@@ -350,7 +350,8 @@ def arc_band(ax, ay, r_out, r_in, a_end, n=40) -> str:
 
 def combo_frame(t: float) -> Image.Image:
     """Vibrato at t: the froth bubbles up (0..0.3), a column of bubbles rises (0.1..0.45), the bubble cloud gathers
-    above (0.25..0.6), the rainbow arcs out of it and down into the pool (0.5..0.85), droplets fall last (0.75..1)."""
+    above (0.25..0.6) and the bubbles shrink away into it (0.45..0.7), the rainbow arcs out of it and down into the
+    pool (0.5..0.85), droplets fall last (0.75..1)."""
     if t <= 0:
         return m.compose()
     SCRIB_MASK[0] = ''
@@ -358,14 +359,15 @@ def combo_frame(t: float) -> Image.Image:
     x0, y0 = FROTH_C
     rnd = random.Random(1)
     fb = win(t, 0.0, 0.3)
+    gone = 1 - win(t, 0.45, 0.65)  # the bubbles shrink away into the cloud as it finishes forming
     for k in range(10):
-        r = (55 - 3 * k + rnd.random() * 10) * fb
+        r = (55 - 3 * k + rnd.random() * 10) * fb * gone
         x = x0 + (rnd.random() - 0.5) * 260
         y = y0 + 80 - 18 * k + (rnd.random() - 0.5) * 30
         if r > 2:
             out += bubble(x, y, r, ['#e3fbff', '#ffffff', '#f3e9ff'][k % 3])
     for k, (x, y, r) in enumerate([(2090, 2400, 38), (2110, 2320, 32), (2085, 2255, 26), (2105, 2195, 20)]):
-        g = win(t, 0.1 + k * 0.07, 0.25 + k * 0.07)
+        g = win(t, 0.1 + k * 0.07, 0.25 + k * 0.07) * (1 - win(t, 0.45 + k * 0.03, 0.62 + k * 0.03))
         if g > 0.01:
             out += bubble(x, y, r * g)
     cx, cy = FROTH_C[0] + 20, FROTH_C[1] - 300
