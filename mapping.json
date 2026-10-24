@@ -361,8 +361,8 @@
     },
     {
       "id": "curl-rotor",
-      "label": "The spiral curl is the rotor: tap to cycle Stop, Slow, Fast; it spins up and brakes",
-      "object": "spiral-curl",
+      "label": "The sleepy green creature is the rotor: tap its ear to cycle Stop, Slow, Fast; a whirlwind spins up round it, it wakes, and at Fast it raises its little arm",
+      "object": "sleepy-creature",
       "param": "leslie.speed",
       "range": [
         0,
@@ -373,8 +373,76 @@
       "glide": 1500,
       "effects": [
         {
-          "effect": "spin",
-          "amount": 1
+          "effect": "wind",
+          "at": [
+            1005,
+            4273
+          ],
+          "count": 5,
+          "bands": [
+            {
+              "radius": 330,
+              "from": 160,
+              "to": 330,
+              "width": 70,
+              "color": "#d6c7ff",
+              "start": 0
+            },
+            {
+              "radius": 430,
+              "from": 190,
+              "to": 350,
+              "width": 60,
+              "color": "#ffffff",
+              "start": 0.12
+            },
+            {
+              "radius": 270,
+              "from": -20,
+              "to": 120,
+              "width": 56,
+              "color": "#c4a3f0",
+              "start": 0.4
+            },
+            {
+              "radius": 490,
+              "from": 10,
+              "to": 140,
+              "width": 50,
+              "color": "#e7e0ff",
+              "start": 0.55
+            }
+          ]
+        },
+        {
+          "effect": "swing",
+          "parts": "arm",
+          "at": [
+            1128,
+            4330
+          ],
+          "angle": -150,
+          "span": [
+            0.45,
+            1
+          ]
+        },
+        {
+          "effect": "eye",
+          "at": [
+            927,
+            4222
+          ],
+          "size": [
+            114,
+            60
+          ],
+          "color": "#111111",
+          "over": true,
+          "span": [
+            0.1,
+            0.45
+          ]
         }
       ]
     },
@@ -1824,7 +1892,7 @@
     {
       "id": "note-51",
       "label": "D#3: hold to play",
-      "part": "f005",
+      "part": "f259",
       "note": 51,
       "gesture": "hold",
       "effects": [

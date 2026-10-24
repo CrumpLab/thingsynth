@@ -50,11 +50,17 @@
       },
       "ink": "auto"
     },
-    "spiral-curl": {
-      "label": "The pink spiral curl, bottom left",
+    "sleepy-creature": {
+      "label": "The sleepy green creature, bottom left: its curled ear, head and little baguette arm",
       "parts": {
-        "body": [
+        "ear": [
           "f006"
+        ],
+        "head": [
+          "f007"
+        ],
+        "arm": [
+          "f005"
         ]
       },
       "ink": "auto"

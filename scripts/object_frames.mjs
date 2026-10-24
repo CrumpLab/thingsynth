@@ -7,7 +7,7 @@
 // binding is held at its first frame so only this one shows (--context leaves them at their current values):
 //   <tag>-strip.png   frames 0, 0.25 .. 1 side by side, cropped to the object, frame values underneath
 //   <tag>-sweep.gif   a loop from the first frame to the last and back
-// Needs the dev server running (pnpm dev) and ffmpeg.
+// --pad <share> widens the crop around the object (default 0.12). Needs the dev server running (pnpm dev) and ffmpeg.
 import puppeteer from 'puppeteer-core';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -20,7 +20,7 @@ const args = process.argv.slice(2);
 const opt = (name, d) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args.splice(i, 2)[1] : d; };
 const context = args.includes('--context');
 if (context) args.splice(args.indexOf('--context'), 1);
-const outArg = opt('out', null), frames = Number(opt('frames', '5')), tag = opt('tag', 'current');
+const outArg = opt('out', null), frames = Number(opt('frames', '5')), tag = opt('tag', 'current'), pad = Number(opt('pad', '0.12'));
 const [id, base = 'http://localhost:5173/'] = args;
 if (!id) { console.error('usage: node scripts/object_frames.mjs <binding-id> [url] [--frames 5] [--tag name]'); process.exit(1); }
 const CHROME = process.env.CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -54,7 +54,7 @@ try {
     }, id);
   }
   // the object's box on screen, from its fills
-  const box = await page.evaluate((bindingId) => {
+  const box = await page.evaluate(([bindingId, pad]) => {
     const T = window.thingsynth;
     const b = T.mapping.bindings.find((x) => x.id === bindingId);
     if (!b) throw new Error(`no binding ${bindingId}`);
@@ -62,9 +62,9 @@ try {
     const paths = ids.map((f) => document.getElementById(f)).filter(Boolean);
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const p of paths) { const r = p.getBoundingClientRect(); x0 = Math.min(x0, r.x); y0 = Math.min(y0, r.y); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); }
-    const m = Math.max(x1 - x0, y1 - y0) * 0.12;
+    const m = Math.max(x1 - x0, y1 - y0) * pad;
     return { x: Math.max(0, x0 - m), y: Math.max(0, y0 - m), width: x1 - x0 + 2 * m, height: y1 - y0 + 2 * m };
-  }, id);
+  }, [id, pad]);
   const settle = () => page.evaluate(async () => {
     const E = window.thingsynth.effects;
     const t0 = Date.now();

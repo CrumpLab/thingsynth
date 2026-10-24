@@ -10,7 +10,7 @@ the object shows the value but touching it does nothing (routing, tuning and lev
 | `amp.drive` | Drive | golden-pyramid | drag-x | rays 1 count 16 span [0, 0.6], eye 1 parts face-right span [0.25, 0.8], flames 1 span [0.55, 1], tint 1 parts face-left color #FFE070, tint 1 parts face-right color #FFA46A | locked |
 | `upper.db1` | Upper 16' | stalk-left | drag-y | fill 0.5 parts body from bottom edge wave color #9cf27c, swell 3 parts bud-1 span [0.21, 0.33] ease out, glow 0.8 parts bud-1 span [0.21, 0.33], swell 3 parts bud-2 span [0.55, 0.67] ease out, glow 0.8 parts bud-2 span [0.55, 0.67], grow 1 parts body count 8 |  |
 | `upper.db2` | Upper 5 1/3' | stalk-right | drag-y | fill 0.5 parts body from bottom edge wave color #9cf27c, swell 3 parts bud-1 span [0.34, 0.46] ease out, glow 0.8 parts bud-1 span [0.34, 0.46], swell 3 parts bud-2 span [0.37, 0.49] ease out, glow 0.8 parts bud-2 span [0.37, 0.49], swell 3 parts bud-3 span [0.61, 0.73] ease out, glow 0.8 parts bud-3 span [0.61, 0.73], grow 1 parts body count 8 |  |
-| `leslie.speed` | Rotor Speed | spiral-curl | tap | spin 1 |  |
+| `leslie.speed` | Rotor Speed | sleepy-creature | tap | wind 1 count 5, swing 1 parts arm span [0.45, 1], eye 1 color #111111 span [0.1, 0.45] |  |
 | `amp.expression` | Expression | pyramid-worm | drag-y | swell 1, glow 0.4 |  |
 | `vib.upper` | Vibrato Upper | stream | tap | lean 1, hue 0.3 parts water |  |
 | `tg.age` | Wheel Age | cloud | drag-x | scribble 1 count 18 |  |
@@ -62,7 +62,7 @@ the object shows the value but touching it does nothing (routing, tuning and lev
 | golden-pyramid | The golden pyramid, both faces | f135 f136 | `amp.drive` |
 | stalk-left | The left green stalk (f260) | f260 f275 f276 | `upper.db1` |
 | stalk-right | The right green stalk with its mushroom cap | f262 f272 f271 f269 | `upper.db2` |
-| spiral-curl | The pink spiral curl, bottom left | f006 | `leslie.speed` |
+| sleepy-creature | The sleepy green creature, bottom left: its curled ear, head and little baguette arm | f006 f007 f005 | `leslie.speed` |
 | pyramid-worm | The pink worm hanging on the pyramid | f220 | `amp.expression` |
 | stream | The stream and the waterfall's splash | f134 f156 | `vib.upper` |
 | cloud | The big pale cloud at the top | f193 | `tg.age` |
@@ -131,7 +131,7 @@ Bigger shapes play lower notes; the shapes are spread over the whole canvas so a
 | C#2 (37) | f166 | | D2 (38) | f264 | | D#2 (39) | f235 | | E2 (40) | f234 |
 | F2 (41) | f128 | | F#2 (42) | f248 | | G2 (43) | f175 | | G#2 (44) | f291 |
 | A2 (45) | f060 | | A#2 (46) | f185 | | B2 (47) | f079 | | C3 (48) | f113 |
-| C#3 (49) | f058 | | D3 (50) | f265 | | D#3 (51) | f005 | | E3 (52) | f108 |
+| C#3 (49) | f058 | | D3 (50) | f265 | | D#3 (51) | f259 | | E3 (52) | f108 |
 | F3 (53) | f227 | | F#3 (54) | f288 | | G3 (55) | f170 | | G#3 (56) | f066 |
 | A3 (57) | f213 | | A#3 (58) | f230 | | B3 (59) | f244 | | C4 (60) | f214 |
 | C#4 (61) | f133 | | D4 (62) | f233 | | D#4 (63) | f085 | | E4 (64) | f102 |

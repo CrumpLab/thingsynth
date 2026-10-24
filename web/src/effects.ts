@@ -37,7 +37,7 @@
 import type { WebSynthlandHost } from '../runtime/types';
 import { layers, type Art } from './art';
 import { glowColour, hexToOklch, mixOklch, oklchToHex, type Oklch } from './color';
-import { positionOf, type Binding, type Ease, type EffectSpec, type FlameSpot } from './mapping';
+import { positionOf, type Binding, type Ease, type EffectSpec, type FlameSpot, type WindBand } from './mapping';
 import { fillParts, inkParts, resolveObject, type ArtObject } from './objects';
 
 const SVG = 'http://www.w3.org/2000/svg';
@@ -236,6 +236,21 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     while (anchor.nextElementSibling && (anchor.nextElementSibling as HTMLElement).dataset?.revealOf) anchor = anchor.nextElementSibling;
     return anchor;
   };
+  /** Drawing above the painting's ink, in the order the effects are built (later on top). */
+  let overLayer: SVGGElement | null = null;
+  const overGroup = (atBottom = false): SVGGElement => {
+    if (!overLayer) {
+      overLayer = document.createElementNS(SVG, 'g');
+      overLayer.id = 'ts-over';
+      overLayer.style.pointerEvents = 'none';
+      stack.ink.after(overLayer);
+    }
+    const g = document.createElementNS(SVG, 'g');
+    g.style.pointerEvents = 'none';
+    if (atBottom) overLayer.prepend(g); else overLayer.append(g);
+    currentAdded.push(g);
+    return g;
+  };
   /** A group above every painted shape, masked out over the given shapes so they stay in front of it. */
   let currentAdded: Element[] = [];
   const topGroup = (own: string[], front: string[], overInk = false): SVGGElement => {
@@ -258,11 +273,11 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       mask.append(c);
     }
     stack.defs.append(mask);
-    const g = document.createElementNS(SVG, 'g');
+    currentAdded.push(mask);
+    const g = overInk ? overGroup() : document.createElementNS(SVG, 'g');
     g.setAttribute('mask', `url(#${maskId})`);
     g.style.pointerEvents = 'none';
-    if (overInk) stack.ink.after(g); else stack.fills.append(g);
-    currentAdded.push(mask, g);
+    if (!overInk) { stack.fills.append(g); currentAdded.push(g); }
     return g;
   };
 
@@ -297,15 +312,42 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
           break;
         }
         case 'eye': {
-          // On the object, just above its own shapes: anything painted on it later stays in front.
-          const g = document.createElementNS(SVG, 'g');
-          g.style.pointerEvents = 'none';
-          afterShapes(ids).after(g);
-          L.added.push(g);
+          // On the object, just above its own shapes (anything painted on it later stays in front), or with `over`
+          // above the ink and whatever was drawn there before it.
+          let g: SVGGElement;
+          if (spec.over) g = overGroup();
+          else {
+            g = document.createElementNS(SVG, 'g');
+            g.style.pointerEvents = 'none';
+            afterShapes(ids).after(g);
+            L.added.push(g);
+          }
           const [ex, ey] = spec.at ?? obj.centroid;
           const m = Math.min(obj.bbox[2], obj.bbox[3]);
           const [rx = m * 0.18, ry = m * 0.1] = spec.size ?? [];
-          tr.draw = drawEye(g, ex, ey, rx, ry, `ts-eye-${uid++}`);
+          tr.draw = drawEye(g, ex, ey, rx, ry, `ts-eye-${uid++}`, spec.color);
+          break;
+        }
+        case 'wind':
+          tr.draw = drawWind(overGroup(), spec.at ?? obj.centroid, spec.bands ?? [], spec.count ?? 5, rand);
+          break;
+        case 'swing': {
+          const parts = ids.map((id) => fillParts.get(id)).filter((p): p is NonNullable<typeof p> => !!p);
+          if (!parts.length) break;
+          let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+          for (const q of parts) { const [x, y, w, h] = q.bbox; x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x + w); y1 = Math.max(y1, y + h); }
+          const own = new Set(ids);
+          const near = Array.from(fillParts.values())
+            .filter((q) => !own.has(q.id) && (q.visible ?? 1) > 0.5 && q.bbox[0] < x1 + 60 && q.bbox[0] + q.bbox[2] > x0 - 60 && q.bbox[1] < y1 + 60 && q.bbox[1] + q.bbox[3] > y0 - 60)
+            .sort((a, b) => Number(a.id.slice(1)) - Number(b.id.slice(1)));
+          const mw = (x1 - x0) * 0.12, mh = (y1 - y0) * 0.12;
+          const ribs = Array.from(new Set(parts.flatMap((q) => q.ink))).filter((sid) => {
+            const b = inkParts.get(sid)?.bbox;
+            return !!b && b[0] >= x0 - mw && b[1] >= y0 - mh && b[0] + b[2] <= x1 + mw && b[1] + b[3] <= y1 + mh;
+          });
+          tr.draw = drawSwing(overGroup(true), overGroup(), parts.map((q) => ({ d: art.fills.get(q.id)?.getAttribute('d') ?? '', fill: q.fill })),
+            near.map((q) => ({ d: art.fills.get(q.id)?.getAttribute('d') ?? '', fill: q.fill })),
+            ribs.map((sid) => art.ink.get(sid)?.getAttribute('d') ?? ''), spec.at ?? [(x0 + x1) / 2, y0], spec.angle ?? -90, `ts-swing-${uid++}`);
           break;
         }
         case 'boil':
@@ -905,7 +947,7 @@ function drawRays(g: SVGGElement, at: [number, number], size: number[], count: n
 
 /** An almond eye opening from a curved slit (u = 0) to wide open (u = 1): white, outlined, with an outlined blue iris,
  * a pupil that drops a little as it opens, and a highlight, all clipped to the almond. */
-function drawEye(g: SVGGElement, cx: number, cy: number, rx: number, ry: number, clipId: string): (u: number) => void {
+function drawEye(g: SVGGElement, cx: number, cy: number, rx: number, ry: number, clipId: string, irisColour = IRIS): (u: number) => void {
   const clip = document.createElementNS(SVG, 'clipPath');
   clip.id = clipId;
   const clipShape = document.createElementNS(SVG, 'path');
@@ -917,7 +959,7 @@ function drawEye(g: SVGGElement, cx: number, cy: number, rx: number, ry: number,
   const ir = rx * 0.42, pr = rx * 0.18;
   const iris = document.createElementNS(SVG, 'circle');
   iris.setAttribute('cx', f1(cx)); iris.setAttribute('cy', f1(cy + 10)); iris.setAttribute('r', f1(ir));
-  iris.setAttribute('fill', IRIS); iris.setAttribute('stroke', '#000'); iris.setAttribute('stroke-width', '13');
+  iris.setAttribute('fill', irisColour); iris.setAttribute('stroke', '#000'); iris.setAttribute('stroke-width', '13');
   const pupil = document.createElementNS(SVG, 'circle');
   pupil.setAttribute('cx', f1(cx)); pupil.setAttribute('r', f1(pr)); pupil.setAttribute('fill', '#000');
   const shine = document.createElementNS(SVG, 'ellipse');
@@ -943,6 +985,112 @@ function drawEye(g: SVGGElement, cx: number, cy: number, rx: number, ry: number,
     clipShape.setAttribute('d', d); white.setAttribute('d', d); outline.setAttribute('d', d);
     inner.style.visibility = o > 0.12 ? 'visible' : 'hidden';
     pupil.setAttribute('cy', f1(cy + 15 + 25 * o));
+  };
+}
+
+/** A crescent band round (cx, cy) from a0 to a1 degrees, thickest in its middle. */
+function crescent(cx: number, cy: number, r: number, a0: number, a1: number, w: number): string {
+  const n = 28, outer: string[] = [], inner: string[] = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, a = ((a0 + (a1 - a0) * t) * Math.PI) / 180, th = w * Math.pow(Math.sin(Math.PI * t), 0.9);
+    outer.push(`${f1(cx + Math.cos(a) * (r + th / 2))} ${f1(cy + Math.sin(a) * (r + th / 2))}`);
+    inner.push(`${f1(cx + Math.cos(a) * (r - th / 2))} ${f1(cy + Math.sin(a) * (r - th / 2))}`);
+  }
+  return `M${[...outer, ...inner.reverse()].join('L')}Z`;
+}
+
+const WIND_EDGE_PX = 15;
+const LEAF_BITS = ['#b4e0a2', '#f2a6c6', '#ffe066'];
+
+/** Wind round `at`: each band sweeps from its start angle round to its end (and thickens) over a window that opens
+ * at its own `start`; then `count` leaves and petals pop in on the outside, caught up in it. */
+function drawWind(g: SVGGElement, at: [number, number], bands: WindBand[], count: number, rand: () => number): (u: number) => void {
+  const mk = (fill: string, edge: number): SVGPathElement => {
+    const p = document.createElementNS(SVG, 'path');
+    p.setAttribute('fill', fill); p.setAttribute('stroke', '#000'); p.setAttribute('stroke-width', String(edge));
+    p.setAttribute('stroke-linejoin', 'round');
+    p.style.visibility = 'hidden';
+    g.append(p);
+    return p;
+  };
+  const els = bands.map((b) => ({ b, el: mk(b.color, WIND_EDGE_PX) }));
+  const outer = Math.max(300, ...bands.map((b) => b.radius));
+  const leaves = Array.from({ length: count }, (_, k) => {
+    const a = ((200 + k * 33) * Math.PI) / 180, r = outer * 0.78 + rand() * 80, rot = rand() * 180;
+    return { x: at[0] + Math.cos(a) * r, y: at[1] + Math.sin(a) * r, rot, start: 0.62 + k * 0.06, el: mk(LEAF_BITS[k % 3]!, WIND_EDGE_PX * 0.8) };
+  });
+  let written = '';
+  return (u) => {
+    const key = u.toFixed(4);
+    if (key === written) return;
+    written = key;
+    for (const { b, el } of els) {
+      const v = easeOut3((u - b.start) / 0.45);
+      el.style.visibility = v > 0.01 ? 'visible' : 'hidden';
+      if (v > 0.01) el.setAttribute('d', crescent(at[0], at[1], b.radius, b.from, b.from + (b.to - b.from) * v, b.width * (0.5 + 0.5 * v)));
+    }
+    for (const l of leaves) {
+      const v = easeOut3((u - l.start) / 0.2);
+      l.el.style.visibility = v > 0 ? 'visible' : 'hidden';
+      if (v <= 0) continue;
+      const s = 34 * v;
+      l.el.setAttribute('d', `M${f1(l.x - s)} ${f1(l.y)}Q${f1(l.x)} ${f1(l.y - s * 0.9)} ${f1(l.x + s)} ${f1(l.y)}Q${f1(l.x)} ${f1(l.y + s * 0.9)} ${f1(l.x - s)} ${f1(l.y)}Z`);
+      l.el.setAttribute('transform', `rotate(${l.rot.toFixed(0)} ${f1(l.x)} ${f1(l.y)})`);
+    }
+  };
+}
+
+const SWING_EDGE_PX = 20;
+
+/** Swing parts of an object about a pivot: an outlined copy of them (with their ribs) turns by `angle` degrees as u
+ * goes 0..1, drawn above the ink; under it, a patch over their old place where the neighbouring shapes grow in, in
+ * their own colours, so the gap they leave is filled the way the painting would have it. */
+function drawSwing(coverG: SVGGElement, armG: SVGGElement, parts: Array<{ d: string; fill: string }>, near: Array<{ d: string; fill: string }>,
+  ribs: string[], pivot: [number, number], angle: number, clipId: string): (u: number) => void {
+  const clip = document.createElementNS(SVG, 'clipPath');
+  clip.id = clipId;
+  for (const q of parts) {
+    const c = document.createElementNS(SVG, 'path');
+    c.setAttribute('d', q.d); c.setAttribute('stroke', '#000'); c.setAttribute('stroke-width', '34'); c.setAttribute('stroke-linejoin', 'round');
+    clip.append(c);
+  }
+  coverG.append(clip);
+  const patch = document.createElementNS(SVG, 'g');
+  patch.setAttribute('clip-path', `url(#${clipId})`);
+  const base = near.length ? near.reduce((a, b) => (b.d.length > a.d.length ? b : a)).fill : '#cccccc';
+  for (const q of parts) {
+    const e = document.createElementNS(SVG, 'path');
+    e.setAttribute('d', q.d); e.setAttribute('fill', base); e.setAttribute('stroke', base); e.setAttribute('stroke-width', '34');
+    patch.append(e);
+  }
+  for (const q of near) {
+    const e = document.createElementNS(SVG, 'path');
+    e.setAttribute('d', q.d); e.setAttribute('fill', q.fill); e.setAttribute('stroke', q.fill); e.setAttribute('stroke-width', '170');
+    e.setAttribute('stroke-linejoin', 'round');
+    patch.append(e);
+  }
+  coverG.append(patch);
+  const turn = document.createElementNS(SVG, 'g');
+  for (const q of parts) {
+    const e = document.createElementNS(SVG, 'path');
+    e.setAttribute('d', q.d); e.setAttribute('fill', q.fill); e.setAttribute('stroke', '#000');
+    e.setAttribute('stroke-width', String(SWING_EDGE_PX)); e.setAttribute('stroke-linejoin', 'round');
+    turn.append(e);
+  }
+  const ink = document.createElementNS(SVG, 'g');
+  ink.setAttribute('fill', '#000');
+  for (const d of ribs) { const e = document.createElementNS(SVG, 'path'); e.setAttribute('d', d); ink.append(e); }
+  turn.append(ink);
+  armG.append(turn);
+  coverG.style.visibility = armG.style.visibility = 'hidden';
+  let written = '';
+  return (u) => {
+    const v = easeOut3(u);
+    const key = v.toFixed(4);
+    if (key === written) return;
+    written = key;
+    coverG.style.visibility = armG.style.visibility = v > 0 ? 'visible' : 'hidden';
+    turn.setAttribute('transform', `rotate(${(angle * v).toFixed(2)} ${f1(pivot[0])} ${f1(pivot[1])})`);
   };
 }
 

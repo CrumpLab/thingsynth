@@ -31,12 +31,16 @@ export interface RegionEntry extends Control {
   region: RegionShape;
 }
 
-export type EffectKind = 'glow' | 'hue' | 'tint' | 'fill' | 'scribble' | 'grow' | 'rays' | 'eye' | 'flames' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
-export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'tint', 'fill', 'scribble', 'grow', 'rays', 'eye', 'flames', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
+export type EffectKind = 'glow' | 'hue' | 'tint' | 'fill' | 'scribble' | 'grow' | 'rays' | 'eye' | 'flames' | 'wind' | 'swing' | 'line' | 'boil' | 'swell' | 'lean' | 'spin' | 'blink';
+export const EFFECTS: readonly EffectKind[] = ['glow', 'hue', 'tint', 'fill', 'scribble', 'grow', 'rays', 'eye', 'flames', 'wind', 'swing', 'line', 'boil', 'swell', 'lean', 'spin', 'blink'];
 
 /** flames: one tongue, standing at `at` (canvas px), tilted `angle` degrees, `size` times the standard flame, starting
  * `delay` (0..1) into the effect's span. */
 export interface FlameSpot { at: [number, number]; angle: number; size: number; delay: number }
+
+/** wind: one band, a crescent round the centre at `radius`, sweeping from `from` to `to` degrees, `width` thick at
+ * its middle, starting `start` (0..1) into the effect's span. */
+export interface WindBand { radius: number; from: number; to: number; width: number; color: string; start: number }
 /** Older names still read: pulse and wobble were free-running; as frames of the timeline they are swell and lean. */
 const EFFECT_ALIASES: Record<string, EffectKind> = { pulse: 'swell', wobble: 'lean' };
 export type FillFrom = 'bottom' | 'top' | 'left' | 'right';
@@ -76,6 +80,12 @@ export interface EffectSpec {
   front?: string[];
   /** flames: where the tongues stand. */
   spots?: FlameSpot[];
+  /** wind: its bands. */
+  bands?: WindBand[];
+  /** swing: degrees the parts turn about `at` by the last frame (negative = anticlockwise). */
+  angle?: number;
+  /** eye: draw it above the painting's ink (and over anything else drawn there before it). */
+  over?: boolean;
 }
 
 interface BindingBase {
@@ -226,6 +236,17 @@ function parseBinding(raw: unknown, i: number): Binding {
         const q = x as Record<string, unknown>;
         if (!q || !isPt(q.at) || typeof q.angle !== 'number') fail(`${w}.spots[${k}]`, 'needs at [x, y] and angle');
         return { at: q.at, angle: q.angle, size: typeof q.size === 'number' ? q.size : 1, delay: typeof q.delay === 'number' ? q.delay : 0 };
+      });
+    }
+    if (o.angle !== undefined) { if (typeof o.angle !== 'number') fail(w, 'angle must be degrees'); spec.angle = o.angle; }
+    if (o.over !== undefined) spec.over = o.over === true;
+    if (o.bands !== undefined) {
+      if (!Array.isArray(o.bands)) fail(w, 'bands must be a list');
+      spec.bands = o.bands.map((x, k) => {
+        const q = x as Record<string, unknown>;
+        const num = (v: unknown, d: number): number => (typeof v === 'number' ? v : d);
+        if (!q || typeof q.radius !== 'number' || typeof q.from !== 'number' || typeof q.to !== 'number') fail(`${w}.bands[${k}]`, 'needs radius, from and to');
+        return { radius: q.radius, from: q.from, to: q.to, width: num(q.width, 50), color: typeof q.color === 'string' ? q.color : '#ffffff', start: num(q.start, 0) };
       });
     }
     if (o.color !== undefined) {
