@@ -13,7 +13,9 @@ import { createWander } from './wander';
 import { shuffleBindings } from './shuffle';
 import { mountPainting } from './painting';
 
-const base = import.meta.env.BASE_URL;
+// Absolute: the runtime resolves presets and wasm relative to the plugin URL, so a relative base (the './' the
+// production build uses to live under /thingsynth/ on Pages) would double the path.
+const base = new URL(import.meta.env.BASE_URL, document.baseURI).href;
 const query = new URLSearchParams(location.search);
 const debug = query.has('debug');
 const flat = query.has('flat');
