@@ -7,6 +7,8 @@ and Web MIDI play notes. Everything runs in the browser (WebAssembly in an Audio
 
 See [PLAN.md](PLAN.md) for the architecture, the mapping schema and the parameter list.
 
+**Play it:** <https://www.crumplab.com/thingsynth/> (built from `main` by GitHub Actions on every push, see `.github/workflows/pages.yml`).
+
 [![thingsynth demo: the painting playing Tonewheel](docs/demo/poster.jpg)](docs/demo/thingsynth-demo.mp4)
 
 *A 28-second demo with sound (`docs/demo/thingsynth-demo.mp4`): a jazz progression, Drive heating the pyramid,
