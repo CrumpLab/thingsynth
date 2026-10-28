@@ -123,7 +123,7 @@ def crescent(P, w, colour, edge=INK) -> str:
         dx, dy = b[0] - a[0], b[1] - a[1]
         d = math.hypot(dx, dy) or 1
         nx, ny = -dy / d, dx / d
-        ww = w * (0.25 + 0.75 * math.sin(math.pi * i / (n - 1)) ** 0.6)
+        ww = w * (0.25 + 0.75 * max(0.0, math.sin(math.pi * i / (n - 1))) ** 0.6)
         L.append((x + nx * ww, y + ny * ww))
         Rr.append((x - nx * ww, y - ny * ww))
     return outlined(closed(L + Rr[::-1]), colour, edge)
@@ -387,7 +387,7 @@ def crescent_d(P, w) -> str:
         dx, dy = b[0] - a[0], b[1] - a[1]
         d = math.hypot(dx, dy) or 1
         nx, ny = -dy / d, dx / d
-        ww = w * (0.25 + 0.75 * math.sin(math.pi * i / (n - 1)) ** 0.6)
+        ww = w * (0.25 + 0.75 * max(0.0, math.sin(math.pi * i / (n - 1))) ** 0.6)
         L.append((x + nx * ww, y + ny * ww))
         Rr.append((x - nx * ww, y - ny * ww))
     return closed(L + Rr[::-1])
