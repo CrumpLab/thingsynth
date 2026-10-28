@@ -191,6 +191,44 @@ What the decisions have shown, to apply to later objects:
   rings (a target). Built as one arrival per drawbar step: the horn tips swell into sleepy eyes (steps 1-2), the
   spiral shell winds out of its back one turn per step, each turn a wavy outlined band revealed by a wedge sweeping
   clockwise from the head (steps 3-6), the eyes open wide (step 7), and its lips open into a big singing O (step 8).
+- **Pink column review, upper drawbar 4' (2026-10-28, object and pick by Claude):** the "column" is not a thing but
+  the tall gap of pale sky (f305) between the middle stalk and the right one, under the big mushroom cap, the yellow
+  spike poking into it from below. The stalks beside it already grow branches, so the five avoided branching: offered
+  caterpillar, singing organ pipe (the 4' pipe pun), waving spider, party cake, dripping cap. Picked the caterpillar
+  on its own (5a rule 1 and 2: the empty gap morphs into a creature that could live there, with a face whose eyes
+  open; and a stacked body reads as one thing per drawbar step). The pipe's sound rings were left out for restraint.
+  Adjusted before building: the first face read as a stock cartoon (round eyes, grin, blush), so it was redrawn the
+  painting's way: lumpier segments of uneven size and tilt, spots as irregular blobs, almond eye whites with a heavy
+  outline, cyan irises and sleepy pink lids, and a small plain mouth. Lesson: a negative space can be given a
+  creature to fill it; drawn "on" the gap (clipped to it, under the ink), it sits behind the things round it for free.
+- **Rocket hill review, lower drawbar 1 3/5' (2026-10-28, object picked by Claude):** the "pink hill" (f191) is
+  really a white cloud lobe (white at 0.8 opacity, like the clouds round it). It rises like a tall ear behind the
+  right side of a little mint rocket at the pyramid's top and runs on as a white wedge down the right slope, behind
+  the lavender straw creature. The rocket has a porthole window, an arched lime door and two striped fins; its pink
+  right fin (f311) lies over the lobe and is the object's detail. The lobe has no face or limbs of its own. Offered
+  blast-off, feathered wing, waving fin, fireworks, and tiered cake (tierce as tiers). Picked blast-off on its own.
+  Under 5a: the hill is a cloud, and it does what a cloud under a rocket would do, billowing up into exhaust (rule 1,
+  the thing in its own nature). It is physical, playful and celebratory, and it uses the rocket painted right there.
+  The cake was too obscure a pun and read as a prop. The wing and the waving fin changed the rocket's fin more than
+  the hill. The fireworks were generic decoration.
+  Built as a build-up on the drawbar. Steps 1-4 are the rumble: lumpy, uneven exhaust puffs swell out of the hill's
+  lobe and wedge, one or two a step, scalloped like the painting's clouds and carrying its little ink ticks. On
+  steps 5-6 two flames ignite under the rocket's foot and grow, and their cores light up. On step 7 the big central
+  flame roars out. On step 8 its core lights and the last puffs roll down both slopes. The effect is placed `around`
+  with the fin (`detail`), the rocket, its left fin and the straw creature in front, so the flames come out from
+  behind the rocket's foot and the puffs pass behind the straw creature.
+- **Pink figure review, lower drawbar 4' (2026-10-28, object picked by Claude):** the pink figure is a long-necked
+  creature, bottom centre: a coral neck (khaki where it crosses the green) rising up-left out of the orange disc, its
+  head a cyan ring mouth with a purple tongue poking out, a magenta ear flap on the neck, a hump carrying the yellow
+  heart, and a long red arm lying down to the left. Offered trumpet flower (the head blooms), reaching up (an arm rises
+  to a big open hand, an eye opens), streamers (candy streamers burst from the mouth), up an octave (the neck stretches
+  up and the same head pops out again higher), long tongue (the tongue unrolls and curls). Picked up an octave, with
+  the wide eye from reaching up (under 5a): the figure's own form doing something and a literal reading of the
+  parameter at once (the 4' rank sounds the same note an octave up: the same head, higher), drawn as a big thing in
+  the painting's style; the eye gives the character a face looking up at it. The arm was left out because with the
+  new neck and a second head it would crowd (restraint). Streamers and the flower lean decorative. Built on step
+  boundaries: the eye opens and looks up (steps 1-2), the neck rises out from behind the ring one segment per step
+  (steps 2-6), the head copy pops out with an overshoot (step 7), its tongue pokes out further (step 8).
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -269,4 +307,7 @@ its thing in the painting's style.
 | straw-creature (upper-db7) | `upper.db7` | the see-through lavender creature, top right: round bulb under a tan one-eyed head in an orange collar, long tail pooling on the saucer, a straw through it, an egg in front | built: it becomes a flower: over step 1 two leaves unfurl from its tail and the first petal opens behind its collar; then one big lumpy candy petal per step goes round the ring from the lower left, over the pyramid side, to the cloud side, each landing on k/8 and overlapping the last; placed around, the body, head, collar, ears and egg in front; `docs/objects/upper-db7/bloom/steps.png` |
 | blue-fish (lower-db5) | `lower.db5` | the translucent blue-purple fish right of centre: two fins raised like arms, a striped head-lobe, a long body sweeping into a hooked crescent tail | built: an eye opens on its head and its mouth opens at the tip (step 1), its tail unfurls into a flowing fabric betta veil one lobe a step (steps 2-6), then its left and right fins flare into veils (steps 7, 8); `docs/objects/lower-db5/betta-veils/strip.png` |
 | horned-mask (upper-db5) | `upper.db5` | the tall orange mask, top left, blue-grey horns tipped ochre, yellow almond eye, wavy magenta-cyan striped panel, red lips, pink collar | built: it turns into a snail, one step at a time: its horn tips swell into sleepy eyes on stalks (steps 1-2), a candy spiral shell in its panel's wavy bands winds out of its back one turn per step, magenta, cyan, ice, magenta (3-6), its eyes open wide (7), its lips open to sing (8); `docs/objects/upper-db5/snail/strip.png` |
+| pink-column (upper-db4) | `upper.db4` | the tall gap of pale cream sky between the middle and right green stalks, under the big mushroom cap | built: a pink caterpillar climbs into the gap one lumpy spotted segment per step (steps 1-5, drawn on the column under the ink so the stalks and spike stay in front), its head arrives with sleepy half-lidded eyes (6), the lids lift and the eyes open wide (7), its antennae curl out over the stalks (8); `docs/objects/upper-db4/caterpillar/` |
+| rocket-hill (lower-db7) | `lower.db7` | the white cloud lobe behind the little mint rocket at the pyramid's top, with the rocket's pink striped fin over it and a white wedge running down the right slope behind the straw creature | built: blast-off: lumpy exhaust puffs swell out of the hill one or two a step (steps 1-4), flames ignite under the rocket's foot and grow (5-6), the big central flame roars out (7), its core lights and the last puffs roll down both slopes (8); `docs/objects/lower-db7/blast-off/strip.png` |
+| pink-figure (lower-db4) | `lower.db4` | the long-necked coral figure, bottom centre, its head a cyan ring mouth with a purple tongue | built: a wide eye opens on its neck looking up (steps 1-2), a new neck rises out from behind its ring mouth one segment per drawbar step (2-6), the same ring-and-tongue head pops out on top with an overshoot (7), and its tongue pokes out further, longer and bulbous (8); `docs/objects/lower-db4/octave-up/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
