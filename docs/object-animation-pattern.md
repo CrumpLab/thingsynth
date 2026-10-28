@@ -292,6 +292,36 @@ What the decisions have shown, to apply to later objects:
   ear springs up, then the right with an overshoot (a longer ear springs up and sinks back into it), and a round nose
   pops out at the tip last. The ears are lumpy and lopsided, both on the cap's right half so they stay clear of the
   cyan creature's eye above its left half, and sit behind the cap with the green head in front.
+- **Party-hat cone review, Upper 1' drawbar (2026-10-28, picked by Claude under 5a):** the tall, narrow lilac cone
+  by the big eye, right: a translucent pale blue triangle over the purple wash, pointing up. The lavender eye-head
+  sits at its foot, the cyan cactus-hand's hooked arm crosses its lower left, and the blue tube hangs by its tip.
+  Offered crystal (it becomes a lilac quartz point with candy crystals round its foot), chirping beak (it is the big
+  eye's beak: it splits down its length and opens to the sky like a baby bird's, singing), party popper (streamers
+  and confetti burst from its tip), tip-top star (a candy-striped point stretches it up and a big star lands on top)
+  and soft-serve (it becomes a strawberry-and-vanilla swirl, one roll per step, with a cherry). Picked the chirping
+  beak. It wins on three rules: the object's own form does something (it splits, like the coral tongue; rule 1); it
+  uses the anatomy of the character right beside it, so the big eye becomes a singing bird (rule 2); and it is a
+  playful literal reading of the highest drawbar as the top note (rule 4). The popper only adds things around the
+  cone, the star is a topper, and the crystal and soft-serve are morphs without a character. Built as one arrival
+  per drawbar step: the halves open a quarter more on each of steps 1-4, the pink mouth, throat and tongue arrive on
+  step 5, and one fat, lumpy candy crescent per step on steps 6-8, each bigger. Sprites cannot turn, so each pose of
+  each half is its own shape, swept in round the hinge as the step plays while the pose before it drops away.
+- **Saucer review, percussion volume (2026-10-28, object picked by Claude):** the "pink saucer" is an apricot ruff
+  at the painting's right edge that the lavender straw creature's see-through neck stands in, going down through an
+  oval hole in its middle; no face or limbs, and nothing can grow to its right (the painting ends there). Soft is the
+  last frame, so the most of it is the softest, most hushed thing. Offered plush cushion, sleepy sheep, soft serve
+  (the creature's ball as the cherry), hushing petals (the rim closing round the neck like a tulip at night) and
+  feather plumes. Picked the sleepy sheep (under 5a): the saucer morphs into something living with a face, and the
+  face does something, it nods off, which is the most literal "soft" (wool, hushed, asleep) as a big drawn thing.
+  The cushion is a prop-like replacement, the soft serve a good pun but candy rather than a character, the petals
+  quieter, the plumes a display mostly behind the see-through creature. Built for the switch as one change on a
+  0.75 s glide: the wool puffs swell over the saucer one after another, from the back round to the front (0-0.5), a
+  fill-only core melts their inner joins and three curls settle on top; the head pops out on the left wide awake
+  (0.4-0.62), then its lids droop down over its eyes (0.64-0.86); the four legs drop last (0.72-0.97). Placed
+  `around` with the creature's body and ball (f187, f188, f189) in `front`, so the neck and ball stay in front and the
+  neck goes down into a hole in the fleece. No vanish: the fleece covers the saucer whole, and a vanish would also
+  fade the ink of the oval hole, leaving the neck's foot outline-less in a ring of bare background; kept, the saucer
+  shows only as a thin apricot rim round the neck.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -378,4 +408,6 @@ its thing in the painting's style.
 | right-cloud (upper-db8) | `upper.db8` | the tall white cloud at the right edge, a column of scallops behind the hat creature, its outline running out past the painting's edge | built: it turns into a cockatoo, one arrival per step (k/8): steps 1-3 bring two big wing feathers each down its side over the scallops (the lowest pale sulphur); step 4 a lumpy white head on its top with a pink cheek and a sleepy half-lidded eye; step 5 the hooked slate beak; steps 6-8 the yellow crest fans up feather by feather (two, two, then the tallest), the lid lifts and the eye wakes wide on 6, and on 8 the beak drops open in a squawk round a pink mouth; placed around, the hat creature and its ear kept in front; `docs/objects/upper-db8/cockatoo/steps.png` |
 | waving-pink (lower-db3) | `lower.db3` | the pale see-through creature, lower left: long horn up-left, pointed ear, snout with a green spike, a mitten hand raised beside its face, body running down behind the lavender mitten | built: it twists up into a glossy pink balloon animal, one balloon inflating per drawbar step from the bottom: body (1), neck (2), hand (3), head (4), snout (5), horn (6), ear (7), with deep-pink twists at the joins and white shines popping on as each fills; on step 8 the knot is tied at its snout and its head balloon opens one round eye; the painted creature fades over 0.1-0.9 (`vanish`), the balloons sit `over`, clear of the lavender mitten so it stays in front, and a copy of the f244 lobe's outline (one of the creature's strokes) keeps that lobe outlined; `docs/objects/lower-db3/balloon-animal/strip.png` |
 | pink-cap (perc-decay) | `perc.decay` | the pale pink top band of the striped stack beside the sleepy green creature, bottom left, with its own half-lidded purple eye | built: at Fast it turns into a hare: its sleepy eye opens wide (0-0.34), the left ear springs up behind the cap (0.26-0.51), then the right with an overshoot that sinks back (0.46-0.78), and a round deep pink nose pops out at its tip (0.78-1); 750 ms glide; `docs/objects/perc-decay/hare/strip.png` |
+| party-cone (upper-db9) | `upper.db9` | the tall, narrow lilac cone by the big eye, right, pointing up, the eye-head at its foot and the cyan arm's hook across it | built: it is the big eye's beak: it splits down its length and the halves open a quarter more each step, a dark mouth between them (steps 1-4); the pink lining, throat and tongue arrive (5); then fat, lumpy yellow, cyan and pink crescents rise out of it, one per step, each bigger (6-8); `around`, with the eye-head, its lip and eye and the cyan arm in front (an empty role `split` keeps the cone itself unmasked); `docs/objects/upper-db9/chirping-beak/steps.png` |
+| straw-saucer (perc-volume) | `perc.volume` | the apricot ruff, top right, that the lavender straw creature's see-through neck stands in | built: on Soft it fluffs up into a sleepy sheep: scalloped wool puffs swell over it one after another round the neck (0-0.5), its dark head pops out on the left wide awake (0.4-0.62), its lids droop shut (0.64-0.86), its legs drop last (0.72-0.97); 0.75 s glide; `docs/objects/perc-volume/sleepy-sheep/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
