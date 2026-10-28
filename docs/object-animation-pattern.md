@@ -144,6 +144,16 @@ What the decisions have shown, to apply to later objects:
   fading as its kernel swells over it; each kernel is lumpy puffs pushed out one after another over a bigger puff
   that swells first and sinks back (the overshoot), with a crease puff and a golden hull last; two kernels fly off
   up and to the right at the end, leaving puffs of steam that sink away.
+- **Eye tree review, Upper 2' drawbar (2026-10-28, picked by Claude under 5a):** the green teardrop crown on the
+  left with one half-lidded almond eye and a lumpy right edge, on a purple stalk. Offered songbird (the crown
+  turns into a bird: an open singing beak, a wing, a crest), wake and wave (the eye opens, leafy arms rise), in
+  bloom (candy blossoms round its edge), two octaves up (two smaller, brighter copies of it stacked on its crest)
+  and whistling (a puckered mouth with a ribbon of whistle and bubbles). Picked the songbird with the round waking
+  eye from wake and wave: the object changing in its own nature into something that could live there (rule 1),
+  read as a playful literal pun on the bright, whistly 2' drawbar (rule 4), with the sleepy eye waking (rule 2).
+  Adjusted before building: a bigger beak, open and singing (about 270 px out of the crown), and a lumpier,
+  hand-drawn wing rather than a clean fan. Built as eight arrivals, one per drawbar step: three crest feathers,
+  the upper beak, the lower beak opening, the wing, its feathers, then the eye waking.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -218,4 +228,5 @@ its thing in the painting's style.
 | coral-tongue (leslie-mic-angle) | `leslie.mic_angle` | the long salmon band under the acorn frog, hooking up at the right into a rounded tip | built: its tip splits in two and the halves spread (0-0.5), then each half splits again into two curling tips (0.45-1); outlined and fill layers so the forks join seamlessly; `docs/objects/leslie-mic-angle/mockup-vs-app.png` |
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
 | fan-hand (tg-click-release) | `tg.click_release` | the broad yellow-green fan hand, lower right, two rows of pale pill fingers pointing up and right | built: its fingers pop into big lumpy popcorn one after another, base row first and out to the tips (0-0.65), each pale finger fading as its kernel swells over it with a puff that overshoots and sinks back; then two kernels fly off up and to the right trailing steam puffs (0.62-1); `docs/objects/tg-click-release/popcorn/strip.png` |
+| eye-tree (upper-db6) | `upper.db6` | the green teardrop crown on the left with one half-lidded eye and a lumpy right edge, on a purple stalk | built: it turns into a songbird, one arrival per drawbar step: three candy crest feathers fan up (steps 1-3), an orange beak comes out of its left side (4) and its butter lower half swings open singing (5), a lumpy magenta wing lifts from its right side (6) and gets three pink feathers (7), and its eye wakes round (8); crest, beak and wing tuck behind the crown and the eye tree f118 (`around`), the eye goes over; `docs/objects/upper-db6/songbird/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
