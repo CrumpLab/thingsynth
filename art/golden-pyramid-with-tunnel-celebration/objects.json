@@ -427,6 +427,9 @@
       "parts": {
         "body": [
           "f072"
+        ],
+        "capsule": [
+          "f169"
         ]
       },
       "ink": "auto"

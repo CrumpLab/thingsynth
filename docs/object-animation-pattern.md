@@ -229,6 +229,19 @@ What the decisions have shown, to apply to later objects:
   new neck and a second head it would crowd (restraint). Streamers and the flower lean decorative. Built on step
   boundaries: the eye opens and looks up (steps 1-2), the neck rises out from behind the ring one segment per step
   (steps 2-6), the head copy pops out with an overshoot (step 7), its tongue pokes out further (step 8).
+- **Antler trunk review, lower drawbar 16' (2026-10-28, object picked by Claude):** the "pink trunk" (f072) is in
+  fact a pale lime column, centre, rising from the red ground to the horizon line behind the coral antler hand,
+  with the orange capsule at its top; only a narrow strip of it shows, so every idea rises over the horizon.
+  Offered candy tree, basso (it swells into a singing head), 16' organ pipe, giraffe, maypole. Picked giraffe
+  (under 5a): the object morphs into an animal that could live there and gains a face, like the narwhal, and the
+  long column is already a neck; the organ pipe was the most literal reading of 16' but a mechanical prop, the tree
+  growth without character, the basso a face on a blob, the maypole decoration. Adjusted before building: the head
+  drawn the painting's way (lumpier, irregular outline), the patches uneven blobs, and an eye like the painting's
+  own (a tall oval with a heavy outline and a yellow lid whose line runs on in a tapered flick) that arrives sleepy
+  and opens wide on the last step. Built as one arrival per drawbar step: the trunk pales and patches come up on
+  it, the lower neck rises out of its top, the upper neck rises leaning toward the hand, patches come up on the
+  neck, a pink and violet mane pops out along its back, the head swells at the top half-lidded, two pink-knobbed
+  ossicones sprout, and the eye opens.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -310,4 +323,5 @@ its thing in the painting's style.
 | pink-column (upper-db4) | `upper.db4` | the tall gap of pale cream sky between the middle and right green stalks, under the big mushroom cap | built: a pink caterpillar climbs into the gap one lumpy spotted segment per step (steps 1-5, drawn on the column under the ink so the stalks and spike stay in front), its head arrives with sleepy half-lidded eyes (6), the lids lift and the eyes open wide (7), its antennae curl out over the stalks (8); `docs/objects/upper-db4/caterpillar/` |
 | rocket-hill (lower-db7) | `lower.db7` | the white cloud lobe behind the little mint rocket at the pyramid's top, with the rocket's pink striped fin over it and a white wedge running down the right slope behind the straw creature | built: blast-off: lumpy exhaust puffs swell out of the hill one or two a step (steps 1-4), flames ignite under the rocket's foot and grow (5-6), the big central flame roars out (7), its core lights and the last puffs roll down both slopes (8); `docs/objects/lower-db7/blast-off/strip.png` |
 | pink-figure (lower-db4) | `lower.db4` | the long-necked coral figure, bottom centre, its head a cyan ring mouth with a purple tongue | built: a wide eye opens on its neck looking up (steps 1-2), a new neck rises out from behind its ring mouth one segment per drawbar step (2-6), the same ring-and-tongue head pops out on top with an overshoot (7), and its tongue pokes out further, longer and bulbous (8); `docs/objects/lower-db4/octave-up/strip.png` |
+| antler-trunk (lower-db1) | `lower.db1` | the pale lime column, centre, rising from the red ground to the horizon behind the coral antler hand, the orange capsule at its top | built: one arrival per drawbar step: the trunk pales and uneven patches come up on it (step 1), its neck rises over the horizon in two sections (2-3), patches come up on the neck (4), a candy mane pops out along its back (5), a sleepy giraffe head swells at the top (6), ossicones sprout (7), and its eye opens wide (8); `docs/objects/lower-db1/giraffe/steps.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
