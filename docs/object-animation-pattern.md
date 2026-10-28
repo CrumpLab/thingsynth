@@ -464,6 +464,66 @@ What the decisions have shown, to apply to later objects:
   turns with lumpy hand-drawn edges, candy bands arriving as it rolls. Built for the switch on an 800 ms glide: the
   band grows on from the rim's top end along the crown (swept), rolls up piece by piece round the spiral's centre
   (swept reveals, so it visibly rolls), and candy bands pop in from root to tip last.
+- **Bunny slab review, manual mode (2026-10-28, object picked by Claude):** the "magenta slab" (f048) is a stepped
+  pink-and-peach platform at the bottom right: three tiers rising to the right, a yellow hole in the low one, an orange
+  hole in the middle one, and on the top one an orange pot out of which the magenta-to-violet bunny rises (tall pink
+  ears, a big sleepy cyan eye under a red lid, a second lobe leaning left like an arm). The bunny is painted in the
+  wash and belongs to no object. The slab runs off the painting's bottom and right edges, so everything grows up and
+  left. Offered hippo jaw (the slab wakes as a lying beast, its low step the snout and its orange hole an eye; its
+  mouth splits open at Split and its upper jaw lifts at Upper), bunny family (a smaller bunny pops out of each hole),
+  Easter eggs (the holes swell into candy eggs and the pot becomes a basket), two manuals (the steps turn into stacked
+  organ keyboards) and split in two (the bunny's leaning lobe becomes a twin head and both wake). Picked the hippo jaw,
+  with the bunny's eye waking from split in two as a small last beat (under 5a). The slab itself turns into a
+  creature that could live there (rule 1). It gains a face and does something physical, an eye opening and a jaw
+  swinging (rule 2). It reads both switch values literally and playfully (rule 4): the mouth splits at Split and the
+  upper jaw lifts at Upper. The twin head was the runner-up but changes the bunny, not the slab. The family repeats
+  the ghost's twins, the eggs are a generic motif, and the keyboards are mechanical. Adjusted before building: the
+  head was made bigger and lumpier so it reads at the painting's scale, and the teeth chunky. The build has two
+  arrivals on an 800 ms glide. By Split the closed snout, jowl and brow bump cover the painted steps (the yellow and
+  orange holes fade under them), the eye opens (white, orange lid, then a pupil looking up at the bunny) and the jaw
+  cracks open over a dark wedge. By Upper the upper jaw swings up wide, the mouth, tongue, chunky tusks and teeth come
+  in, and the bunny on its back wakes, a tall open eye over its sleepy one. A sprite can't rotate, so the jaw is
+  three poses (closed, cracked, wide), each shrinking out as the next grows in from the hinge. The shapes are placed
+  `over`. New roles `snout` (f049) and `eye` (f050) let the holes vanish.
+- **Sky review, output Volume (2026-10-28, object and pick by Claude):** the sky (f303) is the translucent cream wash
+  behind everything across the top of the painting, the pastel bands of the wash showing through it. It is cut out
+  round everything in front, so only a thin strip along the painting's top edge shows, with a few gaps hanging off it:
+  between the big stalk cap and the cyan link, under the cap round the blue teardrop, and above the pink cloud. The
+  other gaps belong to work already done (the rocket's blast-off puffs, the mushrooms on the big pale cloud, the
+  snail's eye-stalks between the mask's horns). Offered shouting sky (the sky wakes: an eye peeks out of one gap, a
+  yelling mouth out of another), sky dragon, trumpet vine (morning glories as living loudspeakers in each gap),
+  hot-air balloon (volume as size: a balloon swells) and bunting along the top edge. Picked the sky dragon on its own
+  (under 5a): a creature that could live in the sky (rule 1), a character with an eye that wakes and a jaw that roars
+  (rule 2), festive (rule 3), and louder read literally as a bigger roar (rule 4). It also uses every visible gap
+  instead of spreading thinly. The balloon was a prop, the bunting decoration, and the trumpets read as stuck on. Changed
+  before building: the pink cloud had become a pink elephant filling the gap above it, so the head comes out of the
+  upper gap instead, between the cap and the link, roaring up and to the right. It was also drawn lumpier, as a chain
+  of uneven segments, rather than as a clean festival-dragon graphic. Presets sit near -6 dB (frame 0.1), so nothing
+  happens before 0.15. The body loops come in gap by gap along the top strip, tail first (0.15-0.56), the head rises
+  into its gap (0.5-0.65) with a sleepy lid, the eye opens (0.66-0.8), horns, frill and whisker sprout (0.75-0.88), and
+  the jaw drops wide at the loudest (0.85-1). Lesson: a background that is mostly covered can host a long creature
+  drawn "on" it, clipped to it so everything stays in front. Its loops then show only in the strip and the gaps, and
+  read as humps diving in and out of the painting's top edge. The one part that must be read, the head, goes "over".
+- **Grey cliff review, master tuning (2026-10-28, object picked by Claude):** the left cliff (f104) is the huge
+  translucent grey mass (#818181 at 0.68, olive-khaki over the wash) behind the whole left side. Almost all of it is
+  hidden behind the horn blob, the yellow streamers, the eye tree and the eye bush. What shows is its open face in
+  the middle, between the yellow streamer, the pink heart creature and the eye bush, and the long slope where it
+  drops to the stream bank, with a few crag ticks. It has no face or limbs. Per 5a the ideas went on that face and
+  slope (its most characterful visible part), not spread thinly over the whole mass. Offered crystals (candy quartz
+  points bursting out of it), a singing cliff face (its edge juts into a craggy profile that opens an eye and sings),
+  organ pipes (it cracks into basalt columns, the rock formation of that name), a tuning fork struck into it like a
+  sword in a stone, and a mountain goat on its ledge. Picked crystals on its own. Under 5a: the cliff changes in its
+  own nature (rule 1); it is a literal reading of tuned sharper and brighter, and quartz is what keeps tuning
+  (rule 4); and it is a celebratory candy display (rule 3). The singing face was the runner-up (rule 2), but it was
+  too big to add as a secondary without crowding. The pipes read grey and mechanical, the fork as a prop, and the
+  goat as a creature stuck on. Adjusted before building: the crystals are chunkier and fewer per cluster, each point
+  the size of the painting's shapes (130-190 px wide, 260-470 px long), with lumpy hand-drawn edges rather than clean
+  facets. Presets sit at 440 Hz (frame 0), so the change shows only when the organ is tuned sharp. Built as arrivals
+  across the continuous range, each cluster's collar of broken rock cracking out first and its points pushing out
+  one after another: three points on the face (0-0.35), three on the slope down to the stream (0.3-0.65), two off
+  the right edge over the bank (0.6-0.9), and glints popping on the five tallest tips last (0.88-1). The sprites are
+  placed `around` with an empty role (`none`), so the cliff itself doesn't mask them, and the eye bush, its eye and
+  fruits and the pink heart creature stay in front.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -562,4 +622,7 @@ its thing in the painting's style.
 | left-cushion (pedal-db8) | `pedal.db8` | the soft two-lobed mound, lower left, between the pink figure and the orange caps, the eye tree's stalks planted in its dip | built: it turns into an octopus, one arrival per drawbar step: a lumpy magenta tentacle comes out from behind its edges on each of steps 1-7 (up past the bush's stalk curling behind it, right under the hand's thumb, left behind the pink figure, stubby up-right, over the yellow and the orange cap, down on the right, lolling over the lower cap) while its see-through fill deepens to magenta (`tint`, 0-0.875); on step 8 two almond eyes appear sleepy, their lids lift and a singing mouth opens; tentacles `around` with the pink figure and the stalks in front, face `over`; `docs/objects/pedal-db8/octopus/strip.png` |
 | striped-shell (tg-tuning) | `tg.tuning` | the brown oval shell at the bottom centre, a salmon band and wavy stripe across it, on a green mound, the trunk of the creature beside it drinking from its yellow ring | built: on Equal it becomes a nautilus: a brown coil swells out of the oval as its outer wall while the green carries on where the oval was (0-0.28), its four turns wind in from the mouth with a sweep, salmon, tan, salmon, dark brown (0.22-0.72), a yellow eye pops at its centre (0.66-0.78), then six chambers a turn pop in from the mouth inward, outer turn first (0.62-1), their outlines laying down twelve lumpy septa to a turn, with yellow, pink, cyan, lime and lilac accents among the browns; placed around, the yellow ring (role `ring`) as the coil's mouth and the trunk in front; 800 ms glide; `docs/objects/tg-tuning/nautilus/strip.png` |
 | tunnel-rim (leslie-on) | `leslie.on` | the pale blue band round the left of the tunnel in the golden pyramid, from under the worm's ring down behind the acorn frog | built: on On the band grows on from its top end along the tunnel's crown (0-0.22) and rolls up into a fat pale blue spiral of 2.2 turns, about 400 px across, one swept piece after another round its centre (0.2-0.76), then candy bands pop in along it from root to tip (0.5-1); outlined and fill-only layers so the pieces join without seams; `around`, with the worm and its ring (f220) in front and an empty role `roll` so the rim itself doesn't mask it; 0.8 s glide; `docs/objects/leslie-on/curl/strip.png` |
+| bunny-slab (voice-manuals) | `voice.manuals` | the stepped pink slab, bottom right, a yellow and an orange hole on its low steps, the magenta bunny rising from an orange pot on its top step | built: it wakes as a hippo: by Split its low step becomes a snout, a brow swells and its orange hole opens into an eye looking up (0-0.4), and its mouth splits open a crack (0.28-0.46); by Upper its upper jaw swings up wide (0.6-0.8), tongue, chunky tusks and teeth come in (0.7-0.9), and the bunny on its back wakes (0.82-1); 800 ms glide; `docs/objects/voice-manuals/hippo-jaw/strip.png` |
+| sky (out-level) | `out.level` | the translucent cream sky behind everything across the top, showing as a strip along the top edge and a few gaps | built: a candy sky dragon: its lumpy segmented body loops along the top strip gap by gap from the tail in (0.15-0.56, drawn on the sky so everything stays in front), its head rears out of the gap between the stalk cap and the cyan link with a sleepy eye (0.5-0.65), the eye opens (0.66-0.8), horns, frill and whisker sprout (0.75-0.88), and its jaw drops into a wide roar at the loudest (0.85-1); `docs/objects/out-level/sky-dragon/strip.png` |
+| left-cliff (tg-master) | `tg.master` | the huge translucent grey cliff behind the left side, mostly hidden; its open face shows between the yellow streamer, the pink heart creature and the eye bush, and its slope drops to the stream | built: crystals: tuned sharp above 440 Hz, three clusters of chunky candy quartz points break out of collars of broken rock one point after another, on its face (0-0.35), its slope (0.3-0.65) and its right edge over the bank (0.6-0.9), then glints pop on the tallest tips (0.88-1); the eye bush and heart creature stay in front; `docs/objects/tg-master/crystals/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
