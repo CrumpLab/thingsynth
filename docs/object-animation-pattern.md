@@ -524,6 +524,22 @@ What the decisions have shown, to apply to later objects:
   the right edge over the bank (0.6-0.9), and glints popping on the five tallest tips last (0.88-1). The sprites are
   placed `around` with an empty role (`none`), so the cliff itself doesn't mask them, and the eye bush, its eye and
   fruits and the pink heart creature stay in front.
+- **Splash bush review, tonewheel leakage (2026-10-28, picked by Claude under 5a):** the splash bush is the
+  see-through green splash at the painting's far left edge: two pointed tips up top, a sawtoothed left side,
+  scalloped lobes along the bottom, a pale cloverleaf in its middle (wash, not a fill) where the magenta stalk comes
+  up, the eye tree's crown over its right side; no face or limbs. Offered ghost bush (it becomes a ghost: eyes, an
+  "oooo" mouth, a waving arm, a wavy tail), springing leaks (candy jets arcing out of holes in it), echo chorus (a
+  fan of see-through candy copies of it behind it), melting (fat drips sagging from its lobes) and bleeding hearts
+  (arching stems from its tips hung with big pink heart flowers). Picked the ghost on its own: the bush changing in
+  its own nature into a character (rules 1 and 2), and the parameter read literally (rule 4): leakage is a ghostly
+  bleed of every other note. The echo copies were left out: they read messy and would crowd the songbird growing on
+  the eye tree next door. Adjusted before building: not a stock white ghost pasted over it but the bush becoming a
+  ghost of itself: its own silhouette (sawtooth, lobes, its tips as ears) pales to a see-through white-green so the
+  painting still shows through, then eyes in the painting's almond style open from sleepy, a small round "oooo"
+  mouth, the arm rises and waves, the tail trails last. Built across the continuous range as a sequence of arrivals:
+  pale 0-0.4 (a `tint` of f116, with patches paling the cloverleaf placed `under` so its outline and the stalk stay
+  on top), eyes 0.35-0.6 (a pale lid over each almond lifts as it opens, then iris, pupil, glint), mouth 0.55-0.7,
+  arm 0.65-0.9 (out of its left side, leaving the sawtooth showing, crescents round the hand last), tail 0.8-1.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -625,4 +641,5 @@ its thing in the painting's style.
 | bunny-slab (voice-manuals) | `voice.manuals` | the stepped pink slab, bottom right, a yellow and an orange hole on its low steps, the magenta bunny rising from an orange pot on its top step | built: it wakes as a hippo: by Split its low step becomes a snout, a brow swells and its orange hole opens into an eye looking up (0-0.4), and its mouth splits open a crack (0.28-0.46); by Upper its upper jaw swings up wide (0.6-0.8), tongue, chunky tusks and teeth come in (0.7-0.9), and the bunny on its back wakes (0.82-1); 800 ms glide; `docs/objects/voice-manuals/hippo-jaw/strip.png` |
 | sky (out-level) | `out.level` | the translucent cream sky behind everything across the top, showing as a strip along the top edge and a few gaps | built: a candy sky dragon: its lumpy segmented body loops along the top strip gap by gap from the tail in (0.15-0.56, drawn on the sky so everything stays in front), its head rears out of the gap between the stalk cap and the cyan link with a sleepy eye (0.5-0.65), the eye opens (0.66-0.8), horns, frill and whisker sprout (0.75-0.88), and its jaw drops into a wide roar at the loudest (0.85-1); `docs/objects/out-level/sky-dragon/strip.png` |
 | left-cliff (tg-master) | `tg.master` | the huge translucent grey cliff behind the left side, mostly hidden; its open face shows between the yellow streamer, the pink heart creature and the eye bush, and its slope drops to the stream | built: crystals: tuned sharp above 440 Hz, three clusters of chunky candy quartz points break out of collars of broken rock one point after another, on its face (0-0.35), its slope (0.3-0.65) and its right edge over the bank (0.6-0.9), then glints pop on the tallest tips (0.88-1); the eye bush and heart creature stay in front; `docs/objects/tg-master/crystals/strip.png` |
+| splash-bush (tg-leakage) | `tg.leakage` | the see-through green splash at the far left: two tips, a sawtoothed side, scalloped lobes, a pale cloverleaf where the magenta stalk comes up | built: it becomes a ghost of itself: its own shape pales to a see-through white-green (0-0.4, the cloverleaf with it), almond eyes open from under sleepy lids (0.35-0.6), a round "oooo" mouth opens (0.55-0.7), an arm rises from its left side and waves (0.65-0.9), a wavy tail curls off its bottom last (0.8-1); `docs/objects/tg-leakage/ghost/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
