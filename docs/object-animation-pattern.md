@@ -348,6 +348,20 @@ What the decisions have shown, to apply to later objects:
   that each arrive on their step as the last shrinks away, so the drop climbs a step at a time; the left arm in
   three; motion crescents on the last step. The arms take the stem's own aqua-mint where they leave it, so they
   merge with it; the curl's cyan wash is hidden under the shoulder and a fill-only patch of sky mint.
+- **Pink cloud review, Leslie horn/drum balance (2026-10-28, picked under 5a):** the pale pink scalloped cloud left
+  of the pyramid, its lumps joined by little black hooks, its lower half behind the magenta and yellow spikes. No
+  face or limbs. Offered pink elephant (the top lump becomes a head with a scalloped ear and a waking eye, its trunk
+  rises and trumpets through a golden bell), coiled horn (the cloud rolls up into one big spiral that flares into a
+  bell), horn and drum (a two-sided pun: the left lump becomes a bass drum, the top lump a horn), blowing (eyes open,
+  a cheek puffs out and blows curling gusts) and cotton candy (a heap of candy floss on a striped cone). Picked the
+  pink elephant: the cloud turns into a creature that could live there (rule 1), with a sleepy eye that wakes
+  (rule 2), and trumpeting is a playful literal reading of the horn side (rule 4). The coiled horn came closest, but
+  it has no character, and horn and drum read as props. Timing: the default is 0 dB (frame 0.5) and the painting should look as
+  drawn by default, so nothing happens on the drum side (0-0.5) and the whole elephant arrives toward +12. Adjusted
+  before building: head and ear made lumpier and cloud-scalloped, with the painting's little black hooks, so it
+  reads as the cloud becoming an elephant. Built as a chain of arrivals from 0.5: the ear and head billow up over
+  the top lump, the eye opens under a heavy lid and wakes, the trunk rises up and to the left with a little tusk,
+  and the golden bell flares open last.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -438,4 +452,5 @@ its thing in the painting's style.
 | straw-saucer (perc-volume) | `perc.volume` | the apricot ruff, top right, that the lavender straw creature's see-through neck stands in | built: on Soft it fluffs up into a sleepy sheep: scalloped wool puffs swell over it one after another round the neck (0-0.5), its dark head pops out on the left wide awake (0.4-0.62), its lids droop shut (0.64-0.86), its legs drop last (0.72-0.97); 0.75 s glide; `docs/objects/perc-volume/sleepy-sheep/strip.png` |
 | mitten (lower-db8) | `lower.db8` | the translucent lavender-blue mitten, bottom left: the party narwhal's raised arm, coming up between the pink cap and its body | built: the arm stretches up one segment per drawbar step (steps 1-6, the painted mitten fading over 1-2), its mitten pops onto the end with a little overshoot (step 7) and motion crescents flick out either side as it waves high above the crowd (step 8); `docs/objects/lower-db8/reaching-high/strip.png` |
 | mushroom-stem (upper-db3) | `upper.db3` | the pale mint stem under the green sleepy-eyed cap, top centre, a curled fist on its right holding a blue drop | built: hooray: its curl becomes a shoulder and the painted drop fades on step 1, then the arm unrolls in four poses (steps 1-4), lifting a sprite drop higher each step until it holds it up past the cap; a second arm rises from its left side in three poses (5-7) and waves; two motion crescents flick round that hand (8); arms, shoulder and a fill-only aqua band inside the stem are drawn as outlined and fill-only layers so the joins merge, and a fill-only sky-mint patch hides the cyan wash under the old drop (`over`, objectParts `drop`: f285); `docs/objects/upper-db3/hooray/strip.png` |
+| pink-cloud (leslie-balance) | `leslie.balance` | the pale pink scalloped cloud left of the pyramid, its lower half behind the magenta and yellow spikes | built: as painted from -12 to 0 dB (frames 0-0.5); toward the horn it turns into a pink elephant: a lumpy scalloped ear (0.5-0.68) and head (0.55-0.7) billow up over its top lump with the painting's little hooks, its eye opens sleepy and the lid lifts (0.65-0.8), its trunk rises up and to the left with a cream tusk (0.75-0.92), and a golden bell flares open at the trunk's tip, trumpeting (0.88-1); all `over`, clear of the spikes, which stay in front; `docs/objects/leslie-balance/pink-elephant/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
