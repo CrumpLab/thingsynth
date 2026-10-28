@@ -54,7 +54,8 @@ Until Matt says the choices can be made without him, every object goes through t
    mockup.
 6. **Log the choice** below: what was offered, what was picked, and what that says about his taste.
 
-Since 2026-10-24 Matt only stops the loop at step 3: his pick of end frames means build it (steps 4-6 run without a
+Since 2026-10-28 Matt has handed the loop over: Claude picks from the five using section 5a and builds without
+stopping. Before that, from 2026-10-24, Matt only stopped the loop at step 3: his pick of end frames means build it (steps 4-6 run without a
 separate approval), and after the build Claude picks the next object and starts it. Once Matt hands it over, the
 loop runs without him, using the log to choose.
 
@@ -134,6 +135,53 @@ What the decisions have shown, to apply to later objects:
   the object's own form dividing, rather than a costume or a prop. Built as a fork: the tip splits in two, then each
   half splits again into four tips; the branches stay as thick as the tongue (the size rule) and curl only gently.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
+
+## 5a. How Matt chooses (read before picking)
+
+*Distilled on 2026-10-28 from every pick logged above, when Matt handed the remaining objects over: "take what
+you've learned and apply my process". Claude now runs the whole loop, steps 1 to 6, and picks by these rules.*
+
+**What wins**
+
+1. **The thing itself changes, in its own nature.** It morphs into something else that could live there (acorns
+   into graffiti eyeballs, the eye into a disco ball, the sprite into starfish, butterfly, jellyfish, the lying
+   creature into a narwhal), or its own form does something (the tongue splits, the cloud grows over, the eye springs
+   out on a coil). This is the strongest pattern: 9 of the 15 picks.
+2. **A character doing something friendly, playful or physical.** Sleepy eyes wake (rotor, eye, snout, narwhal,
+   jellyfish), arms rise and wave (rotor, ghost), company arrives (twins). If the object has a face or limbs, the pick
+   almost always uses them. He knows his characters' anatomy: look for a limb, eye or mouth that can move.
+3. **Celebration, layered.** The painting is a celebration. Given a "party" option he takes it (party narwhal), and
+   he often combines two or three ideas that land in different parts of the timeline and different parts of the
+   picture (sunburst + eye + a little crown; bell + crest + ripples; eyes + rainbow rings; disco ball + peacock fan;
+   bubble cloud + rainbow; twins + wave). When two of the five complement each other, offer and build the pair.
+4. **A playful literal reading of the parameter** wins when it is also an object in the painting's style: the
+   telescope for mic *distance*, a boing for *percussion*, growth for wheel *age*. The pun must be a big drawn
+   thing, not a label or symbol.
+5. **Living over mechanical or grim.** Age became mushrooms and flowers, not decay, an old man, or tonewheels;
+   heat became a sunburst and eye, not cracks or eruption.
+
+**What loses**
+
+- Colour, glow, fill, hue or size changes on their own (the old effects). Lines merely getting bolder.
+- Props and costumes stuck onto the object (candy cane, pointing glove, microphone, propeller cap, folding fan):
+  they read as decoration, not the object doing anything.
+- Generic motifs and clip-art (waves, leaping fish, whirlpool, plain sparkles).
+- Anything small and fiddly: little fingers, toes, faces, leaves. **New parts are the size of the painting's own
+  shapes**, about 150-300 px on the 4950 canvas, and secondary parts stay smaller than the main one.
+- Effects spread thinly over a whole big object. Find its most characterful part (the stream's froth) and
+  transform that.
+- Ideas that live where the object is hidden: draw them on the visible part or bring them out in front.
+
+**How to run the five**
+
+- Make the five genuinely different kinds: at least one morph, one character action (if it has a face or limbs),
+  one celebratory display, one literal pun on the parameter. Avoid five decorations.
+- When none would win by the rules above, that is a round he would reject ("they all suck"): do a second round
+  around the object's most characterful part before building.
+- **Continuous parameters can carry a chain** (starfish, then butterfly, then jellyfish) or a sequence of arrivals
+  (one mushroom after another). **Drawbars (0-8)** read well as one new thing per step, like the stalks' branches.
+  **Switches** (tap, two or a few values) play one change through on a glide.
+- Draw it the painting's way (section 3): outlined fills, matching ink, lumpy hand-drawn outlines, candy palette.
 
 ## 6. Repeat
 
