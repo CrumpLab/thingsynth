@@ -242,6 +242,56 @@ What the decisions have shown, to apply to later objects:
   it, the lower neck rises out of its top, the upper neck rises leaning toward the hand, patches come up on the
   neck, a pink and violet mane pops out along its back, the head swells at the top half-lidded, two pink-knobbed
   ossicones sprout, and the eye opens.
+- **Coral hand review, lower drawbar 5 1/3' (2026-10-28, object picked by Claude):** the coral hand is the
+  translucent coral-red hand rising out of the red ground at bottom centre (it reads tan-gold at the top, grey-green in
+  the palm, red at the wrist as the wash shows through). Its tall middle finger is an antler with four prongs on its
+  right, a thumb with a lavender nail stands on its left, and a pink tongue-like curl sits in a loop at the bottom of
+  its palm; the fan's pale pills overlap its right edge. Offered coral grows (knobbly branches with candy polyps out
+  of the antler, prongs and thumb), the palm wakes (an eye opens in the palm and the loop opens into a mouth round the
+  pink tongue), antler in bloom (candy blossoms on every tip), conch horn (a pun on the stop's hollow low tone: the
+  hand curls into a conch booming sound rings), octopus (the hand becomes a coral octopus, eight tentacles for eight
+  steps). Picked coral grows for steps 1-6 and the palm wakes for steps 7-8 (under 5a): the coral keeps the hand and
+  grows in its own nature (it is a coral hand), like the stalks' branches, and the waking palm adds the character
+  beat at the end. The octopus was passed over as a stock cartoon octopus replacing the hand; bloom covered the
+  prongs; the conch replaced the hand with a prop-like pun. Adjusted: the polyps made bigger and fewer (one per
+  branch, about 150-180 px across) and the branches chunkier, six branches in all.
+- **Right cloud review, upper drawbar 1 1/3' (2026-10-28, object picked by Claude):** the tall white cloud at the
+  right edge is a column of scallops whose outline runs out past the painting's coloured edge; most of its left half
+  is hidden behind the hat creature (tan ears, orange brim, purple body and blue neck), so what shows is the dome
+  above the creature's head and the scallops down the right. No face or limbs. Offered flock of sheep (each scallop
+  puffs into a woolly sheep), whistling (the cloud wakes into a face and blows puffs out of the picture), cockatoo
+  (the cloud turns into a big white cockatoo: head, hooked beak, sulphur crest, scallops become wing feathers),
+  fireworks (rockets out of the scallops bursting into candy bursts) and on its feet (a pun on the drawbar's foot
+  length: striped legs and big sneakers). Picked the cockatoo, with its beak opening in a squawk on the last step as
+  the small extra (under 5a): the object becomes an animal that could live there, as the lying creature became a
+  narwhal, its tall white shape already reads as one, and the rising crest gives a face-less cloud a friendly,
+  excitable action; a cockatoo's high bright squawk also reads the larigot. The sheep were runner-up but repeat one
+  small face four times and read more clip-art. Adjusted: the head made lumpier and hand-drawn, the crest feathers
+  uneven in length with slightly curled tips, the eye waking from a sleepy half-lid instead of appearing open, and the
+  new parts kept inside the painting's right edge (only the beak's tip, about 10 px, crosses it; the crest's tips
+  rise about 90 px above the painting's top edge).
+- **Waving pink creature review, Lower 8' drawbar (2026-10-28, picked by Claude under 5a):** a pale see-through
+  creature standing upright, lower left. Its fill is grey at 46%, so the wash glows rose and red-orange through it.
+  It faces right, with a long horn sweeping up-left, a pointed ear on top and a round snout tipped by a green spike.
+  A mitten hand is raised beside its face (the wave), it has no eye, and its long body runs down behind the lavender
+  mitten. Five ideas were offered:
+  - balloon animal (it twists into a glossy pink balloon animal);
+  - big hello (an eye opens, a grin, both arms waving big);
+  - fanfare horn (its horn grows into a banded candy trumpet blasting streamers);
+  - eight feet (a pun on 8': it stands up on eight legs with candy-soled feet);
+  - many hands (the raised hand splits into a fan of waving mittens).
+- **Pink cap review, percussion decay (2026-10-28, object picked by Claude):** the pink cap is the pale pink top band
+  of the striped stack (pink, deep pink, purple, red) beside the sleepy green creature, bottom left, tucked behind its
+  head, with its own half-lidded purple eye. Offered hare, snap (the cap hinging open as a toothy jaw), party hat,
+  toadstool, streamers. Picked hare (under 5a): the cap already has an eye, so it morphs into an animal (the
+  narwhal pattern), and the morph is a playful literal reading of the switch drawn big: the squat painted cap is the
+  tortoise (Slow), the hare is Fast; its sleepy eye wakes, too. It keeps clear of the rotor's whirlwind and raised
+  arm, which belong to the green creature. Snap was lively but opened down into the rotor's arm and read aggressive;
+  the party hat is a costume, the streamers an effect, the toadstool repeats the cloud's mushrooms. Built on a 750 ms
+  glide: the sleepy eye opens first (a pink lid patch swells over it, then the white, iris, pupil and glint), the left
+  ear springs up, then the right with an overshoot (a longer ear springs up and sinks back into it), and a round nose
+  pops out at the tip last. The ears are lumpy and lopsided, both on the cap's right half so they stay clear of the
+  cyan creature's eye above its left half, and sit behind the cap with the green head in front.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -324,4 +374,8 @@ its thing in the painting's style.
 | rocket-hill (lower-db7) | `lower.db7` | the white cloud lobe behind the little mint rocket at the pyramid's top, with the rocket's pink striped fin over it and a white wedge running down the right slope behind the straw creature | built: blast-off: lumpy exhaust puffs swell out of the hill one or two a step (steps 1-4), flames ignite under the rocket's foot and grow (5-6), the big central flame roars out (7), its core lights and the last puffs roll down both slopes (8); `docs/objects/lower-db7/blast-off/strip.png` |
 | pink-figure (lower-db4) | `lower.db4` | the long-necked coral figure, bottom centre, its head a cyan ring mouth with a purple tongue | built: a wide eye opens on its neck looking up (steps 1-2), a new neck rises out from behind its ring mouth one segment per drawbar step (2-6), the same ring-and-tongue head pops out on top with an overshoot (7), and its tongue pokes out further, longer and bulbous (8); `docs/objects/lower-db4/octave-up/strip.png` |
 | antler-trunk (lower-db1) | `lower.db1` | the pale lime column, centre, rising from the red ground to the horizon behind the coral antler hand, the orange capsule at its top | built: one arrival per drawbar step: the trunk pales and uneven patches come up on it (step 1), its neck rises over the horizon in two sections (2-3), patches come up on the neck (4), a candy mane pops out along its back (5), a sleepy giraffe head swells at the top (6), ossicones sprout (7), and its eye opens wide (8); `docs/objects/lower-db1/giraffe/steps.png` |
+| coral-hand (lower-db2) | `lower.db2` | the translucent coral hand rising at bottom centre: an antler for a middle finger with four prongs, a thumb with a lavender nail, a pink tongue in a loop at the bottom of its palm | built: it grows like coral: on each of steps 1-6 a chunky branch (in the hand's own colour where it joins, so no seam) pushes out of the antler's top, a prong, the thumb or the left nub with a knobbly side stub, and a big lumpy candy polyp swells on its tip, each landing on k/8; on step 7 an eye opens in the palm, on step 8 the loop opens into a dark mouth round the pink tongue and a cheek flushes; placed over; `docs/objects/lower-db2/coral-wakes/steps.png` |
+| right-cloud (upper-db8) | `upper.db8` | the tall white cloud at the right edge, a column of scallops behind the hat creature, its outline running out past the painting's edge | built: it turns into a cockatoo, one arrival per step (k/8): steps 1-3 bring two big wing feathers each down its side over the scallops (the lowest pale sulphur); step 4 a lumpy white head on its top with a pink cheek and a sleepy half-lidded eye; step 5 the hooked slate beak; steps 6-8 the yellow crest fans up feather by feather (two, two, then the tallest), the lid lifts and the eye wakes wide on 6, and on 8 the beak drops open in a squawk round a pink mouth; placed around, the hat creature and its ear kept in front; `docs/objects/upper-db8/cockatoo/steps.png` |
+| waving-pink (lower-db3) | `lower.db3` | the pale see-through creature, lower left: long horn up-left, pointed ear, snout with a green spike, a mitten hand raised beside its face, body running down behind the lavender mitten | built: it twists up into a glossy pink balloon animal, one balloon inflating per drawbar step from the bottom: body (1), neck (2), hand (3), head (4), snout (5), horn (6), ear (7), with deep-pink twists at the joins and white shines popping on as each fills; on step 8 the knot is tied at its snout and its head balloon opens one round eye; the painted creature fades over 0.1-0.9 (`vanish`), the balloons sit `over`, clear of the lavender mitten so it stays in front, and a copy of the f244 lobe's outline (one of the creature's strokes) keeps that lobe outlined; `docs/objects/lower-db3/balloon-animal/strip.png` |
+| pink-cap (perc-decay) | `perc.decay` | the pale pink top band of the striped stack beside the sleepy green creature, bottom left, with its own half-lidded purple eye | built: at Fast it turns into a hare: its sleepy eye opens wide (0-0.34), the left ear springs up behind the cap (0.26-0.51), then the right with an overshoot that sinks back (0.46-0.78), and a round deep pink nose pops out at its tip (0.78-1); 750 ms glide; `docs/objects/perc-decay/hare/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
