@@ -407,6 +407,63 @@ What the decisions have shown, to apply to later objects:
   anatomy wins when there is a limb to use. The rainbow was dropped as a partner: the stream already has a candy
   rainbow, and restraint. Adjusted: the hand made bigger and chunkier, with fat lumpy fingers, so it is the size of
   the painting's shapes; the flipper painted out with the cape's colour before the arm rises from where it lay.
+- **Sand review, Pedal 16' drawbar (2026-10-28, picked by Claude under 5a):** the sandy ground is two pale golden,
+  half-transparent fills under the crowd in the bottom right, almost all hidden. Its one open, characterful part
+  is the dune peak, a sandy triangle between the fan hand and the big-eye creature's pink snout with the orange
+  arch across its foot. Every idea rose from behind that crest. Offered the dune wakes (the peak heaves up into a
+  sand creature that flings up its arms, opens an eye and hums), a candy-banded sandworm arching out and singing,
+  big foot (a giant sandy sole with pink toenails: Pedal is a foot), a sand castle flying candy pennants, and desert
+  bloom (a saguaro with raised arms and candy flowers). Picked the dune wakes with a little of desert bloom: the
+  ground changing in its own nature into a creature that could live there (rule 1), its arms going up and its sleepy
+  eye waking (rule 2), and its low hum a literal reading of the deep 16' bass (rule 4). A few small candy flowers
+  pop on its crown last for the celebration (rules 3 and 5), kept well smaller than the creature (restraint). Big
+  foot was a good pun but read as a prop, the castle as decoration, and the sandworm as a visitor, not the sand.
+  Adjusted before building: the eye opens sleepy and half-lidded first, then wide; the arms are stubby, chunky and
+  lumpy. Built as eight arrivals, one per drawbar step: the hump, its crown, the left arm, the right arm, the sleepy
+  eye, the lid lifting, the humming mouth, and the flowers.
+- **Cushion review, Pedal 8' drawbar (2026-10-28, picked by Claude under 5a):** the soft two-lobed mound, lower
+  left, between the pink one-eyed figure and the orange caps, with the eye tree's stalks planted in the dip of its
+  top edge; see-through, so it reads as a washy lilac, teal and pink, its lower half hidden behind the caps and the
+  cyan creature. Offered octopus (an octave up = octo: it turns magenta and eight tentacles curl out, two eyes
+  wake), singing (eyes, raised brows and a big open mouth singing the bass), bouncy castle (candy stripes, puffy
+  towers with pennants, an arched door), whoopee cushion (it puffs up into a bladder and a puff blows out of its
+  neck) and overstuffed (its seams tear and wads of stuffing billow out). Picked the octopus with the singing mouth
+  from singing arriving last: the blob changing in its own nature into a creature that could live there (rule 1),
+  a playful literal pun that also counts the drawbar (octave, octo, eight; rule 4), and the character waking and
+  singing (rule 2). The castle leaned clip-art and crowded the eye tree; the whoopee cushion and stuffing were
+  weaker. Adjusted before building: the mockup read as a stock cartoon octopus, so the tentacles became uneven in
+  length and thickness, lumpy, two tucking behind neighbours (behind the bush's magenta stalk, behind the pink
+  figure), with one or two irregular suckers each, and the eyes became heavy-outlined almonds. Built as one arrival
+  per drawbar step: a tentacle on each of steps 1-7 while the cushion deepens to magenta, then on step 8 the
+  sleepy lids lift and the mouth opens to sing.
+- **Striped shell review, tonewheel tuning (2026-10-28, picked by Claude under 5a):** the brown oval shell at the
+  bottom centre, a salmon band with a dark wavy stripe swooping across it, sitting on a dark green mound that runs
+  off the painting's bottom edge; the pale trunk of the creature on its right drinks from the yellow ring on its
+  side. Offered nautilus (the oval coils into a logarithmic spiral, twelve equal chambers to a turn, its mouth on the
+  yellow ring), snail (a smiling green head on eye stalks rises out from under it), scallop fan (twelve equal candy
+  ribs fan open behind it), tuning pegs (its end rises into a fiddle's scroll with four pegs) and spire (it stacks
+  up into a turreted spire). Picked the nautilus on its own: the shell changing in its own nature (rule 1) and the
+  most literal reading of Equal as a big drawn thing (rule 4): equal temperament is a logarithmic spiral, each turn
+  an octave cut into twelve equal steps. The snail was left out because the horned mask had just become a snail;
+  the scallop fan repeats the peacock fan; the pegs read as a prop and the spire as decoration. Adjusted before
+  building: the end frame read as a colour wheel, so most chambers take the shell's own browns and salmon with only
+  a few candy accents, the septa are lumpier and bowed, the outer wall is wider, and the chambers shrink toward
+  the centre. Built on an 800 ms glide: the oval swells into the coil's outer wall, the coil winds in from its
+  mouth with a sweep, one turn after another, and the chambers pop in last from the outside inward, so the equal
+  division is the final beat.
+- **Tunnel rim review, Leslie on (2026-10-28, picked by Claude under 5a):** the pale blue C-shaped band round the
+  left of the tunnel, from the tunnel's top (where the worm's ring hooks over it) down behind the acorn frog; no face
+  or limbs, and boxed in by the worm, the frog and the cactus creature, with open space only above the tunnel's
+  crown. Offered curled snake (the rim becomes a snake coiled round the tunnel, head rearing off its top end), curl
+  (the rim grows on over the crown and rolls up into a candy-banded spiral), plate spinning (its top end rises as an
+  arm spinning a candy plate), twirling ribbons (candy streamers whirl off it) and pinwheel blooms (candy pinwheel
+  flowers open on it). Picked the curl on its own: the rim's own form changes (rule 1), and a band rolling up into a
+  spiral is the drawn reading of the rotating speaker switching on (rule 4). The snake was passed over for variety
+  (the purple path is becoming a two-headed snake for crosstalk); the plate is a prop, the ribbons and pinwheels
+  decoration round it. Adjusted before building: bigger, more of a statement, a fat spiral of two to two-and-a-half
+  turns with lumpy hand-drawn edges, candy bands arriving as it rolls. Built for the switch on an 800 ms glide: the
+  band grows on from the rim's top end along the crown (swept), rolls up piece by piece round the spiral's centre
+  (swept reveals, so it visibly rolls), and candy bands pop in from root to tip last.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -501,4 +558,8 @@ its thing in the painting's style.
 | river-bank (vib-lower) | `vib.lower` | the dark green band down the pool's left shore, under the pink flower creature | built: two lumpy frogs pop up on it one after the other (0-0.6), their sleepy lids lift off gold, slot-pupilled eyes (0.5-0.7), their mouths open and their throat sacs balloon pink and yellow (0.6-0.9), and two fat song arcs each go out toward the pool (0.85-1); outlined and fill-only layers melt the eye bumps into the heads; drawn `over`; 0.8 s glide; `docs/objects/vib-lower/frog-chorus/strip.png` |
 | purple-path (tg-crosstalk) | `tg.crosstalk` | the pale sage band down the left of the stream: a long tapering tail running down to the pink horned creature, forking into a right arm that widens into a wedge at the purple plug | built: it rears up into a two-headed snake: the tail arm's neck rises and its sleepy head comes out (0-0.34), then the right arm's (0.22-0.54); the lids lift and the eyes look at each other (0.5-0.68); the jaws drop open, the second a beat after the first, so they chatter, tongues last (0.6-0.86); lavender spots pop on their crowns (0.84-1); placed over; `docs/objects/tg-crosstalk/two-headed-snake/strip.png` |
 | horned-collar (lower-db9) | `lower.db9` | the pale pink cape under the magenta neck ring of the tall horned mask, top left, with a mint flipper tucked across its right side | built: on step 1 the flipper fades and a cape-coloured patch fills its place, as the first segment of a mint arm swings up out of the cape's edge; steps 1-4 raise the arm a segment at a time (outlined and fill layers, so the joints are seamless); step 5 brings a big lumpy palm, step 6 opens four fat fingers and a thumb; steps 7 and 8 each flick a yellow swish crescent out beside the hand; vanish `detail`, patch placed under, arm placed around (the cape and its outline in front of the arm's root); `docs/objects/lower-db9/waving/steps.png` |
+| sand-ground (pedal-db16) | `pedal.db16` | the half-transparent golden sand under the crowd, bottom right; its open part is the dune peak between the fan hand and the big-eye's snout | built: the dune wakes, one arrival per drawbar step: a sand hump heaves up from behind the crest (1) and its crown with pale wind ripples (2), a stubby lumpy arm goes up on the left (3) and the right (4), a sleepy half-lidded eye opens (5) and its lid lifts wide awake (6), its round mouth opens humming with a blush (7), and three small candy flowers pop open on its crown (8); all `around`, masked off the sand, the fan hand, the big-eye and the arch, so it rises from behind the crest; `docs/objects/pedal-db16/dune-wakes/strip.png` |
+| left-cushion (pedal-db8) | `pedal.db8` | the soft two-lobed mound, lower left, between the pink figure and the orange caps, the eye tree's stalks planted in its dip | built: it turns into an octopus, one arrival per drawbar step: a lumpy magenta tentacle comes out from behind its edges on each of steps 1-7 (up past the bush's stalk curling behind it, right under the hand's thumb, left behind the pink figure, stubby up-right, over the yellow and the orange cap, down on the right, lolling over the lower cap) while its see-through fill deepens to magenta (`tint`, 0-0.875); on step 8 two almond eyes appear sleepy, their lids lift and a singing mouth opens; tentacles `around` with the pink figure and the stalks in front, face `over`; `docs/objects/pedal-db8/octopus/strip.png` |
+| striped-shell (tg-tuning) | `tg.tuning` | the brown oval shell at the bottom centre, a salmon band and wavy stripe across it, on a green mound, the trunk of the creature beside it drinking from its yellow ring | built: on Equal it becomes a nautilus: a brown coil swells out of the oval as its outer wall while the green carries on where the oval was (0-0.28), its four turns wind in from the mouth with a sweep, salmon, tan, salmon, dark brown (0.22-0.72), a yellow eye pops at its centre (0.66-0.78), then six chambers a turn pop in from the mouth inward, outer turn first (0.62-1), their outlines laying down twelve lumpy septa to a turn, with yellow, pink, cyan, lime and lilac accents among the browns; placed around, the yellow ring (role `ring`) as the coil's mouth and the trunk in front; 800 ms glide; `docs/objects/tg-tuning/nautilus/strip.png` |
+| tunnel-rim (leslie-on) | `leslie.on` | the pale blue band round the left of the tunnel in the golden pyramid, from under the worm's ring down behind the acorn frog | built: on On the band grows on from its top end along the tunnel's crown (0-0.22) and rolls up into a fat pale blue spiral of 2.2 turns, about 400 px across, one swept piece after another round its centre (0.2-0.76), then candy bands pop in along it from root to tip (0.5-1); outlined and fill-only layers so the pieces join without seams; `around`, with the worm and its ring (f220) in front and an empty role `roll` so the rim itself doesn't mask it; 0.8 s glide; `docs/objects/leslie-on/curl/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
