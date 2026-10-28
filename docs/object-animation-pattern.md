@@ -166,6 +166,31 @@ What the decisions have shown, to apply to later objects:
   strip stuck on; the crazy straw tangled over its neighbour; the reeds hid the tail. Built inside the painting's
   edges (it stops at about x 4570 on the right and y 390 at the top), so the ring fans six petals over the roomy
   pyramid side and two smaller ones over the narrow cloud side, with the head and ears closing it at the top.
+- **Blue fish review, lower drawbar 2 2/3' (2026-10-28, object picked by Claude):** the fish is the translucent cyan
+  shape right of centre (f179), teal on the left and blue-purple towards the tail where the ground shows through: two
+  big fins raised like arms, a striped head-lobe at its lower left, a long body sweeping right into a hooked crescent
+  tail. It had no eye or mouth. Offered betta veils, flying fish, singing, carp streamer, harmonics (two smaller
+  copies, half and a third its size, for the twelfth being the third harmonic). Picked betta veils with the eye and
+  open mouth from singing as the smaller secondary, and no bubbles (the stream already turns into bubbles). Under 5a:
+  the fish's own form changes in its nature (its fins unfurl), big celebratory parts, and a face it never had. The
+  wings read as an insect's, the streamers as props stuck on, and the copies repeated the ghost's twins. The tail veil
+  was redrawn as fabric rather than a regular fan, so it would not echo the big eye's peacock fan nearby: uneven
+  flowing lobes that bend as they go, with ruffled ends and wavy folds. Built as one arrival per drawbar step: the eye
+  opens and the mouth opens on step 1, the tail veil unfurls one lobe a step from the top round to the right over
+  steps 2-6, and the left fin and then the right fin flare into veils on steps 7 and 8. The veils are placed `around`,
+  so the fish's translucent cyan and its outline stay in front of them unchanged.
+- **Horned mask review, upper drawbar 2 2/3' (2026-10-28, object picked by Claude):** the horned mask is the tall
+  orange mask at the far top left, with blue-grey horns tipped ochre, a yellow almond eye, a wavy magenta-and-cyan
+  striped panel down its right side, red lips and a pink collar. It is hemmed in by the painting's top and left edges.
+  Offered antlers, singing with arms up, rainbow ribbons, candle and snail (a first bloom idea, petals opening from its
+  crown, was dropped: hidden behind the horns with no room above). Picked the snail, with the singing mouth as a late
+  beat (under 5a): the mask morphs into a creature that could live there, built from its own most characterful parts
+  (the striped panel's wavy bands become the shell, the horns become eye-stalks), its sleepy eyes wake, and it
+  sings. Antlers was the runner-up but only grows the horns; the candle and ribbons are a pun and a display rather
+  than the thing changing. On review the shell was asked to be a true spiral winding inward rather than concentric
+  rings (a target). Built as one arrival per drawbar step: the horn tips swell into sleepy eyes (steps 1-2), the
+  spiral shell winds out of its back one turn per step, each turn a wavy outlined band revealed by a wedge sweeping
+  clockwise from the head (steps 3-6), the eyes open wide (step 7), and its lips open into a big singing O (step 8).
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -242,4 +267,6 @@ its thing in the painting's style.
 | fan-hand (tg-click-release) | `tg.click_release` | the broad yellow-green fan hand, lower right, two rows of pale pill fingers pointing up and right | built: its fingers pop into big lumpy popcorn one after another, base row first and out to the tips (0-0.65), each pale finger fading as its kernel swells over it with a puff that overshoots and sinks back; then two kernels fly off up and to the right trailing steam puffs (0.62-1); `docs/objects/tg-click-release/popcorn/strip.png` |
 | eye-tree (upper-db6) | `upper.db6` | the green teardrop crown on the left with one half-lidded eye and a lumpy right edge, on a purple stalk | built: it turns into a songbird, one arrival per drawbar step: three candy crest feathers fan up (steps 1-3), an orange beak comes out of its left side (4) and its butter lower half swings open singing (5), a lumpy magenta wing lifts from its right side (6) and gets three pink feathers (7), and its eye wakes round (8); crest, beak and wing tuck behind the crown and the eye tree f118 (`around`), the eye goes over; `docs/objects/upper-db6/songbird/strip.png` |
 | straw-creature (upper-db7) | `upper.db7` | the see-through lavender creature, top right: round bulb under a tan one-eyed head in an orange collar, long tail pooling on the saucer, a straw through it, an egg in front | built: it becomes a flower: over step 1 two leaves unfurl from its tail and the first petal opens behind its collar; then one big lumpy candy petal per step goes round the ring from the lower left, over the pyramid side, to the cloud side, each landing on k/8 and overlapping the last; placed around, the body, head, collar, ears and egg in front; `docs/objects/upper-db7/bloom/steps.png` |
+| blue-fish (lower-db5) | `lower.db5` | the translucent blue-purple fish right of centre: two fins raised like arms, a striped head-lobe, a long body sweeping into a hooked crescent tail | built: an eye opens on its head and its mouth opens at the tip (step 1), its tail unfurls into a flowing fabric betta veil one lobe a step (steps 2-6), then its left and right fins flare into veils (steps 7, 8); `docs/objects/lower-db5/betta-veils/strip.png` |
+| horned-mask (upper-db5) | `upper.db5` | the tall orange mask, top left, blue-grey horns tipped ochre, yellow almond eye, wavy magenta-cyan striped panel, red lips, pink collar | built: it turns into a snail, one step at a time: its horn tips swell into sleepy eyes on stalks (steps 1-2), a candy spiral shell in its panel's wavy bands winds out of its back one turn per step, magenta, cyan, ice, magenta (3-6), its eyes open wide (7), its lips open to sing (8); `docs/objects/upper-db5/snail/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
