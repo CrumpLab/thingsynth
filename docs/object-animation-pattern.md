@@ -336,6 +336,18 @@ What the decisions have shown, to apply to later objects:
   pops onto the end of the arm on step 7, swelling a little past its size and settling, and motion crescents flick
   out either side of it on step 8. The arm is outlined and fill layers so its segments and the mitten join without
   seams, in one opaque blue-teal matched to how f241 reads.
+- **Mushroom stem review, Upper 8' drawbar (2026-10-28, picked by Claude under 5a):** the pale mint stem under the
+  bright green sleepy-eyed cap, top centre (labelled pink, painted mint, aqua where the wash crosses its middle),
+  with a curl on its right side like a fist holding a blue drop. Offered shelf fungi (candy bracket fungi climbing
+  both sides, one per step), hooray (the curl unrolls into an arm lifting the drop high, a second arm rises and
+  waves), veiled lady (a pink lace net skirt dropping from under the cap), 8' pipe (the stem turns into a golden
+  organ pipe singing rings of sound) and pot belly (the stem swells into a round bulb). Picked hooray on its own:
+  the stem's one limb is its curled hand, and a character doing something friendly with its limbs wins (rule 2),
+  with the celebration in the gesture itself. The shelf fungi were left out: beside two arms they would crowd the
+  stem, and they were smallish and spread thin (restraint). Built across the drawbar: the right arm in four poses
+  that each arrive on their step as the last shrinks away, so the drop climbs a step at a time; the left arm in
+  three; motion crescents on the last step. The arms take the stem's own aqua-mint where they leave it, so they
+  merge with it; the curl's cyan wash is hidden under the shoulder and a fill-only patch of sky mint.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -425,4 +437,5 @@ its thing in the painting's style.
 | party-cone (upper-db9) | `upper.db9` | the tall, narrow lilac cone by the big eye, right, pointing up, the eye-head at its foot and the cyan arm's hook across it | built: it is the big eye's beak: it splits down its length and the halves open a quarter more each step, a dark mouth between them (steps 1-4); the pink lining, throat and tongue arrive (5); then fat, lumpy yellow, cyan and pink crescents rise out of it, one per step, each bigger (6-8); `around`, with the eye-head, its lip and eye and the cyan arm in front (an empty role `split` keeps the cone itself unmasked); `docs/objects/upper-db9/chirping-beak/steps.png` |
 | straw-saucer (perc-volume) | `perc.volume` | the apricot ruff, top right, that the lavender straw creature's see-through neck stands in | built: on Soft it fluffs up into a sleepy sheep: scalloped wool puffs swell over it one after another round the neck (0-0.5), its dark head pops out on the left wide awake (0.4-0.62), its lids droop shut (0.64-0.86), its legs drop last (0.72-0.97); 0.75 s glide; `docs/objects/perc-volume/sleepy-sheep/strip.png` |
 | mitten (lower-db8) | `lower.db8` | the translucent lavender-blue mitten, bottom left: the party narwhal's raised arm, coming up between the pink cap and its body | built: the arm stretches up one segment per drawbar step (steps 1-6, the painted mitten fading over 1-2), its mitten pops onto the end with a little overshoot (step 7) and motion crescents flick out either side as it waves high above the crowd (step 8); `docs/objects/lower-db8/reaching-high/strip.png` |
+| mushroom-stem (upper-db3) | `upper.db3` | the pale mint stem under the green sleepy-eyed cap, top centre, a curled fist on its right holding a blue drop | built: hooray: its curl becomes a shoulder and the painted drop fades on step 1, then the arm unrolls in four poses (steps 1-4), lifting a sprite drop higher each step until it holds it up past the cap; a second arm rises from its left side in three poses (5-7) and waves; two motion crescents flick round that hand (8); arms, shoulder and a fill-only aqua band inside the stem are drawn as outlined and fill-only layers so the joins merge, and a fill-only sky-mint patch hides the cyan wash under the old drop (`over`, objectParts `drop`: f285); `docs/objects/upper-db3/hooray/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
