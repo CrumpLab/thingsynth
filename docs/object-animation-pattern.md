@@ -565,6 +565,26 @@ What the decisions have shown, to apply to later objects:
   shines: a white highlight and a glint of cyan at its rim. The effect is placed `around` with an empty role (`open`),
   so the ledge is not masked and the shell sits over its top edge. The fish (f179) and the capsule (f169) stay in
   front.
+- **Grey ground review, pedal split (2026-10-28, object picked by Claude):** the "grey ground" (f074) is a big
+  translucent stretch of ground, bottom centre, mostly covered by its neighbours: the pink horned figure stands on it,
+  the waving pink creature and the mitten lie on its left, the lying creature's head below, the pink figure's orange
+  disc and red arm to its right. Its one characterful part is a little dark green dish-shaped hole near its middle, a
+  brown oval inside, with a brown wisp curling down into it from under the orange disc (ink and wash only, no fill).
+  The ground has no face or limbs, so all five transformed the dish. Offered banana split (the dish becomes a sundae
+  boat, the wisp a pour of chocolate sauce), the splits (a tutu round the hole and candy-striped legs kicking apart
+  into the splits: pedals as feet), burrower (a lilac creature pops out and waves), sprout (a stalk, leaves and a candy
+  flower out of the hole) and lily pond (the hole spreads into a pond with pads and a lotus). Picked the banana split
+  on its own (under 5a): a big drawn pun on "split" (rule 4), party food for the celebration (rule 3), and the ground's
+  own dish morphing into something else (rule 1), using what is painted there, since the wisp already reads as sauce
+  pouring into a dish. The splits was the runner-up but its legs reached over the waving pink creature and the disc;
+  the burrower had nothing to do with the parameter; the sprout repeated the painting's many plants; the pond was a
+  generic water motif. Built as arrivals across the 16 values (frame = value / 15), one per note: the painted dish
+  turns to glass and becomes the foot (C1), the boat swells up out of it on a stem (D1), the back and front banana
+  halves (E1, F1), three scoops, pink, mint, then the big cream one (G1-B1), a sauce cap and drips on each (C2-E2),
+  the wisp thickens into a pour of sauce off the disc onto the cream scoop (F2) and runs down it (G2), whipped cream
+  in two goes (A2, B2) and the cherry (C3). The sundae sits up and left of the dish, along the dish's own axis, to
+  clear the narwhal's fountain splash; it is placed `around` with no parts of its own masked (the ground is behind
+  everything) and the pink horned figure (f170-f173) standing in front of it.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -668,4 +688,5 @@ its thing in the painting's style.
 | left-cliff (tg-master) | `tg.master` | the huge translucent grey cliff behind the left side, mostly hidden; its open face shows between the yellow streamer, the pink heart creature and the eye bush, and its slope drops to the stream | built: crystals: tuned sharp above 440 Hz, three clusters of chunky candy quartz points break out of collars of broken rock one point after another, on its face (0-0.35), its slope (0.3-0.65) and its right edge over the bank (0.6-0.9), then glints pop on the tallest tips (0.88-1); the eye bush and heart creature stay in front; `docs/objects/tg-master/crystals/strip.png` |
 | splash-bush (tg-leakage) | `tg.leakage` | the see-through green splash at the far left: two tips, a sawtoothed side, scalloped lobes, a pale cloverleaf where the magenta stalk comes up | built: it becomes a ghost of itself: its own shape pales to a see-through white-green (0-0.4, the cloverleaf with it), almond eyes open from under sleepy lids (0.35-0.6), a round "oooo" mouth opens (0.55-0.7), an arm rises from its left side and waves (0.65-0.9), a wavy tail curls off its bottom last (0.8-1); `docs/objects/tg-leakage/ghost/strip.png` |
 | purple-ledge (voice-split) | `voice.split` | the long dusty-mauve shelf of land right of the stream, level on top with a frilly torn hem, the fish's fin over its right end | built: it is a giant clam: a scalloped, fluted lilac upper shell rises from behind the fish's fin and lifts open a pose per semitone (steps 1-6), showing a dark mouth; a mint mantle ruffles out along its lip (7) and a pink one under the shell (8); a pearl swells in the mouth (9-11) and shines (12); `docs/objects/voice-split/giant-clam/strip.png` |
+| bottom-ground (voice-pedal-split) | `voice.pedal_split` | the big translucent ground, bottom centre, with a little dark green dish-shaped hole and a brown wisp curling into it from under the orange disc | built: its dish turns into a banana split, one arrival per note from C1 to C3: the dish turns to glass (C1), a sundae boat swells up out of it (D1), two banana halves (E1, F1), pink, mint and cream scoops (G1-B1), sauce caps and drips (C2-E2), the wisp thickens into a pour of sauce (F2, G2), whipped cream (A2, B2), the cherry (C3); placed around, the pink horned figure in front; `docs/objects/voice-pedal-split/banana-split/steps.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
