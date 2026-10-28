@@ -7,7 +7,8 @@
 // binding is held at its first frame so only this one shows (--context leaves them at their current values):
 //   <tag>-strip.png   frames 0, 0.25 .. 1 side by side, cropped to the object, frame values underneath
 //   <tag>-sweep.gif   a loop from the first frame to the last and back
-// --pad <share> widens the crop around the object (default 0.12). Needs the dev server running (pnpm dev) and ffmpeg.
+// --pad <share> widens the crop around the object (default 0.12); --crop x,y,w,h (canvas px) crops there instead, for big
+// objects whose change lives in one part. Needs the dev server running (pnpm dev) and ffmpeg.
 import puppeteer from 'puppeteer-core';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -21,6 +22,7 @@ const opt = (name, d) => { const i = args.indexOf(`--${name}`); return i >= 0 ? 
 const context = args.includes('--context');
 if (context) args.splice(args.indexOf('--context'), 1);
 const outArg = opt('out', null), frames = Number(opt('frames', '5')), tag = opt('tag', 'current'), pad = Number(opt('pad', '0.12'));
+const cropArg = opt('crop', null);
 const [id, base = 'http://localhost:5173/'] = args;
 if (!id) { console.error('usage: node scripts/object_frames.mjs <binding-id> [url] [--frames 5] [--tag name]'); process.exit(1); }
 const CHROME = process.env.CHROME ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -65,6 +67,19 @@ try {
     const m = Math.max(x1 - x0, y1 - y0) * pad;
     return { x: Math.max(0, x0 - m), y: Math.max(0, y0 - m), width: x1 - x0 + 2 * m, height: y1 - y0 + 2 * m };
   }, [id, pad]);
+  if (cropArg) {
+    const [cx, cy, cw, ch] = cropArg.split(',').map(Number);
+    Object.assign(box, await page.evaluate(([bindingId, c]) => {
+      const T = window.thingsynth;
+      const b = T.mapping.bindings.find((x) => x.id === bindingId);
+      const fid = b.object.startsWith('#') ? b.object.slice(1) : T.objects.get(b.object).fills[0];
+      const svg = document.getElementById(fid).ownerSVGElement;
+      const m = svg.getScreenCTM();
+      const pt = (x, y) => { const q = svg.createSVGPoint(); q.x = x; q.y = y; return q.matrixTransform(m); };
+      const a = pt(c[0], c[1]), z = pt(c[0] + c[2], c[1] + c[3]);
+      return { x: Math.max(0, a.x), y: Math.max(0, a.y), width: z.x - a.x, height: z.y - a.y };
+    }, [id, [cx, cy, cw, ch]]));
+  }
   const settle = () => page.evaluate(async () => {
     const E = window.thingsynth.effects;
     const t0 = Date.now();
