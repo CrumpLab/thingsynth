@@ -362,6 +362,51 @@ What the decisions have shown, to apply to later objects:
   reads as the cloud becoming an elephant. Built as a chain of arrivals from 0.5: the ear and head billow up over
   the top lump, the eye opens under a heavy lid and wakes, the trunk rises up and to the left with a little tusk,
   and the golden bell flares open last.
+- **River bank review, lower vibrato (2026-10-28, picked by Claude under 5a):** the bank is a translucent dark green
+  band about 120 px wide and 750 px long. It drops from under the pink flower creature, down the pool's left shore,
+  and thins to a sliver under the pool's bottom edge, with the purple bulb in front of its end. It has no face or
+  limbs, and its top end is round like a head. Offered: river serpent (a neck and head rising from its round top
+  end, humps arching out of the pool), wobbly jellies (candy jellies just out of their moulds, shaking), frog
+  chorus (two frogs singing on it, throat sacs ballooned), swaying cattails (candy bulrushes leaning both ways) and
+  ribbon dance (its top end peeling up into a twisting candy streamer). The serpent was picked first, then dropped:
+  the purple path right beside the bank is becoming a two-headed snake for crosstalk, and a serpent next to it would
+  repeat the idea. Built the frog chorus instead. It is company arriving and singing, the same reason the ghost's
+  twins were picked (rule 2), and the throat sacs ballooning are the vibrato, a big drawn pun on a wavering voice
+  (rule 4). Adjusted before building: lumpier frogs with warts, heavy-outlined eye bumps with gold irises and slot
+  pupils under sleepy lids of their own green, rather than stock cartoon eyes, and a few fat song arcs. Built as one
+  change on an 800 ms glide:
+  1. The first frog pops up on the bank (0-0.35), then the second (0.25-0.6).
+  2. Their lids lift as their eyes open (0.5-0.7).
+  3. Their mouths open and their throat sacs swell (0.6-0.9).
+  4. Two fat song arcs each go out toward the pool (0.85-1).
+- **Purple path review, tonewheel crosstalk (2026-10-28, picked by Claude under 5a):** the purple path is a pale sage,
+  half see-through band (lavender scribbles over it) down the left of the stream: a long tail tapering to a point at
+  the shore runs down to end between the pink one-eyed creature's yellow horns, and halfway it forks, a right arm
+  running under the stream bank and widening into a pointed wedge against the purple plug in its blue ring. It has no
+  face or limbs; its characterful parts are the two arm ends at the fork. Offered two-headed snake (both arms rear up
+  as necks, two serpent heads chattering at each other over the fork), high five (the arms lift and big open hands
+  slap together), chattering flowers (four candy flowers spring up in pairs, singing mouths), chattering teeth (the
+  right arm's jagged underside becomes teeth and a lower jaw drops open) and party line (a huge ear pricks up on the
+  right arm, lips at the other end whisper to it). Picked the two-headed snake on its own: the path itself becomes a
+  creature that could live there (rule 1), doing something social (rule 2), a big drawn reading of crosstalk's "the
+  notes chatter to each other" (rule 4), on the arm ends rather than spread over the band. The hands, ear and lips read
+  as parts stuck on; the flowers as a row of decoration; the teeth, the runner-up, as a joke-shop prop. Built as a
+  sequence of arrivals across the continuous range: the tail arm's neck rises out of the band and its head comes out of
+  it sleepy and closed-mouthed, then the right arm's; the lids lift and the eyes look at each other; the jaws drop
+  open, the second a beat after the first so they chatter, tongues inside; lavender spots (the purple it is named for)
+  pop on their crowns last. Necks are a fill plus an open outline, so they rise out of the band with no seam.
+- **Collar review, lower drawbar 1' (2026-10-28, object picked by Claude):** the collar is the pale pink cape,
+  shaped like a bell, that hangs from under the magenta neck ring of the tall horned mask at the painting's left
+  edge. A mint, leaf-shaped flipper lies diagonally across its right side, rooted at its edge, like an arm tucked
+  across its chest; the grey cliff and a green slit-eyed blob hide its hem, and the cream snout creature lies to its
+  right. Offered blossom (the cape opens into an eight-petal flower round the neck, the ring its middle), waving (the
+  flipper lifts out of the cape as an arm with a big open hand), rainbow (an eight-band candy rainbow pours from
+  behind the cape into a pink cloud), one foot (a pun on 1': a bare pink foot in a striped sock kicks out from under
+  the hem) and ringing bell (the cape becomes a swinging bell with a clapper and sound arcs). Picked waving on its
+  own (under 5a): the flipper is the collar's one limb, and a character doing something friendly with its own
+  anatomy wins when there is a limb to use. The rainbow was dropped as a partner: the stream already has a candy
+  rainbow, and restraint. Adjusted: the hand made bigger and chunkier, with fat lumpy fingers, so it is the size of
+  the painting's shapes; the flipper painted out with the cape's colour before the arm rises from where it lay.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -453,4 +498,7 @@ its thing in the painting's style.
 | mitten (lower-db8) | `lower.db8` | the translucent lavender-blue mitten, bottom left: the party narwhal's raised arm, coming up between the pink cap and its body | built: the arm stretches up one segment per drawbar step (steps 1-6, the painted mitten fading over 1-2), its mitten pops onto the end with a little overshoot (step 7) and motion crescents flick out either side as it waves high above the crowd (step 8); `docs/objects/lower-db8/reaching-high/strip.png` |
 | mushroom-stem (upper-db3) | `upper.db3` | the pale mint stem under the green sleepy-eyed cap, top centre, a curled fist on its right holding a blue drop | built: hooray: its curl becomes a shoulder and the painted drop fades on step 1, then the arm unrolls in four poses (steps 1-4), lifting a sprite drop higher each step until it holds it up past the cap; a second arm rises from its left side in three poses (5-7) and waves; two motion crescents flick round that hand (8); arms, shoulder and a fill-only aqua band inside the stem are drawn as outlined and fill-only layers so the joins merge, and a fill-only sky-mint patch hides the cyan wash under the old drop (`over`, objectParts `drop`: f285); `docs/objects/upper-db3/hooray/strip.png` |
 | pink-cloud (leslie-balance) | `leslie.balance` | the pale pink scalloped cloud left of the pyramid, its lower half behind the magenta and yellow spikes | built: as painted from -12 to 0 dB (frames 0-0.5); toward the horn it turns into a pink elephant: a lumpy scalloped ear (0.5-0.68) and head (0.55-0.7) billow up over its top lump with the painting's little hooks, its eye opens sleepy and the lid lifts (0.65-0.8), its trunk rises up and to the left with a cream tusk (0.75-0.92), and a golden bell flares open at the trunk's tip, trumpeting (0.88-1); all `over`, clear of the spikes, which stay in front; `docs/objects/leslie-balance/pink-elephant/strip.png` |
+| river-bank (vib-lower) | `vib.lower` | the dark green band down the pool's left shore, under the pink flower creature | built: two lumpy frogs pop up on it one after the other (0-0.6), their sleepy lids lift off gold, slot-pupilled eyes (0.5-0.7), their mouths open and their throat sacs balloon pink and yellow (0.6-0.9), and two fat song arcs each go out toward the pool (0.85-1); outlined and fill-only layers melt the eye bumps into the heads; drawn `over`; 0.8 s glide; `docs/objects/vib-lower/frog-chorus/strip.png` |
+| purple-path (tg-crosstalk) | `tg.crosstalk` | the pale sage band down the left of the stream: a long tapering tail running down to the pink horned creature, forking into a right arm that widens into a wedge at the purple plug | built: it rears up into a two-headed snake: the tail arm's neck rises and its sleepy head comes out (0-0.34), then the right arm's (0.22-0.54); the lids lift and the eyes look at each other (0.5-0.68); the jaws drop open, the second a beat after the first, so they chatter, tongues last (0.6-0.86); lavender spots pop on their crowns (0.84-1); placed over; `docs/objects/tg-crosstalk/two-headed-snake/strip.png` |
+| horned-collar (lower-db9) | `lower.db9` | the pale pink cape under the magenta neck ring of the tall horned mask, top left, with a mint flipper tucked across its right side | built: on step 1 the flipper fades and a cape-coloured patch fills its place, as the first segment of a mint arm swings up out of the cape's edge; steps 1-4 raise the arm a segment at a time (outlined and fill layers, so the joints are seamless); step 5 brings a big lumpy palm, step 6 opens four fat fingers and a thumb; steps 7 and 8 each flick a yellow swish crescent out beside the hand; vanish `detail`, patch placed under, arm placed around (the cape and its outline in front of the arm's root); `docs/objects/lower-db9/waving/steps.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
