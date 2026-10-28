@@ -134,6 +134,16 @@ What the decisions have shown, to apply to later objects:
   pointing glove, rolled up, microphone. Matt passed on all five and asked for "something where the tongue splits":
   the object's own form dividing, rather than a costume or a prop. Built as a fork: the tip splits in two, then each
   half splits again into four tips; the branches stay as thick as the tongue (the size rule) and curl only gently.
+- **Fan hand review, key click release (2026-10-28, object picked by Claude):** the fan hand is the broad
+  yellow-green fan, lower right, with two rows of pale pill fingers pointing up and to the right. Offered popcorn,
+  folding fan, caterpillars, pea pod, painted nails. Picked popcorn (under 5a): the fingers themselves morph, a
+  playful literal pun on the parameter (a click on release is a pop), physical and celebratory, and each kernel is
+  the size of the painting's shapes. The folding fan is a prop, the painted nails decoration with small parts, the
+  caterpillars add small fiddly faces, the pea pod replaces the hand rather than its fingers. Built as a sequence of
+  arrivals across the continuous range: the base row pops first, then the middle, then the tips, each pale finger
+  fading as its kernel swells over it; each kernel is lumpy puffs pushed out one after another over a bigger puff
+  that swells first and sinks back (the overshoot), with a crease puff and a golden hull last; two kernels fly off
+  up and to the right at the end, leaving puffs of steam that sink away.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -207,4 +217,5 @@ its thing in the painting's style.
 | lavender-snout (leslie-mic-distance) | `leslie.mic_distance` | the cream snout creature on the left: pink snout with a straw in its nostril, sleepy yellow eye | built: its sleepy eye fades as a wide-open eye opens, then a brass telescope slides out of it one section after another and its cyan lens glints; `docs/objects/leslie-mic-distance/mockup-vs-app.png` |
 | coral-tongue (leslie-mic-angle) | `leslie.mic_angle` | the long salmon band under the acorn frog, hooking up at the right into a rounded tip | built: its tip splits in two and the halves spread (0-0.5), then each half splits again into two curling tips (0.45-1); outlined and fill layers so the forks join seamlessly; `docs/objects/leslie-mic-angle/mockup-vs-app.png` |
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
+| fan-hand (tg-click-release) | `tg.click_release` | the broad yellow-green fan hand, lower right, two rows of pale pill fingers pointing up and right | built: its fingers pop into big lumpy popcorn one after another, base row first and out to the tips (0-0.65), each pale finger fading as its kernel swells over it with a puff that overshoots and sinks back; then two kernels fly off up and to the right trailing steam puffs (0.62-1); `docs/objects/tg-click-release/popcorn/strip.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
