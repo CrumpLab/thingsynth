@@ -207,7 +207,7 @@ ball (`scripts/bigeye_endframes.py`). **orange-sprite** (pedal sustain), three m
 jellyfish (`scripts/sprite_endframes.py`). **lying-creature** (key click), party narwhal: a candy tusk, a blowhole fountain and
 sparkles (`scripts/lying_endframes.py`). **lavender-snout** (Leslie mic distance), telescope: its eye opens and a brass
 telescope slides out of it (`scripts/snout_endframes.py`). **coral-tongue** (Leslie mic angle), splitting: its tip forks in two,
-then four (`scripts/tongue_endframes.py`). **fan-hand** (release click), popcorn: its fingers pop into popcorn kernels one after another and two fly off (`scripts/fan_endframes.py`). **eye-tree** (upper 2'), songbird: crest feathers, a singing beak and a wing, then its eye wakes (`scripts/eyetree_endframes.py`).
+then four (`scripts/tongue_endframes.py`). **fan-hand** (release click), popcorn: its fingers pop into popcorn kernels one after another and two fly off (`scripts/fan_endframes.py`). **eye-tree** (upper 2'), songbird: crest feathers, a singing beak and a wing, then its eye wakes (`scripts/eyetree_endframes.py`). **straw-creature** (upper 1 3/5'), bloom: candy petals open round its head one per drawbar step, leaves unfurling from its tail, until it is a flower (`scripts/straw_endframes.py`).
 **stalk-drawbar-16 and stalk-drawbar-513**, sap rising: a green sap with a wavy surface climbs each stalk with the
 drawbar, turning a luminous light green (#9cf27c) towards the top; each bud on the stalk (roles `bud-1`..) swells
 24% and glows just as the sap reaches its height; and the stalk grows (`grow`): one new branch per drawbar step,

@@ -154,6 +154,18 @@ What the decisions have shown, to apply to later objects:
   Adjusted before building: a bigger beak, open and singing (about 270 px out of the crown), and a lumpier,
   hand-drawn wing rather than a clean fan. Built as eight arrivals, one per drawbar step: three crest feathers,
   the upper beak, the lower beak opening, the wing, its feathers, then the eye waking.
+- **Straw creature review, upper drawbar 1 3/5' (2026-10-28, object picked by Claude):** the straw creature is the
+  see-through lavender body at top right: a round bulb under a tan one-eyed head in an orange collar, running down
+  into a long tail that pools on the saucer, with a straw crossing it and a pink-and-yellow egg in front. Offered
+  reeds (a pun on the tierce's reedy colour: cattails up out of its pool), waving (lavender arms with big pink hands
+  either side of its head), bloom (a ring of candy petals behind its head, leaves from its tail: it becomes a
+  flower), seahorse (candy fin, spines and a curled tail), crazy straw (its straw loops the loop into its mouth).
+  Picked bloom on its own (under 5a): the creature itself becomes something living that could grow there, a layered,
+  celebratory display, and eight petals give a drawbar one new big shape per step. The waving arms were left out:
+  their hands would collide with the petals, and restraint keeps one idea clear. The seahorse's spines read as a
+  strip stuck on; the crazy straw tangled over its neighbour; the reeds hid the tail. Built inside the painting's
+  edges (it stops at about x 4570 on the right and y 390 at the top), so the ring fans six petals over the roomy
+  pyramid side and two smaller ones over the narrow cloud side, with the head and ears closing it at the top.
 - **Restraint with secondary ideas.** A "little bit" of crown: supporting elements stay smaller than the main one.
 
 ## 5a. How Matt chooses (read before picking)
@@ -229,4 +241,5 @@ its thing in the painting's style.
 | sleepy-creature (curl-rotor) | `leslie.speed` | a sleepy green creature, bottom left, striped cap, cream ear and baguette arm | built: wind bands sweep round it, its eye opens by Slow, its arm rises (the stripes and ground filling its old place) and leaves are caught up by Fast; `docs/objects/curl-rotor/mockup-vs-app.png` |
 | fan-hand (tg-click-release) | `tg.click_release` | the broad yellow-green fan hand, lower right, two rows of pale pill fingers pointing up and right | built: its fingers pop into big lumpy popcorn one after another, base row first and out to the tips (0-0.65), each pale finger fading as its kernel swells over it with a puff that overshoots and sinks back; then two kernels fly off up and to the right trailing steam puffs (0.62-1); `docs/objects/tg-click-release/popcorn/strip.png` |
 | eye-tree (upper-db6) | `upper.db6` | the green teardrop crown on the left with one half-lidded eye and a lumpy right edge, on a purple stalk | built: it turns into a songbird, one arrival per drawbar step: three candy crest feathers fan up (steps 1-3), an orange beak comes out of its left side (4) and its butter lower half swings open singing (5), a lumpy magenta wing lifts from its right side (6) and gets three pink feathers (7), and its eye wakes round (8); crest, beak and wing tuck behind the crown and the eye tree f118 (`around`), the eye goes over; `docs/objects/upper-db6/songbird/strip.png` |
+| straw-creature (upper-db7) | `upper.db7` | the see-through lavender creature, top right: round bulb under a tan one-eyed head in an orange collar, long tail pooling on the saucer, a straw through it, an egg in front | built: it becomes a flower: over step 1 two leaves unfurl from its tail and the first petal opens behind its collar; then one big lumpy candy petal per step goes round the ring from the lower left, over the pyramid side, to the cloud side, each landing on k/8 and overlapping the last; placed around, the body, head, collar, ears and egg in front; `docs/objects/upper-db7/bloom/steps.png` |
 | stalk-left, stalk-right | `upper.db1`, `upper.db2` | two green stalks in the stalk forest, top left | they grow: one outlined branch per drawbar step, with leaves, spiral tendrils and eye-buds, sap rising |
