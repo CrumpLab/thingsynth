@@ -101,6 +101,9 @@ export interface EffectSpec {
   /** sprites: the shapes, and where they go: under the object, on it (clipped to it, under its ink), or over the ink. */
   items?: Sprite[];
   place?: 'under' | 'on' | 'over' | 'around';
+  /** sprites placed around: false lets them cover the object's own shapes too (only `front` stays in front), for an
+   * object that vanishes into what the sprites draw. Default true. */
+  own?: boolean;
 }
 
 interface BindingBase {
@@ -129,6 +132,9 @@ export interface NoteBinding extends BindingBase {
   note: number;
   /** Release time in ms after note-off (default 300). */
   release: number;
+  /** How long the note must be held for its animation to reach the last frame, ms (default 4000). It advances at a
+   * steady pace while held, so a short tap shows the start and a long hold the whole thing. */
+  hold: number;
 }
 
 export type Binding = ParamBinding | NoteBinding;
@@ -258,6 +264,10 @@ function parseBinding(raw: unknown, i: number): Binding {
       if (!['under', 'on', 'over', 'around'].includes(o.place as string)) fail(w, 'place must be under, on, over or around');
       spec.place = o.place as 'under' | 'on' | 'over' | 'around';
     }
+    if (o.own !== undefined) {
+      if (typeof o.own !== 'boolean') fail(w, 'own must be true or false');
+      spec.own = o.own;
+    }
     if (o.items !== undefined) {
       if (!Array.isArray(o.items)) fail(w, 'items must be a list');
       spec.items = o.items.map((x, k) => {
@@ -306,8 +316,10 @@ function parseBinding(raw: unknown, i: number): Binding {
   if (isNote) {
     if (typeof r.note !== 'number' || !Number.isInteger(r.note) || r.note < 0 || r.note > 127) fail(where, 'note must be a MIDI note number 0..127');
     if (r.release !== undefined && (typeof r.release !== 'number' || r.release < 0)) fail(where, 'release must be milliseconds >= 0');
+    if (r.hold !== undefined && (typeof r.hold !== 'number' || r.hold <= 0)) fail(where, 'hold must be milliseconds > 0');
     b = { kind: 'note', id: typeof r.id === 'string' && r.id ? r.id : `note-${r.note}#${i}`, object, note: r.note,
-      release: typeof r.release === 'number' ? r.release : 300, effects };
+      release: typeof r.release === 'number' ? r.release : 300,
+      hold: typeof r.hold === 'number' ? r.hold : 4000, effects };
     if (typeof r.label === 'string') b.label = r.label;
   } else b = { kind: 'param', ...parseCommon(r, where, i), object, effects };
   if (r.gesture !== undefined) b.gesture = r.gesture as Gesture;

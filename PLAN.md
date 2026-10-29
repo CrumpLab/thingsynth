@@ -123,7 +123,8 @@ hit area is its own outline, not a rectangle).
 
 A binding names either an `object` from objects.json or a single fill as `"part": "f006"`, and either a `param`
 (with `range` and `curve`) or a `note`. Optional: `gesture`, `glide` (ms the picture takes to follow, default 150;
-1500 makes a rotor spin up and brake), and for notes `release` (ms after note-off, default 300).
+1500 makes a rotor spin up and brake), and for notes `release` (ms after note-off, default 300) and `hold` (ms of
+holding to reach the last frame, default 4000).
 
 ```jsonc
 { "id": "curl-rotor", "object": "spiral-curl", "param": "leslie.speed", "range": [0, 2], "curve": "linear",
@@ -134,8 +135,9 @@ A binding names either an `object` from objects.json or a single fill as `"part"
 
 **Each binding is one animation of its object, from a first frame to a last frame, and the frame shown is a
 function of the binding's value and nothing else.** A continuous parameter shows the frame at its position in
-`range` through `curve` (0..1). A note, or an on/off parameter, plays from the first frame to the last when it
-turns on and back when it turns off. Nothing moves on its own: between changes every object holds its frame, and
+`range` through `curve` (0..1). An on/off parameter plays from the first frame to the last when it turns on and back
+when it turns off. A held note plays from the first frame to the last at a steady pace over its `hold` (4 s), so how
+long it is held is how far it gets: a tap shows the start, a long note the whole thing; letting go plays it back. Nothing moves on its own: between changes every object holds its frame, and
 the only motion is the glide from one frame to the next when a value changes.
 
 An animation is the binding's list of effects, all evaluated at the same frame t. Every effect takes `amount`
@@ -172,8 +174,8 @@ borders it shares with neighbours in place; restricted to roles (`parts`), they 
 centre or base with only the ink those shapes enclose (a bud swelling on a stalk). (`pulse` and `wobble` in older mappings are read as `swell` and
 `lean`.)
 
-Changes glide: 150 ms for a parameter (or the binding's `glide`), about 150 ms for a note to reach its last frame,
-the binding's `release` (default 300 ms) to go back. A preset load reaches objects as a wave from the painting's
+Changes glide: 150 ms for a parameter (or the binding's `glide`); a held note moves steadily, reaching its last frame
+after the binding's `hold` (default 4 s), and takes the binding's `release` (default 300 ms) to go back. A preset load reaches objects as a wave from the painting's
 centre (up to 450 ms of delay at the corners) with 400 ms glides. Several bindings may touch the same fill or
 stroke: hue turns and glows add up, boils take the largest depth, moves compose. The painting is redrawn only while
 something is changing, at most 30 times a second (every change inside the art SVG re-rasterises the whole

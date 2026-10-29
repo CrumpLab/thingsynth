@@ -175,7 +175,7 @@ export function mountEditor(d: EditorDeps): void {
     const t = isNote ? `note:${noteNum.value}` : target.value;
     const b = bindingFor(t);
     if (b) { show(b); return; }
-    if (isNote) show({ kind: 'note', id: `note-${noteNum.value}`, object: objSelect.value, note: Number(noteNum.value), release: 300, gesture: 'hold',
+    if (isNote) show({ kind: 'note', id: `note-${noteNum.value}`, object: objSelect.value, note: Number(noteNum.value), release: 300, hold: 4000, gesture: 'hold',
       effects: [{ effect: 'glow', amount: 1.3 }, { effect: 'hue', amount: 0.25 }, { effect: 'boil', amount: 0.6 }] });
     else { const p = byParam.get(target.value); if (p) show(defaults(p)); }
   };

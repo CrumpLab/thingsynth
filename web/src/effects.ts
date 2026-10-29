@@ -1,7 +1,8 @@
 // Effects: each binding drives one animation of its object, from a first frame (t = 0) to a last frame (t = 1).
 // The frame shown is a function of the binding's value and nothing else: a continuous parameter shows the frame at
-// its position in its range; a note or an on/off parameter plays from the first frame to the last when it turns on
-// and back when it turns off. Nothing moves on its own: between changes every object holds its frame. The only
+// its position in its range; an on/off parameter plays from the first frame to the last when it turns on and back when
+// it turns off; a held note plays from the first frame to the last over its hold time (4 s) at a steady pace, so how
+// long it is held is how far it gets, and plays back quickly when let go. Nothing moves on its own: between changes every object holds its frame. The only
 // motion is the glide from one frame to the next when a value changes (and a preset load reaching objects as a wave
 // from the painting's centre).
 //
@@ -65,10 +66,11 @@ const SCRIBBLE_PALETTE: ReadonlyArray<[string, number]> = [
   ['#c4a3f0', 30], ['#efe38a', 15], ['#f2a6c6', 13], ['#b38be8', 9], ['#9fbcec', 7], ['#f0d27a', 5], ['#b4e0a2', 5],
 ];
 /**
- * Glides, as time constants (ms): a parameter change (or the binding's own `glide`), a preset load, a note playing
- * its animation to the last frame. A note's way back is its binding's `release` (ms to settle, so release / 3).
+ * Glides, as time constants (ms): a parameter change (or the binding's own `glide`), a preset load. A held note is not
+ * a glide: it moves at a steady pace, reaching the last frame after its binding's `hold` ms. Its way back is its
+ * binding's `release` (ms to settle, so release / 3).
  */
-const GLIDE_MS = 150, PRESET_GLIDE_MS = 400, WAVE_MS = 450, NOTE_ON_MS = 50;
+const GLIDE_MS = 150, PRESET_GLIDE_MS = 400, WAVE_MS = 450;
 /**
  * The painting is redrawn at most this often while something is changing. Any change inside the art SVG makes the
  * browser re-rasterise the whole painting (one layer of ~1,900 paths), so writing at the display's 120 Hz backs the
@@ -131,6 +133,8 @@ interface Live {
   target: number;
   shown: number;
   tau: number;
+  /** While a note is held: frames per ms it advances by, steadily (0 = glide by `tau`). */
+  rate: number;
   startAt: number;
   tracks: Track[];
   /** Being replaced: going back to frame 0, then its added elements are removed. */
@@ -288,7 +292,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     const obj = resolveObject(objects, binding.object);
     if (!obj) return null; // main.ts warns
     const rand = rng(binding.id);
-    const L: Live = { binding, obj, target: 0, shown: 0, tau: binding.glide ?? GLIDE_MS, startAt: 0, tracks: [], retiring: false, added: [], pinned: null };
+    const L: Live = { binding, obj, target: 0, shown: 0, tau: binding.glide ?? GLIDE_MS, rate: 0, startAt: 0, tracks: [], retiring: false, added: [], pinned: null };
     currentAdded = L.added;
     const [bx, by, bw, bh] = obj.bbox;
     for (const spec of binding.effects) {
@@ -341,7 +345,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
           const place = spec.place ?? 'over';
           let g: SVGGElement;
           if (place === 'over') g = overGroup();
-          else if (place === 'around') g = topGroup(ids, spec.front ?? [], true); // above the ink, the object in front
+          else if (place === 'around') g = topGroup(spec.own === false ? [] : ids, spec.front ?? [], true); // above the ink, the object in front
           else {
             g = document.createElementNS(SVG, 'g');
             g.style.pointerEvents = 'none';
@@ -810,7 +814,8 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       const d = L.target - L.shown;
       if (d === 0) continue;
       dirty = true;
-      if (Math.abs(d) < 1e-3) L.shown = L.target;
+      if (L.rate > 0) { L.shown = d > 0 ? Math.min(L.target, L.shown + dt * L.rate) : L.target; moving = L.shown !== L.target; }
+      else if (Math.abs(d) < 1e-3) L.shown = L.target;
       else { L.shown += d * (L.tau > 0 ? 1 - Math.exp(-dt / L.tau) : 1); moving = true; }
     }
     if (dirty && now - lastPaint >= PAINT_EVERY_MS - 1) {
@@ -840,6 +845,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       if (L.retiring || L.pinned !== null || L.binding.kind !== 'param' || L.binding.param !== id) continue;
       L.target = read(L);
       L.tau = glideOf(L.binding.glide ?? GLIDE_MS);
+      L.rate = 0;
       L.startAt = 0;
       hit = true;
     }
@@ -852,6 +858,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       if (L.retiring || L.pinned !== null || L.binding.kind !== 'param') continue;
       L.target = read(L);
       L.tau = glideOf(L.binding.glide ?? PRESET_GLIDE_MS);
+      L.rate = 0;
       const [cx, cy] = L.obj.centroid;
       L.startAt = instant ? 0 : now + (WAVE_MS * Math.hypot(cx - origin[0], cy - origin[1])) / maxDist;
     }
@@ -859,13 +866,17 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
   });
 
   // Notes: wrap the host's note functions, which the computer keyboard, Web MIDI and touch all go through. Note-on
-  // plays the animation to its last frame; note-off plays it back over the binding's release.
+  // plays the animation towards its last frame at a steady pace, arriving after the binding's hold time; note-off
+  // plays it back over the binding's release.
   const origOn = host.noteOn.bind(host), origOff = host.noteOff.bind(host);
   const sounding = new Set<number>();
   host.noteOn = (note, velocity) => {
     origOn(note, velocity);
     sounding.add(note);
-    for (const L of byNote.get(note) ?? []) { if (L.pinned !== null) continue; L.target = 1; L.tau = glideOf(NOTE_ON_MS); L.startAt = 0; }
+    for (const L of byNote.get(note) ?? []) {
+      if (L.pinned !== null || L.binding.kind !== 'note') continue;
+      L.target = 1; L.rate = 1 / Math.max(1, L.binding.hold); L.startAt = 0;
+    }
     kick();
   };
   host.noteOff = (note) => {
@@ -874,6 +885,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
     for (const L of byNote.get(note) ?? []) {
       if (L.pinned !== null) continue;
       L.target = 0;
+      L.rate = 0;
       L.tau = glideOf(L.binding.kind === 'note' ? L.binding.release / 3 : GLIDE_MS);
     }
     kick();
@@ -900,7 +912,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
       fresh.push(L);
     }
     const leaving = Array.from(old.values());
-    for (const L of leaving) { L.retiring = true; L.target = 0; L.tau = glideOf(handoverMs / 3); L.startAt = 0; }
+    for (const L of leaving) { L.retiring = true; L.target = 0; L.rate = 0; L.tau = glideOf(handoverMs / 3); L.startAt = 0; }
     live = [...fresh, ...leaving, ...live.filter((L) => L.retiring)];
     indexNotes();
     dirty = true;
@@ -918,6 +930,7 @@ export function mountEffects(art: Art, host: WebSynthlandHost, objects: Map<stri
         L.pinned = frame === null ? null : Math.max(0, Math.min(1, frame));
         L.target = L.pinned ?? (L.binding.kind === 'param' ? read(L) : sounding.has(L.binding.note) ? 1 : 0);
         L.tau = glideOf(60);
+        L.rate = 0;
         L.startAt = 0;
       }
       kick();
