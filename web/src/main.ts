@@ -111,29 +111,29 @@ async function boot(): Promise<void> {
   wanderBtn.addEventListener('click', () => { if (wander.running()) wander.stop(); else wander.start(); });
   if (query.has('wander')) wander.start();
 
-  // Shuffle: deal the parameters onto other objects from a seed (web/src/shuffle.ts). ?seed=<n> opens a shuffle,
-  // &notes=shuffle re-deals the notes too; the Shuffle button deals a new seed (shift-click: notes too) and writes it
-  // into the address so it can be shared; the x goes back to the curated mapping.
+  // Shuffle: deal every control, parameters and notes together, onto the painting's animated objects from a seed
+  // (web/src/shuffle.ts). ?seed=<n> opens a shuffle; the Shuffle button deals a new seed and writes it into the
+  // address so it can be shared; the x goes back to the curated mapping.
   const shuffleBtn = document.getElementById('shuffle') as HTMLButtonElement;
   const unshuffleBtn = document.getElementById('unshuffle') as HTMLButtonElement;
   const paramName = (id: string): string => host.params().find((p) => p.id === id)?.name ?? id;
-  const applyShuffle = async (seed: number | null, notes: boolean): Promise<void> => {
-    const next = seed === null ? mapping.bindings : shuffleBindings(mapping.bindings, objects, seed, { notes, paramName });
+  const applyShuffle = async (seed: number | null): Promise<void> => {
+    const next = seed === null ? mapping.bindings : shuffleBindings(mapping.bindings, objects, seed, { paramName });
     await layer.ready;
     layer.setBindings(next);
     (await effectsReady)?.setBindings(next, 1200);
     const url = new URL(location.href);
-    if (seed === null) { url.searchParams.delete('seed'); url.searchParams.delete('notes'); }
-    else { url.searchParams.set('seed', String(seed)); if (notes) url.searchParams.set('notes', 'shuffle'); else url.searchParams.delete('notes'); }
+    url.searchParams.delete('notes'); // older links: notes are always dealt now
+    if (seed === null) url.searchParams.delete('seed'); else url.searchParams.set('seed', String(seed));
     history.replaceState(null, '', url);
     unshuffleBtn.hidden = seed === null;
     shuffleBtn.textContent = 'Shuffle';
     if (seed !== null) shuffleBtn.append(Object.assign(document.createElement('span'), { className: 'seed', textContent: ` · ${seed}` }));
   };
-  shuffleBtn.addEventListener('click', (ev) => { void applyShuffle(1 + Math.floor(Math.random() * 9999), ev.shiftKey); });
-  unshuffleBtn.addEventListener('click', () => { void applyShuffle(null, false); });
+  shuffleBtn.addEventListener('click', () => { void applyShuffle(1 + Math.floor(Math.random() * 9999)); });
+  unshuffleBtn.addEventListener('click', () => { void applyShuffle(null); });
   const seedParam = Number(query.get('seed'));
-  if (query.has('seed') && Number.isInteger(seedParam)) void applyShuffle(seedParam, query.get('notes') === 'shuffle');
+  if (query.has('seed') && Number.isInteger(seedParam)) void applyShuffle(seedParam);
 
   // Audio state.
   const showStatus = (): void => {

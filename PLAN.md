@@ -329,18 +329,20 @@ bound object stays alive:
 
 ## 5.2 Shuffle
 
-The **Shuffle** button deals the parameters onto other objects (`web/src/shuffle.ts`). It picks a seed and
-writes it into the address (`?seed=4821`), so a shuffle can be shared and reopened; shift-click (or
-`&notes=shuffle`) also re-deals the 88 notes over the same note shapes; the × next to it returns to the curated
-mapping. Rules:
+The **Shuffle** button deals every control onto other animations of the painting (`web/src/shuffle.ts`). It picks a
+seed and writes it into the address (`?seed=4821`), so a shuffle can be shared and reopened; the × next to it
+returns to the curated mapping. Rules:
 
-- Bindings with `"locked": true` stay (the pyramid keeps Drive). Every other parameter gets an object from the
-  pool: every named object in objects.json not held by a locked binding (56 objects for 46 parameters, so 10 are
-  left out of each deal). Same seed, same deal.
-- The look follows the parameter: Drive still heats, a drawbar still fills, wherever it lands. What adapts is the
-  shape: drags run along the new object's long side, fills rise from the bottom of tall objects and from the
-  left of wide ones, and role-specific effects (`parts`) cover the whole new object.
-- The handover is animated: old objects fade their effect out while the new ones fade in, over 1.2 s.
+- Each animation belongs to its object: the drawings are made for that shape, in its place. So a shuffle keeps every
+  object with its own animation and deals the controls over them, across everything: the 47 parameters and the 88
+  notes together over all 135 animated objects. A note can land on the sand dune and a drawbar on a tiny bud; every
+  animation runs from frame 0 to 1, so any control can drive any of them. Same seed, same deal.
+- Bindings with `"locked": true` stay as they are (the pyramid keeps Drive).
+- What adapts to the new object is the gesture: drags run along its long side, a note is held wherever it lands, and
+  a parameter that is only shown (no gesture) stays untouchable. A switch keeps a glide so its animation plays
+  through (its own, else the animation's, else 800 ms); a continuous parameter keeps its own, so dragging stays
+  direct.
+- The handover is animated: old objects play back to their first frame while the new ones play in, over 1.2 s.
 
 ## 6. Authoring workflow (what Matt does to assign parameters)
 
@@ -371,7 +373,7 @@ Hand-drawn regions (v1) still work for anything that is not a shape of the paint
 around it, Enter prints a `regions` entry for `mapping.json`.
 
 From the console in debug mode, `thingsynth.params()` lists the ids with ranges and units,
-`thingsynth.set('amp.drive', 0.5)` / `thingsynth.get(id)` poke the engine, `thingsynth.shuffle(seed, notes)`
+`thingsynth.set('amp.drive', 0.5)` / `thingsynth.get(id)` poke the engine, `thingsynth.shuffle(seed)`
 deals, and `thingsynth.host` is the full runtime host.
 
 Tools for starting over with a different painting: `tools/extract_psd.py` (layers and parts),
