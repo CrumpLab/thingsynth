@@ -640,6 +640,16 @@ For each object: render its current animation (`node scripts/object_frames.mjs <
 review loop above, build, render the after, compare first-to-last frame, and tune until it reads as the object doing
 its thing in the painting's style.
 
+## 7. The 88 notes, as a batch
+
+Each note sits on one small painted shape, and holding it plays the animation over 4 s at a steady pace (the
+binding's `hold`), so a tap shows the start and a long note the whole thing. They were done as a batch, with this
+same process: builders offered three ideas per note (morph, character, celebration or pun) in batches of neighbouring
+shapes, one idea per note was picked across the whole keyboard so none repeats, and each batch was built in one
+script on the shared kit `scripts/note_kit.py`. Rules particular to notes: something shows within a 0.2 s tap,
+something new about every second, the payoff at 4 s; low notes may be big and slow, high notes small and quick; each
+drawing stays near its shape. The process, the tools and a table of all 88 are in `docs/notes/README.md`.
+
 ## Done so far
 
 | object | binding | what it is | what it does |
