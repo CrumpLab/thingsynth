@@ -58,7 +58,10 @@ export default defineConfig({
   base: './',
   publicDir: 'public',
   plugins: [editorWriteBack()],
-  build: { outDir: fileURLToPath(new URL('../dist', import.meta.url)), emptyOutDir: true, target: 'es2022' },
+  build: {
+    outDir: fileURLToPath(new URL('../dist', import.meta.url)), emptyOutDir: true, target: 'es2022',
+    rollupOptions: { input: { main: resolve(here, 'index.html'), about: resolve(here, 'about.html') } },
+  },
   server: {
     headers: { 'Cache-Control': 'no-store' },
     // The painting (art/) and mapping.json live outside web/.

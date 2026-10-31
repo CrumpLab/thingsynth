@@ -58,6 +58,8 @@ body.wandering .dial .fill { stroke: var(--accent); }
   #wander, #shuffle, #unshuffle { padding: 3px 7px; }
   .dial svg { width: 24px; height: 24px; }
 }
+/* The narrowest phones: the preset menu gives way so the about link stays on screen. */
+@media (max-width: 374px) { #bar select { max-width: 66px; } }
 
 /* ?debug */
 body.debug .region { stroke: #ff2bd6; stroke-width: 6; fill: #ff2bd6; fill-opacity: 0.12; }

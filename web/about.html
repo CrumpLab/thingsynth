@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About thingsynth</title>
+  <meta name="description" content="thingsynth is an organ synthesizer whose controller is a painting by Matt Crump." />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0e0b0a;
+      --fg: #f3e6d0;
+      --muted: rgba(243, 230, 208, 0.6);
+      --accent: #e0a03c;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 18px/1.6 -apple-system, system-ui, sans-serif; }
+    main { max-width: 680px; margin: 0 auto; padding: 32px 16px 64px; }
+    .back { color: var(--muted); font-size: 15px; }
+    h1 { font-size: 34px; line-height: 1.2; margin: 24px 0 20px; }
+    p { margin: 0 0 18px; }
+    a { color: var(--accent); }
+    .back:hover { color: var(--fg); }
+    figure { margin: 0 0 28px; }
+    img { display: block; width: 100%; height: auto; border-radius: 4px; }
+    h2 { font-size: 26px; line-height: 1.25; margin: 44px 0 14px; }
+    /* The graphic is wider than the text where there is room. */
+    figure.wide { position: relative; left: 50%; width: min(calc(100vw - 32px), 900px); transform: translateX(-50%); margin-top: 8px; }
+    ol.key { list-style: none; counter-reset: key; margin: 0 0 22px; padding: 0; }
+    ol.key li { counter-increment: key; position: relative; padding-left: 46px; margin-bottom: 14px; }
+    ol.key li::before { content: counter(key); position: absolute; left: 0; top: 1px; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: var(--dot); color: #000; font-weight: 700; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="./">&larr; Back to the painting</a>
+    <h1>About thingsynth</h1>
+    <figure>
+      <a href="https://things.instances.crumplab.com/work/colorlands/golden-pyramid-with-tunnel-celebration/">
+        <img id="painting" width="2475" height="2475" alt="Golden Pyramid With Tunnel Celebration, a crowded cartoon valley of horned creatures, a golden pyramid, a tunnel and a stream, in candy colours with heavy black outlines." />
+      </a>
+    </figure>
+    <p>What you're looking at is one of my paintings, <a href="https://things.instances.crumplab.com/work/colorlands/golden-pyramid-with-tunnel-celebration/">Golden Pyramid With Tunnel Celebration</a>. I'm Matt Crump, and I make paintings and all sorts of things, which you can find on my <a href="https://things.instances.crumplab.com/">things website</a>.</p>
+    <p>In this project, what we have here is a painting layer and a synthesizer layer. Underneath the painting is an organ synthesizer. Organs have drawbars. You move them up and down to make different organ sounds. There are all sorts of other parameters that change how an organ sounds, in addition to the individual notes, which play different pitches. So you've got changes in pitch, and you've got changes in the timbre and quality of the sound.</p>
+    <p>Imagine playing an organ and having to move the drawbars up and down to change the quality of the sound. What I've done with this painting is, instead of that, you have to interact with the painting in order to change the sound. Each part of the painting is associated with an animation that can go from its beginning to its end. That's like a drawbar going from all the way in to all the way out. The animations are connected to parts of the organ.</p>
+    <p>If you're playing different notes, each note is associated with an animation. The longer you hold down the note, the longer the animation plays, until it's over.</p>
+    <p>Similarly, there are different presets you can play around with at the bottom. These basically change the drawbars on the organ to make it sound different. Each of the drawbars is connected to a particular animation on the screen. So as you change the presets, you'll notice that the picture changes, because the animation states of the little parts connected to each drawbar are also changing.</p>
+    <p>Basically, this is a controller interface into an organ, but the controller interface is one of my paintings.</p>
+    <h2>How the organ connects to the painting</h2>
+    <p>This is Tonewheel, the organ underneath the painting, with a few of its controls connected to the parts of the painting they drive. The painting is dimmed here so those parts stand out.</p>
+    <figure class="wide">
+      <a href="about-tonewheel-painting.webp">
+        <img src="/about-tonewheel-painting.webp" width="2000" height="2709" loading="lazy" alt="The Tonewheel organ plugin above the painting, with seven numbered arrows running from controls on the organ to the parts of the painting they drive. Each connection is described in the list below." />
+      </a>
+    </figure>
+    <ol class="key">
+      <li style="--dot: #ffe600"><strong>Upper 16' drawbar to the left stalk.</strong> It grows a new branch for every step.</li>
+      <li style="--dot: #ff4fb0"><strong>Pedal 8' drawbar to the cushion at the lower left.</strong> It turns into an octopus, one tentacle per step.</li>
+      <li style="--dot: #7cff4a"><strong>The F3 key to the pink cap on the orange sprite.</strong> Hold the note and it stretches up into a tall party hat.</li>
+      <li style="--dot: #00e5ff"><strong>Lower 2' drawbar to the blue ghost.</strong> Its twins pop up beside it and it waves.</li>
+      <li style="--dot: #ff8a1f"><strong>Vibrato and chorus dial to the tunnel.</strong> Rainbow rings rise out of its depth and two eyes open in the dark.</li>
+      <li style="--dot: #c9a2ff"><strong>Percussion Second or Third to the big eyeball.</strong> On Third, a peacock fan opens behind it and its eye turns into a disco ball.</li>
+      <li style="--dot: #ffffff"><strong>Rotary speaker Mic Spread knob to the long coral tongue.</strong> Its tip splits and splits again, fanning out.</li>
+    </ol>
+    <p>These are seven examples. All 47 of the organ's parameters and all 88 of its notes are connected to the painting this way.</p>
+  </main>
+  <script type="module" src="/src/about.ts"></script>
+</body>
+</html>
