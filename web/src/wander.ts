@@ -15,6 +15,8 @@ import type { ParamDesc, WebSynthlandHost } from '../runtime/types';
 const HELD = new Set(['voice.manuals']);
 /** Gentler: loudness and pitch should drift, not jump. */
 const DEPTH: Record<string, number> = { 'out.level': 0.25, 'tg.master': 0.15 };
+/** A 16 s drift, drawbars straying about one step, a switch flipping every few seconds: lively without glitching. */
+const DEFAULT_SPEED = 0.25, DEFAULT_AMOUNT = 0.25;
 const TICK_MS = 100;
 const MAX_SD = 0.4;
 
@@ -46,8 +48,8 @@ function gauss(): number {
 }
 
 export function createWander(host: WebSynthlandHost, opts: { speed?: number; amount?: number } = {}): Wander {
-  let speed = opts.speed ?? 0.5;
-  let amount = opts.amount ?? 0.5;
+  let speed = opts.speed ?? DEFAULT_SPEED;
+  let amount = opts.amount ?? DEFAULT_AMOUNT;
   let timer = 0;
   let last = 0;
   let writing = false;

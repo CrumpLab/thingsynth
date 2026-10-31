@@ -27,19 +27,17 @@ Open the printed URL (http://localhost:5173). Click or press a key to start audi
 
 - Notes: A W S E D F T G Y H U J K O L P ; on the computer keyboard, Z / X shift the octave. Any Web MIDI input
   plays too (Chrome, Edge; Safari needs Web MIDI enabled).
-- Preset: the select in the bottom bar, or `?preset=<slug>` (slugs are the file names in
+- Preset: the **Change how the organ sounds** select in the bottom bar, or `?preset=<slug>` (slugs are the file names in
   `web/public/tonewheel/presets/`).
 - `?debug` draws the mapped regions, shows pointer coordinates in image pixels and the mapped parameter values,
   logs image coordinates on every click, and has a small polygon editor (shift+click points, Enter prints a
   `mapping.json` entry). In debug, the backquote key (or `?debug=parts`) switches to parts mode: the pointer
   picks the painting's own fill shapes, outlines the one under it and shows its id, colour, area and box.
-- **Wander** (the button in the bottom bar, or `?wander`): every Tonewheel parameter of the current preset takes
-  its own random walk around it, so the whole painting keeps moving while you play. The *speed* dial goes from a
-  slow drift to a flutter, the *amount* dial sets how far things stray (both remembered in this browser; also
-  `?wander-speed=` and `?wander-amount=`, 0 to 1). Drag a dial up and down, scroll it, or use the arrow keys;
-  double-click resets it. Choosing a preset re-centres the walks; setting a parameter yourself re-centres that
+- **Wander** (the **Wander through the organ sound settings** button in the bottom bar, or `?wander`): every Tonewheel parameter of the current preset takes
+  its own random walk around it, so the whole painting keeps moving while you play. Its speed and amount are
+  fixed at 0.25, and `?wander-speed=` and `?wander-amount=` (0 to 1) override them. Choosing a preset re-centres the walks; setting a parameter yourself re-centres that
   one; stopping returns to the preset.
-- **Shuffle** deals every parameter and note onto other animations of the painting from a random seed, written into
+- **Shuffle** (the **Remap the animations to the organ drawbars and keys** button) deals every parameter and note onto other animations of the painting from a random seed, written into
   the address (`?seed=4821`) so it can be shared; each object keeps its own animation and gets a new control. × goes
   back to the curated mapping. The pyramid keeps Drive (it is locked).
 - **Bind editor** (`?debug`, then **Bind…**): click shapes of the painting, make them an object, bind a parameter or
@@ -73,7 +71,6 @@ web/                    Vite app, plain TypeScript, no framework
   src/effects.ts        each binding as one animation, first to last frame, set by its value: the nine effects
   src/color.ts          OKLCH colour math with darken-first gamut mapping
   src/wander.ts         preset wander: a random walk per parameter around the preset
-  src/dial.ts           the small rotary dial used for wander speed and amount
   src/shuffle.ts        seeded, shape-aware re-dealing of parameters (and notes) onto objects
   src/editor.ts         the bind editor (debug only; saves through the dev server, web/vite.config.ts)
   src/output.ts         the path to the speakers: linear to -4.4 dBFS, a soft knee that never passes -1 dBFS

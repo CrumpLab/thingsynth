@@ -310,7 +310,7 @@ Setting them is off-manifest and not covered by presets, so prefer the 47 above.
 ## 5.1 Wander
 
 While playing, only the notes change the picture; everything else moves when a preset changes. Wander
-(`web/src/wander.ts`, the Wander button and its two dials) keeps the preset's 46 sound parameters moving so every
+(`web/src/wander.ts`, the *Wander through the organ sound settings* button) keeps the preset's 46 sound parameters moving so every
 bound object stays alive:
 
 - **floats and ints** (drive, drawbars, levels, times): an Ornstein-Uhlenbeck walk in the parameter's 0..1 range,
@@ -320,6 +320,8 @@ bound object stays alive:
   back to the preset's.
 - **speed** sets the time scale geometrically, a 40 s drift at 0, about 6 s at the middle, 1 s at 1. **amount** sets
   the spread (a standard deviation of up to 0.4 of each range) and how often switches flip; at 0 nothing moves.
+  Both default to 0.25 (a 16 s drift, drawbars straying about a step, a switch flipping every few seconds), set in
+  `web/src/wander.ts`; there are no dials for them, but `?wander-speed=` and `?wander-amount=` (0 to 1) override them.
 - **Held**: `voice.manuals` (it changes which keys play which manual, not the sound). **Gentler**: `out.level` at a
   quarter and `tg.master` at 0.15 of the amount (about ±1 Hz: a tape-like drift, not out of tune). Both lists are
   constants at the top of the file.
@@ -329,7 +331,7 @@ bound object stays alive:
 
 ## 5.2 Shuffle
 
-The **Shuffle** button deals every control onto other animations of the painting (`web/src/shuffle.ts`). It picks a
+The *Remap the animations to the organ drawbars and keys* button deals every control onto other animations of the painting (`web/src/shuffle.ts`). It picks a
 seed and writes it into the address (`?seed=4821`), so a shuffle can be shared and reopened; the × next to it
 returns to the curated mapping. Rules:
 

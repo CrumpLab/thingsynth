@@ -8,7 +8,6 @@ import { createOutput } from './output';
 import { mountEffects } from './effects';
 import { parseMapping } from './mapping';
 import { loadObjects, resolveObject } from './objects';
-import { createDial } from './dial';
 import { createWander } from './wander';
 import { shuffleBindings } from './shuffle';
 import { mountPainting } from './painting';
@@ -88,25 +87,18 @@ async function boot(): Promise<void> {
   });
   host.onPreset((i) => { if (i >= 0) presetSelect.value = String(i); });
 
-  // Wander: every visible parameter random-walks around the preset (web/src/wander.ts). The dials are remembered in
-  // this browser; ?wander starts it, ?wander-speed= and ?wander-amount= (0..1) set the dials.
-  const saved = ((): { speed?: number; amount?: number } => {
-    try { return JSON.parse(localStorage.getItem('thingsynth.wander') ?? '{}') as { speed?: number; amount?: number }; } catch { return {}; }
-  })();
-  const num = (k: string, d: number): number => { const v = Number(query.get(k)); return query.has(k) && Number.isFinite(v) ? v : d; };
-  const wander = createWander(host, { speed: num('wander-speed', saved.speed ?? 0.5), amount: num('wander-amount', saved.amount ?? 0.5) });
-  const save = (): void => {
-    try { localStorage.setItem('thingsynth.wander', JSON.stringify({ speed: wander.speed(), amount: wander.amount() })); } catch { /* private mode */ }
-  };
+  // The bottom bar wraps on narrow windows: the painting sits just above it, however tall it gets.
+  const bar = document.getElementById('bar')!;
+  new ResizeObserver(() => { document.documentElement.style.setProperty('--bar-h', `${bar.offsetHeight}px`); }).observe(bar);
+
+  // Wander: every visible parameter random-walks around the preset (web/src/wander.ts). ?wander starts it;
+  // ?wander-speed= and ?wander-amount= (0..1) override its defaults.
+  const num = (k: string): number | undefined => { const v = Number(query.get(k)); return query.has(k) && Number.isFinite(v) ? v : undefined; };
+  const speed = num('wander-speed'), amount = num('wander-amount');
+  const wander = createWander(host, { ...(speed !== undefined && { speed }), ...(amount !== undefined && { amount }) });
   const wanderBtn = document.getElementById('wander') as HTMLButtonElement;
-  const speedDial = createDial({ label: 'speed', title: 'Wander speed: from a slow drift to a flutter', value: wander.speed(), reset: 0.5,
-    onInput: (v) => { wander.setSpeed(v); save(); } });
-  const amountDial = createDial({ label: 'amount', title: 'Wander amount: how far the parameters stray from the preset', value: wander.amount(), reset: 0.5,
-    onInput: (v) => { wander.setAmount(v); save(); } });
-  document.getElementById('wander-box')!.append(speedDial.el, amountDial.el);
   wander.onChange((on) => {
     wanderBtn.setAttribute('aria-pressed', String(on));
-    document.body.classList.toggle('wandering', on);
   });
   wanderBtn.addEventListener('click', () => { if (wander.running()) wander.stop(); else wander.start(); });
   if (query.has('wander')) wander.start();
@@ -115,6 +107,7 @@ async function boot(): Promise<void> {
   // (web/src/shuffle.ts). ?seed=<n> opens a shuffle; the Shuffle button deals a new seed and writes it into the
   // address so it can be shared; the x goes back to the curated mapping.
   const shuffleBtn = document.getElementById('shuffle') as HTMLButtonElement;
+  const shuffleLabel = shuffleBtn.textContent ?? '';
   const unshuffleBtn = document.getElementById('unshuffle') as HTMLButtonElement;
   const paramName = (id: string): string => host.params().find((p) => p.id === id)?.name ?? id;
   const applyShuffle = async (seed: number | null): Promise<void> => {
@@ -127,7 +120,7 @@ async function boot(): Promise<void> {
     if (seed === null) url.searchParams.delete('seed'); else url.searchParams.set('seed', String(seed));
     history.replaceState(null, '', url);
     unshuffleBtn.hidden = seed === null;
-    shuffleBtn.textContent = 'Shuffle';
+    shuffleBtn.textContent = shuffleLabel;
     if (seed !== null) shuffleBtn.append(Object.assign(document.createElement('span'), { className: 'seed', textContent: ` · ${seed}` }));
   };
   shuffleBtn.addEventListener('click', () => { void applyShuffle(1 + Math.floor(Math.random() * 9999)); });
