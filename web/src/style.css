@@ -36,6 +36,8 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); f
 #bar select { background: #2a1a12; color: var(--fg); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; padding: 2px 6px; max-width: 260px; }
 #bar #status { color: var(--muted); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #bar a { color: var(--muted); }
+#bar #about-link { flex: none; background: #ffe600; color: #000; font-weight: 600; padding: 2px 9px; border-radius: 4px; text-decoration: none; white-space: nowrap; }
+#bar #about-link:hover { background: #fff27a; }
 #wander-box { display: flex; align-items: center; gap: 6px; }
 #wander { background: #2a1a12; color: var(--fg); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; padding: 3px 10px; font: inherit; cursor: pointer; }
 #shuffle-box { display: flex; gap: 2px; }
@@ -53,13 +55,14 @@ body.wandering .dial .fill { stroke: var(--accent); }
 /* Phones: the bar keeps preset, wander and shuffle; status and the debug link step aside (?debug still works). */
 @media (max-width: 480px) {
   #bar { gap: 6px; padding: 0 8px; }
-  #bar select { max-width: 112px; }
+  #bar select { max-width: 66px; }
   #bar #status, #bar #debug-link, #shuffle .seed { display: none; }
   #wander, #shuffle, #unshuffle { padding: 3px 7px; }
   .dial svg { width: 24px; height: 24px; }
 }
-/* The narrowest phones: the preset menu gives way so the about link stays on screen. */
-@media (max-width: 374px) { #bar select { max-width: 66px; } }
+/* Narrower phones: the bar makes room so "What is this?" stays on screen. */
+@media (max-width: 374px) { #bar select { max-width: 44px; } }
+@media (max-width: 350px) { .dial { display: none; } }
 
 /* ?debug */
 body.debug .region { stroke: #ff2bd6; stroke-width: 6; fill: #ff2bd6; fill-opacity: 0.12; }
